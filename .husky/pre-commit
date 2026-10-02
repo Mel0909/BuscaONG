@@ -1,3 +1,16 @@
+# Regras de branch (ver .claude/docs/git.md)
+# vazio quando o HEAD está detached (ex.: durante um rebase)
+BRANCH=$(git symbolic-ref --short -q HEAD)
+
+if [ "$BRANCH" = "main" ]; then
+  echo "Commit direto na main não é permitido. Crie uma branch: git switch -c <tipo>/<descricao>"
+  exit 1
+fi
+
+if [ -n "$BRANCH" ]; then
+  sh .husky/validar-branch.sh "$BRANCH" || exit 1
+fi
+
 # Get list of staged files
 CHANGED_FILES=$(git diff --cached --name-only)
 

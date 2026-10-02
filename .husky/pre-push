@@ -1,3 +1,11 @@
+# Bloqueia push direto na main (ver .claude/docs/git.md)
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Push direto na main não é permitido. Envie a branch e abra um PR."
+    exit 1
+  fi
+done
+
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Verifica se o branch remoto existe. Se não existir, não usa origin/BRANCH no diff.
