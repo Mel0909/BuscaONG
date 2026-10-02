@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E8E4D8;font-family:Figtree,system-ui,sans-serif;color:#1F2B24;-webkit-font-smoothing:antialiased}
+a{color:#2E5E45;text-decoration:underline;text-underline-offset:2px}
+a:hover{color:#1F4232}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<div style="padding:72px 80px 120px;display:flex;flex-direction:column;gap:96px;min-width:max-content">
+
+<header style="display:flex;flex-direction:column;gap:14px;max-width:880px">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;border-radius:11px;background:#2E5E45;display:flex;align-items:center;justify-content:center"><div style="width:12px;height:12px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#DDE7D6"></div></div>
+    <span style="font:700 20px 'Bricolage Grotesque';letter-spacing:-0.01em">perto</span>
+    <span style="font:500 14px Figtree;color:#5E6B62">· mapa de ONGs</span>
+  </div>
+  <h1 style="margin:0;font:600 52px/1.05 'Bricolage Grotesque';letter-spacing:-0.025em">Estrutura de telas — v1</h1>
+  <p style="margin:0;font:400 18px/1.55 Figtree;color:#4A574F;text-wrap:pretty">Sem login para o público. Três áreas visualmente separadas: o site público (mobile-first, sem login), o painel da ONG (/ong) e a área admin (/admin). Verde musgo e creme para conforto; terracota só para urgência; amarelo-mel marca o motivo de cada resultado aparecer.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:6px">
+    <div style="display:flex;align-items:center;gap:8px;font:500 13px Figtree;color:#4A574F"><span style="width:14px;height:14px;border-radius:4px;background:#2E5E45"></span>Musgo · ação</div>
+    <div style="display:flex;align-items:center;gap:8px;font:500 13px Figtree;color:#4A574F"><span style="width:14px;height:14px;border-radius:4px;background:#DDE7D6"></span>Sálvia · superfície</div>
+    <div style="display:flex;align-items:center;gap:8px;font:500 13px Figtree;color:#4A574F"><span style="width:14px;height:14px;border-radius:4px;background:#F6F3EA;border:1px solid #D9D3C3"></span>Creme · fundo</div>
+    <div style="display:flex;align-items:center;gap:8px;font:500 13px Figtree;color:#4A574F"><span style="width:14px;height:14px;border-radius:4px;background:#FBE9B7"></span>Mel · "por que apareceu"</div>
+    <div style="display:flex;align-items:center;gap:8px;font:500 13px Figtree;color:#4A574F"><span style="width:14px;height:14px;border-radius:4px;background:#B9472F"></span>Terracota · urgente</div>
+  </div>
+</header>
+
+<!-- ============ PÚBLICO ============ -->
+<section style="display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #D2CCBB;padding-bottom:14px">
+    <h2 style="margin:0;font:600 32px 'Bricolage Grotesque';letter-spacing:-0.02em">Área pública</h2>
+    <span style="font:500 15px Figtree;color:#5E6B62">/ · mobile-first · nenhum passo exige login</span>
+  </div>
+  <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start;max-width:2400px">
+
+  <!-- P1 -->
+  <div id="P1" data-screen-label="P1 Início" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P1</span><span style="font:600 15px Figtree">Início · mapa + lista</span></div>
+    <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+      <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background-color:#E7EBDD;background-image:radial-gradient(circle at 78% 22%, #CFE0C3 0 60px, transparent 61px),radial-gradient(circle at 12% 46%, #CFE0C3 0 44px, transparent 45px),linear-gradient(90deg, transparent 0 46%, #FFFFFF 46% 48.5%, transparent 48.5%),linear-gradient(0deg, transparent 0 62%, #FFFFFF 62% 64%, transparent 64%),linear-gradient(62deg, transparent 0 55%, #F8F5EC 55% 57%, transparent 57%),repeating-linear-gradient(90deg, transparent 0 62px, rgba(255,255,255,.75) 62px 64px),repeating-linear-gradient(0deg, transparent 0 80px, rgba(255,255,255,.75) 80px 82px)">
+        <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+        <div style="position:absolute;top:50px;left:14px;right:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:48px;border-radius:16px;background:#FFFDF8;box-shadow:0 4px 14px rgba(31,43,36,.12);display:flex;align-items:center;gap:10px;padding:0 14px;font:500 15px Figtree;color:#5E6B62">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F2B24" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>ONG ou bairro</div>
+            <div style="width:48px;height:48px;flex:none;border-radius:16px;background:#FFFDF8;box-shadow:0 4px 14px rgba(31,43,36,.12);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E5E45" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"></path></svg></div>
+          </div>
+          <div style="display:flex;gap:8px;overflow:hidden">
+            <div style="flex:none;height:36px;border-radius:12px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;gap:7px;padding:0 12px;font:600 14px Figtree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>Filtros<sc-if value="{{ p1HasFilter }}" hint-placeholder-val="{{ false }}"><span style="background:#FFFDF8;color:#2E5E45;border-radius:8px;padding:1px 6px;font:700 12px Figtree">1</span></sc-if></div>
+            <sc-for list="{{ p1Chips }}" as="ch" hint-placeholder-count="3">
+              <sc-if value="{{ ch.active }}" hint-placeholder-val="{{ false }}"><div style="flex:none;height:36px;border-radius:12px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 14px Figtree;box-shadow:0 2px 8px rgba(31,43,36,.1)">{{ ch.label }}<span style="font:600 16px Figtree">×</span></div></sc-if>
+              <sc-if value="{{ ch.idle }}" hint-placeholder-val="{{ true }}"><div style="flex:none;height:36px;border-radius:12px;background:#FFFDF8;display:flex;align-items:center;padding:0 12px;font:500 14px Figtree;box-shadow:0 2px 8px rgba(31,43,36,.1)">{{ ch.label }}</div></sc-if>
+            </sc-for>
+          </div>
+        </div>
+        <div style="position:absolute;left:96px;top:190px;width:30px;height:30px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#B9472F;border:3px solid #FFFDF8;box-shadow:0 3px 8px rgba(0,0,0,.25)"></div>
+        <div style="position:absolute;left:226px;top:230px;width:30px;height:30px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2E5E45;border:3px solid #FFFDF8;box-shadow:0 3px 8px rgba(0,0,0,.25)"></div>
+        <div style="position:absolute;left:290px;top:160px;width:38px;height:38px;border-radius:50%;background:#2E5E45;border:3px solid #FFFDF8;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 13px Figtree;box-shadow:0 3px 8px rgba(0,0,0,.25)">6</div>
+        <div style="position:absolute;left:150px;top:290px;width:30px;height:30px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2E5E45;border:3px solid #FFFDF8;box-shadow:0 3px 8px rgba(0,0,0,.25)"></div>
+        <div style="position:absolute;left:176px;top:236px;width:18px;height:18px;border-radius:50%;background:#1F2B24;border:3px solid #FFFDF8;box-shadow:0 0 0 8px rgba(46,94,69,.18)"></div>
+        <div style="position:absolute;right:14px;top:300px;width:44px;height:44px;border-radius:14px;background:#FFFDF8;box-shadow:0 4px 14px rgba(31,43,36,.15);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2E5E45" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:470px;background:#F6F3EA;border-radius:28px 28px 0 0;box-shadow:0 -10px 30px rgba(31,43,36,.14);padding:10px 16px 0;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+          <div style="width:40px;height:5px;border-radius:3px;background:#CFC8B6;align-self:center"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font:600 20px 'Bricolage Grotesque';letter-spacing:-0.01em">{{ p1Count }}</div>
+            <div style="font:500 13px Figtree;color:#5E6B62">por distância ▾</div>
+          </div>
+          <sc-for list="{{ p1Cards }}" as="c" hint-placeholder-count="3">
+            <div style="background:#FFFDF8;border:1px solid #E6E0D0;border-radius:20px;padding:14px;display:flex;gap:12px">
+              <div style="width:52px;height:52px;flex:none;border-radius:15px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 17px 'Bricolage Grotesque'">{{ c.initials }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;gap:8px">
+                  <div style="font:600 16px/1.25 Figtree">{{ c.name }}</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;font:500 13px Figtree;color:#5E6B62">{{ c.cause }} · {{ c.dist }}<sc-if value="{{ c.urgent }}" hint-placeholder-val="{{ false }}"><span style="background:#B9472F;color:#FFFDF8;border-radius:6px;padding:2px 7px;font:700 11px Figtree;letter-spacing:.03em">URGENTE</span></sc-if></div>
+                <sc-if value="{{ showDefault }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ c.items }}" as="it" hint-placeholder-count="3"><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">{{ it }}</span></sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ showItem }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <div style="display:flex;align-items:center;gap:6px;background:#FBE9B7;color:#4F3A00;border-radius:9px;padding:6px 9px;font:600 13px Figtree;align-self:flex-start">✓ Precisa de {{ c.matchItem }}</div>
+                    <div style="font:400 12px Figtree;color:#5E6B62">{{ c.matchNote }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ showVol }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <sc-for list="{{ c.slots }}" as="s" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:6px;background:#FBE9B7;color:#4F3A00;border-radius:9px;padding:6px 9px;font:600 13px Figtree;align-self:flex-start">{{ s }}</div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:390px;font:400 13px/1.5 Figtree;color:#5E6B62">Mapa = recorte do viewport. Lista em painel deslizante (meio/aberto). Tweak <b>cardContext</b> troca o conteúdo do card: sem filtro, item ativo ou voluntariado ativo.</p>
+  </div>
+
+<!-- P1.1 -->
+  <div id="P1-1" data-screen-label="P1.1 Menu engrenagem" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P1.1</span><span style="font:600 15px Figtree">Engrenagem · acesso da ONG</span></div>
+    <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+      <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#6F786F">
+        <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree;color:#FFFDF8">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:#F6F3EA;border-radius:28px 28px 0 0;padding:10px 20px 34px;display:flex;flex-direction:column;gap:18px">
+          <div style="width:40px;height:5px;border-radius:3px;background:#CFC8B6;align-self:center"></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="font:600 22px/1.2 'Bricolage Grotesque'">Para ONGs</div>
+            <div style="font:400 14px/1.5 Figtree;color:#4A574F">Quem só quer ajudar não precisa de conta.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px">
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font:600 16px Figtree">Entrar no painel</span><span style="font:400 13px Figtree;color:#5E6B62">Para ONGs já cadastradas</span></div><span style="font:600 18px Figtree;color:#2E5E45">→</span>
+            </div>
+            <div style="background:#2E5E45;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;color:#FFFDF8">
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font:600 16px Figtree">Cadastrar minha ONG</span><span style="font:400 13px Figtree;color:#D2E0D5">Gratuito. Comece pelo CNPJ.</span></div><span style="font:600 18px Figtree">→</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:390px;font:400 13px/1.5 Figtree;color:#5E6B62">A engrenagem fica ao lado da busca (P1, P3). “Entrar” leva a /ong/entrar; “Cadastrar” leva ao passo 1 (O1).</p>
+  </div>
+
+    <!-- P2 -->
+  <div id="P2" data-screen-label="P2 Filtros" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P2</span><span style="font:600 15px Figtree">Filtros</span></div>
+    <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+      <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#6F786F">
+        <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree;color:#FFFDF8">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;top:58px;background:#F6F3EA;border-radius:28px 28px 0 0;display:flex;flex-direction:column">
+          <div style="padding:18px 20px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E3DED0">
+            <span style="font:600 22px 'Bricolage Grotesque'">Filtros</span>
+            <span style="font:600 14px Figtree;color:#2E5E45;text-decoration:underline;text-underline-offset:3px">Limpar tudo</span>
+          </div>
+          <div style="flex:1;overflow:hidden;padding:14px 20px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="font:700 13px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Causa</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:7px 11px;white-space:nowrap;font:600 14px Figtree">✓ Orfanatos</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Situação de rua</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Animais</span>
+                <span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:7px 11px;white-space:nowrap;font:600 14px Figtree">✓ Idosos</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Pessoas com deficiência</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Saúde</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Educação</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="font:700 13px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Tenho para doar</div>
+              <div style="height:42px;border-radius:12px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;gap:8px;padding:0 12px;font:400 14px Figtree;color:#5E6B62"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5E6B62" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Buscar item</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:7px 11px;white-space:nowrap;font:600 14px Figtree">✓ Fraldas</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Alimentos</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Roupas</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Cobertores</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Ração</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Higiene</span>
+              </div>
+              <div style="font:500 12px Figtree;color:#5E6B62">Cadastrados pelas ONGs</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span style="background:#FFFDF8;border:1px dashed #BDB59F;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Cadeira de rodas</span>
+                <span style="background:#FFFDF8;border:1px dashed #BDB59F;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Bolsa de colostomia</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="font:700 13px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Quero ser voluntário</div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">D</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">S</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">T</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">Q</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">Q</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">S</span>
+                <span style="height:40px;border-radius:11px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 14px Figtree">S</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                <span style="height:40px;border-radius:11px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">Manhã</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:500 14px Figtree">Tarde</span>
+                <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:500 14px Figtree">Noite</span>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Recreação</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Cozinha</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Aulas</span>
+                <span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:7px 11px;white-space:nowrap;font:500 14px Figtree">Eventos</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 20px 30px;border-top:1px solid #E3DED0;background:#F6F3EA">
+            <div style="height:54px;border-radius:16px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 16px Figtree">Mostrar 12 ONGs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:390px;font:400 13px/1.5 Figtree;color:#5E6B62">Contagem ao vivo no botão. Itens livres das ONGs aparecem com borda tracejada, abaixo da lista fixa.</p>
+  </div>
+
+  <!-- P3 -->
+  <div id="P3" data-screen-label="P3 Lista filtrada" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P3</span><span style="font:600 15px Figtree">Lista aberta · filtros ativos</span></div>
+    <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+      <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#F6F3EA;display:flex;flex-direction:column">
+        <div style="height:46px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+        <div style="padding:4px 16px 12px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #E3DED0">
+          <div style="display:flex;gap:8px"><div style="flex:1;height:46px;border-radius:15px;background:#FFFDF8;border:1px solid #E3DED0;display:flex;align-items:center;gap:10px;padding:0 14px;font:500 15px Figtree;color:#5E6B62"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F2B24" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>ONG ou bairro</div><div style="width:48px;height:48px;flex:none;border-radius:16px;background:#FFFDF8;border:1px solid #E3DED0;height:46px;width:46px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E5E45" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"></path></svg></div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span style="height:34px;border-radius:11px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;gap:6px;padding:0 11px;font:600 13px Figtree">Filtros <span style="background:#FFFDF8;color:#2E5E45;border-radius:7px;padding:1px 6px;font:700 11px Figtree">2</span></span>
+            <span style="height:34px;border-radius:11px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;gap:8px;padding:0 11px;font:600 13px Figtree">Fraldas <span style="font-size:16px">×</span></span>
+            <span style="height:34px;border-radius:11px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;gap:8px;padding:0 11px;font:600 13px Figtree">Sáb · manhã <span style="font-size:16px">×</span></span>
+          </div>
+        </div>
+        <div style="padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font:600 19px 'Bricolage Grotesque'">12 ONGs</span>
+          <span style="font:500 13px Figtree;color:#5E6B62">4 na área do mapa</span>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ p3Cards }}" as="c" hint-placeholder-count="4">
+            <div style="background:#FFFDF8;border:1px solid #E6E0D0;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px">
+              <sc-if value="{{ c.outside }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:6px;font:600 12px Figtree;color:#5E6B62;background:#EFEBDF;border-radius:8px;padding:5px 9px;align-self:flex-start"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path></svg>Fora da área do mapa · toque para centralizar</div>
+              </sc-if>
+              <div style="display:flex;gap:12px">
+                <div style="width:48px;height:48px;flex:none;border-radius:14px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 16px 'Bricolage Grotesque'">{{ c.initials }}</div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <div style="font:600 16px/1.25 Figtree">{{ c.name }}</div>
+                  <div style="font:500 13px Figtree;color:#5E6B62">{{ c.cause }} · {{ c.dist }}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="background:#FBE9B7;color:#4F3A00;border-radius:9px;padding:6px 9px;font:600 13px Figtree">✓ {{ c.matchItem }}</span>
+                  <sc-if value="{{ c.urgent }}" hint-placeholder-val="{{ false }}"><span style="background:#B9472F;color:#FFFDF8;border-radius:6px;padding:3px 7px;font:700 11px Figtree;letter-spacing:.03em">URGENTE</span></sc-if>
+                  <span style="font:400 12px Figtree;color:#5E6B62">{{ c.others }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ c.slots }}" as="s" hint-placeholder-count="1"><span style="background:#FBE9B7;color:#4F3A00;border-radius:9px;padding:6px 9px;font:600 13px Figtree">✓ {{ s }}</span></sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);height:44px;border-radius:22px;background:#1F2B24;color:#F6F3EA;display:flex;align-items:center;gap:8px;padding:0 18px;font:600 14px Figtree;box-shadow:0 8px 20px rgba(0,0,0,.25)">Ver no mapa</div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:390px;font:400 13px/1.5 Figtree;color:#5E6B62">Card mostra só o item e o horário que bateram com o filtro, em mel. Demais necessidades viram resumo em cinza.</p>
+  </div>
+
+  <!-- P4 -->
+  <div id="P4" data-screen-label="P4 Estados vazios" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P4</span><span style="font:600 15px Figtree">Estados vazios (dois casos)</span></div>
+    <div style="display:flex;gap:24px">
+      <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background-color:#E7EBDD;background-image:radial-gradient(circle at 30% 30%, #CFE0C3 0 70px, transparent 71px),linear-gradient(90deg, transparent 0 60%, #FFFFFF 60% 62.5%, transparent 62.5%),linear-gradient(0deg, transparent 0 48%, #FFFFFF 48% 50%, transparent 50%),repeating-linear-gradient(90deg, transparent 0 62px, rgba(255,255,255,.75) 62px 64px),repeating-linear-gradient(0deg, transparent 0 80px, rgba(255,255,255,.75) 80px 82px)">
+          <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+          <div style="position:absolute;top:56px;left:14px;right:14px;display:flex;gap:8px">
+            <span style="height:36px;border-radius:12px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 12px;font:600 14px Figtree">Filtros · 2</span>
+            <span style="height:36px;border-radius:12px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 14px Figtree">Ração ×</span>
+            <span style="height:36px;border-radius:12px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 14px Figtree">Animais ×</span>
+          </div>
+          <div style="position:absolute;top:250px;left:24px;right:24px;background:#FFFDF8;border-radius:22px;padding:20px;box-shadow:0 12px 30px rgba(31,43,36,.18);display:flex;flex-direction:column;gap:10px">
+            <div style="font:600 19px/1.25 'Bricolage Grotesque'">Nenhuma ONG nesta área do mapa</div>
+            <div style="font:400 14px/1.5 Figtree;color:#4A574F">8 ONGs com seus filtros estão fora da área visível. A mais próxima fica a 4,6 km.</div>
+            <div style="display:flex;gap:8px;padding-top:4px">
+              <span style="flex:1;height:44px;border-radius:13px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">Ver na lista</span>
+              <span style="flex:1;height:44px;border-radius:13px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:600 14px Figtree">Ir para a mais próxima</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:110px;background:#F6F3EA;border-radius:28px 28px 0 0;box-shadow:0 -10px 30px rgba(31,43,36,.14);padding:10px 18px;display:flex;flex-direction:column;gap:12px">
+            <div style="width:40px;height:5px;border-radius:3px;background:#CFC8B6;align-self:center"></div>
+            <div style="font:600 18px 'Bricolage Grotesque'">8 ONGs na lista <span style="font:500 13px Figtree;color:#5E6B62">· 0 nesta área</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#F6F3EA;display:flex;flex-direction:column">
+          <div style="height:46px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+          <div style="padding:4px 16px 12px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #E3DED0">
+            <span style="height:34px;border-radius:11px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Filtros · 3</span>
+            <span style="height:34px;border-radius:11px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Cadeira de rodas ×</span>
+            <span style="height:34px;border-radius:11px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Dom ×</span>
+            <span style="height:34px;border-radius:11px;background:#FBE9B7;color:#4F3A00;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Noite ×</span>
+          </div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="width:56px;height:56px;border-radius:18px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2E5E45" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5M8 11h6"></path></svg></div>
+            <div style="font:600 24px/1.2 'Bricolage Grotesque';letter-spacing:-0.01em">Nenhuma ONG com todos esses filtros</div>
+            <div style="font:400 15px/1.5 Figtree;color:#4A574F">A busca não é ampliada automaticamente. Remova um filtro para ver mais resultados:</div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding-top:6px">
+              <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font:500 15px Figtree">Remover “Noite”<span style="font:600 14px Figtree;color:#2E5E45">5 ONGs →</span></div>
+              <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font:500 15px Figtree">Remover “Dom”<span style="font:600 14px Figtree;color:#2E5E45">3 ONGs →</span></div>
+              <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font:500 15px Figtree">Remover “Cadeira de rodas”<span style="font:600 14px Figtree;color:#2E5E45">9 ONGs →</span></div>
+            </div>
+            <span style="font:600 14px Figtree;color:#2E5E45;text-decoration:underline;text-underline-offset:3px;padding-top:8px">Limpar todos os filtros</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:804px;font:400 13px/1.5 Figtree;color:#5E6B62">Esquerda: há resultados, só não nesta área do mapa — aviso flutua sobre o mapa. Direita: zero resultados nos filtros — sugere qual filtro remover, com contagem.</p>
+  </div>
+
+  <!-- P5 -->
+  <div id="P5" data-screen-label="P5 Página da ONG" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P5</span><span style="font:600 15px Figtree">Página da ONG · variações por contatos preenchidos</span></div>
+    <div style="display:flex;gap:28px;align-items:flex-start">
+      <sc-for list="{{ p5Variants }}" as="v" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:3px;padding-left:6px"><span style="font:600 14px Figtree">{{ v.title }}</span><span style="font:400 13px Figtree;color:#5E6B62">{{ v.rule }}</span></div>
+      <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+      <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#F6F3EA;display:flex;flex-direction:column">
+        <div style="height:150px;flex:none;position:relative;background:repeating-linear-gradient(135deg,#D3DECB 0 14px,#DCE6D5 14px 28px);display:flex;align-items:center;justify-content:center">
+          <span style="font:500 12px 'IBM Plex Mono';color:#5E6B62">foto da ONG</span>
+          <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+          <div style="position:absolute;top:52px;left:16px;width:40px;height:40px;border-radius:13px;background:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 20px Figtree">←</div>
+          <div style="position:absolute;top:52px;right:16px;height:40px;border-radius:13px;background:rgba(255,253,248,.92);display:flex;align-items:center;gap:6px;padding:0 12px;font:500 13px Figtree;color:#5E6B62"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Denunciar</div>
+          <div style="position:absolute;bottom:-28px;left:20px;width:64px;height:64px;border-radius:19px;background:#2E5E45;color:#FFFDF8;border:4px solid #F6F3EA;display:flex;align-items:center;justify-content:center;font:700 20px 'Bricolage Grotesque'">CE</div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:36px 20px 100px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font:600 26px/1.15 'Bricolage Grotesque';letter-spacing:-0.015em">Casa Lar Esperança</div>
+            <div style="font:500 14px Figtree;color:#5E6B62">Orfanatos · 0,8 km · Vila Mariana</div>
+            <div style="font:400 15px/1.5 Figtree;color:#33403A;padding-top:4px">Acolhemos 22 crianças de 0 a 12 anos desde 1998.</div>
+          </div>
+          <div style="background:#F6DED5;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#8A2F1C">Urgente agora</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 16px Figtree;color:#5C1E11">Fraldas tamanho G</span><span style="font:500 12px Figtree;color:#8A2F1C">há 2 h</span></div>
+            <div style="font:400 14px/1.45 Figtree;color:#5C1E11">200 unidades até sexta. Pode entregar na portaria, 8h–18h.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Sempre precisa</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="background:#EEF2E8;color:#2E4A3A;border-radius:9px;padding:6px 10px;font:500 13px Figtree">Leite em pó</span>
+              <span style="background:#EEF2E8;color:#2E4A3A;border-radius:9px;padding:6px 10px;font:500 13px Figtree">Material escolar</span>
+              <span style="background:#EEF2E8;color:#2E4A3A;border-radius:9px;padding:6px 10px;font:500 13px Figtree">Roupas infantis</span>
+              <span style="background:#EEF2E8;color:#2E4A3A;border-radius:9px;padding:6px 10px;font:500 13px Figtree">Produtos de higiene</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Voluntariado</div>
+            <div style="display:flex;justify-content:space-between;font:500 14px Figtree;padding:8px 0;border-bottom:1px solid #E3DED0"><span>Sábado · 8h–12h</span><span style="color:#5E6B62">Recreação</span></div>
+            <div style="display:flex;justify-content:space-between;font:500 14px Figtree;padding:8px 0;border-bottom:1px solid #E3DED0"><span>Quarta · 14h–17h</span><span style="color:#5E6B62">Reforço escolar</span></div>
+          </div>
+          <sc-if value="{{ v.hasEnd }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px;flex:none"><sc-for list="{{ v.endLinks }}" as="l" hint-placeholder-count="1"><div style="flex:1;height:50px;border-radius:15px;border:1px solid #DCD5C4;background:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 15px Figtree;color:#2E5E45">{{ l }}</div></sc-for></div></sc-if>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 28px;background:#FFFDF8;border-top:1px solid #E3DED0;display:flex;gap:8px">
+          <sc-for list="{{ v.bar }}" as="btn" hint-placeholder-count="2">
+            <sc-if value="{{ btn.primary }}" hint-placeholder-val="{{ false }}"><div style="flex:1;height:52px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 15px Figtree">{{ btn.label }}</div></sc-if>
+            <sc-if value="{{ btn.secondary }}" hint-placeholder-val="{{ true }}"><div style="flex:1;height:52px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:600 15px Figtree">{{ btn.label }}</div></sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;max-width:1000px;font:400 13px/1.5 Figtree;color:#5E6B62">Regra: a barra fixa tem até 2 botões, por prioridade: WhatsApp, e-mail, site, Instagram. O que não couber vira botão no fim da página. WhatsApp é o principal quando existe; sem ele, o e-mail. Abaixo da dobra: endereço com mapa focado. “Denunciar” fica discreto no topo, sobre a foto, e abre um formulário curto (motivo + relato, e-mail opcional) que cai na fila do admin (A2).</p>
+  </div>
+
+
+  <!-- P5.1 -->
+  <div id="P5-1" data-screen-label="P5.1 Denunciar perfil" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">P5.1</span><span style="font:600 15px Figtree">Denunciar perfil · formulário e confirmação</span></div>
+    <div style="display:flex;gap:24px">
+      <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#6F786F">
+          <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree;color:#FFFDF8">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;top:70px;background:#F6F3EA;border-radius:28px 28px 0 0;padding:10px 20px 30px;display:flex;flex-direction:column;gap:14px">
+            <div style="width:40px;height:5px;border-radius:3px;background:#CFC8B6;align-self:center"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="font:600 22px/1.2 'Bricolage Grotesque'">Denunciar perfil</div><div style="font:500 14px Figtree;color:#5E6B62">Casa Lar Esperança</div></div>
+              <span style="width:36px;height:36px;flex:none;border-radius:12px;background:#EEF2E8;display:flex;align-items:center;justify-content:center;font:600 18px Figtree;color:#2E5E45">×</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label style="font:600 13px Figtree">O que aconteceu?</label>
+              <div style="border-radius:14px;background:#FFFDF8;border:2px solid #2E5E45;padding:11px 13px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:6px solid #2E5E45;background:#FFFDF8"></span><span style="font:600 14px Figtree">A ONG fechou ou mudou de endereço</span></div>
+              <div style="border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid #BDB59F;background:#FFFDF8"></span><span style="font:500 14px Figtree">Pediu dinheiro ou dados pessoais</span></div>
+              <div style="border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid #BDB59F;background:#FFFDF8"></span><span style="font:500 14px Figtree">Não parece ser uma ONG</span></div>
+              <div style="border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid #BDB59F;background:#FFFDF8"></span><span style="font:500 14px Figtree">Violência verbal ou física</span></div>
+              <div style="border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid #BDB59F;background:#FFFDF8"></span><span style="font:500 14px Figtree">Conteúdo ou fotos inadequados</span></div>
+              <div style="border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;display:flex;gap:12px;align-items:center"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid #BDB59F;background:#FFFDF8"></span><span style="font:500 14px Figtree">Outro motivo</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 13px Figtree">Conte o que viu <span style="font-weight:400;color:#5E6B62">(opcional)</span></label><div style="height:60px;border-radius:13px;background:#FFFDF8;border:1px solid #DCD5C4;padding:10px 14px;font:400 14px/1.45 Figtree">Fui entregar doação e o local está fechado.</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 13px Figtree">Seu e-mail <span style="font-weight:400;color:#5E6B62">(opcional, para retorno)</span></label><div style="height:48px;border-radius:13px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;padding:0 14px;font:400 14px Figtree;color:#8A948D">voce@email.com</div></div>
+            <div style="font:400 12px/1.5 Figtree;color:#5E6B62">A ONG não fica sabendo quem denunciou.</div>
+            <div style="margin-top:auto;height:54px;flex:none;border-radius:16px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 16px Figtree">Enviar denúncia</div>
+          </div>
+        </div>
+      </div>
+      <div style="width:390px;height:844px;border-radius:50px;background:#151B17;padding:10px;box-shadow:0 30px 60px -20px rgba(31,43,36,.35)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;background:#6F786F">
+          <div style="position:absolute;top:0;left:0;right:0;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px Figtree;color:#FFFDF8">9:41<span style="letter-spacing:2px">▪▪▪</span></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#F6F3EA;border-radius:28px 28px 0 0;padding:10px 20px 34px;display:flex;flex-direction:column;gap:16px">
+            <div style="width:40px;height:5px;border-radius:3px;background:#CFC8B6;align-self:center"></div>
+            <div style="width:52px;height:52px;border-radius:17px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 22px Figtree">✓</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font:600 22px/1.2 'Bricolage Grotesque'">Denúncia enviada</div>
+              <div style="font:400 15px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Obrigado por avisar. A equipe vai analisar o perfil da Casa Lar Esperança. Se você deixou e-mail, avisamos quando houver uma decisão.</div>
+            </div>
+            <div style="height:54px;flex:none;border-radius:16px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:600 16px Figtree">Voltar ao perfil</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:804px;font:400 13px/1.5 Figtree;color:#5E6B62">Aberto pelo “Denunciar” no topo da página da ONG. Motivo obrigatório (lista fixa, os mesmos da fila em A2). “Violência verbal ou física” vai direto para o topo da fila e mostra contatos de emergência (190 / Disque 100) na confirmação; relato e e-mail opcionais. Limite de 1 denúncia por perfil a cada 24 h por aparelho, para evitar abuso. Não tira a ONG do ar automaticamente: só ordena a fila do admin.</p>
+  </div>
+
+
+  </div>
+</section>
+
+<!-- ============ ONG ============ -->
+<section style="display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #D2CCBB;padding-bottom:14px">
+    <h2 style="margin:0;font:600 32px 'Bricolage Grotesque';letter-spacing:-0.02em">Área da ONG</h2>
+    <span style="font:500 15px Figtree;color:#5E6B62">/ong · self-service · lateral musgo escura separa do site público</span>
+  </div>
+  <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start;max-width:2700px">
+
+  <!-- O1 -->
+  <div id="O1" data-screen-label="O1 Cadastro CNPJ" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1</span><span style="font:600 15px Figtree">Cadastro · passo 1 de 8 (CNPJ)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Sem fila de aprovação. Validamos o CNPJ automaticamente na Receita Federal.</div>
+        </div>
+        <div style="padding:56px 72px;display:flex;flex-direction:column;gap:26px;max-width:760px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font:600 36px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Comece pelo CNPJ da sua ONG</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F">Ele fica interno: não aparece no seu perfil público.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="font:600 14px Figtree">CNPJ</label>
+            <div style="height:56px;border-radius:14px;background:#FFFDF8;border:2px solid #2E5E45;display:flex;align-items:center;justify-content:space-between;padding:0 16px"><span style="font:500 18px 'IBM Plex Mono';letter-spacing:.02em">12.345.678/0001-95</span><span style="font:600 13px Figtree;color:#2E5E45">✓ Válido</span></div>
+          </div>
+          <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Encontrado na Receita Federal</div>
+            <div style="display:grid;grid-template-columns:180px 1fr;gap:10px 16px;font:400 15px Figtree">
+              <span style="color:#5E6B62">Razão social</span><span style="font-weight:600">Associação Casa Lar Esperança</span>
+              <span style="color:#5E6B62">Situação</span><span style="font-weight:600;color:#2E5E45">✓ Ativa</span>
+              <span style="color:#5E6B62">Natureza jurídica</span><span style="font-weight:600;color:#2E5E45">✓ 399-9 · Associação privada</span>
+              <span style="color:#5E6B62">Endereço</span><span>R. Domingos de Morais, 1200 — Vila Mariana, São Paulo/SP</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px">
+            <span style="height:52px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 26px;font:600 16px Figtree">Usar esses dados e continuar</span>
+            <span style="height:52px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 16px Figtree">O endereço mudou</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Validação: dígito verificador no navegador → BrasilAPI (/cnpj/v1) → regras: situação ATIVA + natureza jurídica sem fins lucrativos → confirmação de e-mail. Estados do campo: digitando, validando, válido, inválido, já cadastrado, não elegível. Passos seguintes em O1.2 a O1.8.</p>
+  </div>
+
+
+  <div id="O1-2" data-screen-label="O1.2 Criar acesso" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.2</span><span style="font:600 15px Figtree">Cadastro · passo 2 de 8 (Criar acesso)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/acesso</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps2 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Crie o acesso da ONG</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Com o acesso criado, o cadastro fica salvo e vocês podem continuar depois. Estes dados são internos.</div>
+          </div>
+          
+  <div style="display:flex;flex-direction:column;gap:22px;max-width:520px">
+    <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">E-mail de acesso</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">contato@casalaresperanca.org.br</div><span style="font:400 13px Figtree;color:#5E6B62">Para entrar no painel e receber avisos do site. Não aparece no perfil.</span></div>
+    <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Senha</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">••••••••••</div><span style="font:400 13px Figtree;color:#5E6B62">Mínimo de 8 caracteres</span></div>
+    <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 15px Figtree">Digite o código enviado para contato@casalaresperanca.org.br</span>
+      <div style="display:flex;gap:8px">
+        <span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'">4</span><span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'">8</span><span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'">1</span><span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'">2</span><span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:2px solid #2E5E45;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'"></span><span style="width:48px;height:56px;border-radius:12px;background:#F6F3EA;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:center;font:600 22px 'IBM Plex Mono'"></span>
+      </div>
+      <span style="font:400 13px Figtree;color:#5E6B62">Não chegou? <span style="color:#2E5E45;font-weight:600;text-decoration:underline">Reenviar em 0:42</span></span>
+    </div>
+  </div>
+
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Confirmar e continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Logo após o CNPJ: a conta existe a partir daqui, então os passos seguintes já salvam como rascunho. Código de 6 dígitos por e-mail, válido por 10 min. CNPJ já cadastrado leva para “Entrar” ou recuperar acesso.</p>
+  </div>
+  <div id="O1-3" data-screen-label="O1.3 Localização" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.3</span><span style="font:600 15px Figtree">Cadastro · passo 3 de 8 (Localização)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/localizacao</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps3 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Confirme onde fica a ONG</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Trouxemos o endereço da Receita Federal. Arraste o pin até a entrada onde as doações são recebidas.</div>
+          </div>
+          
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:24px;min-height:0;flex:1">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Endereço</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">R. Domingos de Morais, 1200</div><span style="font:400 13px Figtree;color:#5E6B62">Preenchido a partir do CNPJ</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Bairro</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">Vila Mariana</div></div><div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">CEP</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">04010-100</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Complemento</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree"><span style="color:#8A948D">Ex: portão lateral</span></div></div>
+      <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font:600 15px Figtree">Mostrar só o bairro no perfil</span><span style="font:400 13px/1.4 Figtree;color:#5E6B62">Para abrigos que não divulgam o endereço. O pin fica numa área aproximada.</span></div>
+        <div style="width:48px;height:28px;flex:none;border-radius:14px;background:#D6D0C0;padding:3px"><div style="width:22px;height:22px;border-radius:50%;background:#FFFDF8"></div></div>
+      </div>
+    </div>
+    <div style="border-radius:20px;position:relative;overflow:hidden;min-height:400px;background-color:#E7EBDD;background-image:radial-gradient(circle at 20% 70%, #CFE0C3 0 80px, transparent 81px),linear-gradient(90deg, transparent 0 52%, #FFFFFF 52% 54%, transparent 54%),linear-gradient(0deg, transparent 0 40%, #FFFFFF 40% 42.5%, transparent 42.5%),linear-gradient(28deg, transparent 0 60%, #F8F5EC 60% 61.5%, transparent 61.5%),repeating-linear-gradient(90deg, transparent 0 70px, rgba(255,255,255,.75) 70px 72px),repeating-linear-gradient(0deg, transparent 0 86px, rgba(255,255,255,.75) 86px 88px)">
+      <div style="position:absolute;left:50%;top:46%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px dashed rgba(46,94,69,.35)"></div>
+      <div style="position:absolute;left:50%;top:46%;width:40px;height:40px;margin:-40px 0 0 -20px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2E5E45;border:4px solid #FFFDF8;box-shadow:0 6px 14px rgba(0,0,0,.3)"></div>
+      <div style="position:absolute;left:50%;top:46%;transform:translate(-50%,18px);background:#1F2B24;color:#F6F3EA;border-radius:10px;padding:7px 12px;font:600 13px Figtree;white-space:nowrap">Arraste para ajustar</div>
+      <div style="position:absolute;left:16px;bottom:16px;background:#FFFDF8;border-radius:12px;padding:9px 13px;font:500 13px 'IBM Plex Mono';color:#4A574F">-23.5893, -46.6345</div>
+      <div style="position:absolute;right:16px;top:16px;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#FFFDF8;box-shadow:0 4px 12px rgba(31,43,36,.15)"><span style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font:600 20px Figtree;border-bottom:1px solid #E3DED0">+</span><span style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font:600 20px Figtree">−</span></div>
+    </div>
+  </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Coordenadas vêm da geocodificação do endereço; o pin arrastado tem prioridade. Se o endereço mudar muito em relação ao da Receita, vira um sinal para a auditoria (A1), sem bloquear o cadastro.</p>
+  </div>
+  <div id="O1-4" data-screen-label="O1.4 Contatos e redes" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.4</span><span style="font:600 15px Figtree">Cadastro · passo 4 de 8 (Contatos e redes)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/contatos</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps4 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Contatos e redes públicas</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Como as pessoas vão falar com vocês e conhecer o trabalho da ONG.</div>
+          </div>
+          
+  <div style="display:flex;flex-direction:column;gap:26px;max-width:860px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Contatos · deixe pelo menos um visível</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px">
+        <div style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><label style="font:600 14px Figtree">WhatsApp</label><span style="display:flex;align-items:center;gap:7px;font:500 13px Figtree;color:#1F2B24"><span style="width:18px;height:18px;border-radius:5px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 11px Figtree">✓</span>Visível na página</span></div><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree;border:2px solid #2E5E45">+55 (11) 97123-4567<span style="font:600 13px Figtree;color:#2E5E45;text-decoration:underline">Testar no WhatsApp</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><label style="font:600 14px Figtree">E-mail de contato</label><span style="display:flex;align-items:center;gap:7px;font:500 13px Figtree;color:#1F2B24"><span style="width:18px;height:18px;border-radius:5px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 11px Figtree">✓</span>Visível na página</span></div><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree"><span style="color:#8A948D">Mesmo do acesso ou outro</span></div><span style="font:400 13px Figtree;color:#5E6B62"><span style="text-decoration:underline;color:#2E5E45;font-weight:600">Usar contato@casalaresperanca.org.br</span></span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Site e redes</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px">
+        <div style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><label style="font:600 14px Figtree">Site <span style="font-weight:400;color:#5E6B62">· opcional</span></label><span style="display:flex;align-items:center;gap:7px;font:500 13px Figtree;color:#5E6B62"><span style="width:18px;height:18px;border-radius:5px;border:1.5px solid #BDB59F;background:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 11px Figtree"></span>Visível na página</span></div><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree"><span style="color:#8A948D">casalaresperanca.org.br</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><label style="font:600 14px Figtree">Instagram <span style="font-weight:400;color:#5E6B62">· opcional</span></label><span style="display:flex;align-items:center;gap:7px;font:500 13px Figtree;color:#1F2B24"><span style="width:18px;height:18px;border-radius:5px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 11px Figtree">✓</span>Visível na página</span></div><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">@casalaresperanca</div></div>
+      </div>
+    </div>
+    <div style="background:#EEF2E8;border-radius:14px;padding:12px 16px;font:400 14px/1.5 Figtree;color:#2E4A3A">Só o que estiver marcado como visível aparece na página. Desmarcados ficam salvos no painel, sem aparecer. Dos visíveis, os dois primeiros nesta ordem (WhatsApp, e-mail, site, Instagram) viram os botões fixos; o resto vai para o fim da página.</div>
+  </div>
+
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">WhatsApp: validação de formato; “Testar” abre o link wa.me. E-mail de contato pode reaproveitar o de acesso com um toque. Instagram: aceita @usuário ou link, normalizado para @. Desmarcar não apaga o dado; dá para reexibir no painel. Ordem dos botões em P5.</p>
+  </div>
+  <div id="O1-5" data-screen-label="O1.5 Causas e itens" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.5</span><span style="font:600 15px Figtree">Cadastro · passo 5 de 8 (Causas e itens)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/causas-itens</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps5 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Causa e o que vocês costumam precisar</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">São as listas que alimentam os filtros do mapa. Escolha até 3 causas. Itens fora da lista podem ser adicionados como texto.</div>
+          </div>
+          
+  <div style="display:flex;flex-direction:column;gap:22px;max-width:900px">
+    <div style="display:flex;flex-direction:column;gap:10px"><div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Causas · 2 de 3</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Orfanatos</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Situação de rua</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Animais</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Idosos</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Pessoas com deficiência</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Saúde</span><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Educação</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Mulheres</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Meio ambiente</span></div></div>
+    <div style="display:flex;flex-direction:column;gap:10px"><div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Itens que costumam precisar</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Fraldas</span><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Leite em pó</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Alimentos</span><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Material escolar</span><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Roupas infantis</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Cobertores</span><span style="background:#2E5E45;color:#FFFDF8;border-radius:11px;padding:8px 12px;white-space:nowrap;font:600 14px Figtree">✓ Higiene</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Brinquedos</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Móveis</span><span style="background:#FFFDF8;border:1px solid #DCD5C4;border-radius:11px;padding:8px 12px;white-space:nowrap;font:500 14px Figtree">Remédios</span></div></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Outros itens</div>
+      <div style="display:flex;gap:8px;max-width:560px"><div style="flex:1;height:48px;border-radius:13px;background:#FFFDF8;border:2px solid #2E5E45;display:flex;align-items:center;padding:0 14px;font:400 15px Figtree">Ventil</div><span style="height:48px;border-radius:13px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 18px;font:600 14px Figtree">Adicionar</span></div>
+      <div style="font:400 13px Figtree;color:#5E6B62">Sugestão: “Ventilador” já foi cadastrado por outras 4 ONGs. Usar o mesmo nome ajuda quem filtra.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="background:#FFFDF8;border:1px dashed #9C947D;border-radius:11px;padding:8px 12px;white-space:nowrap;display:flex;gap:8px;align-items:center;font:600 14px Figtree">Fraldas tamanho G<span style="font-size:16px;color:#5E6B62">×</span></span><span style="background:#FFFDF8;border:1px dashed #9C947D;border-radius:11px;padding:8px 12px;white-space:nowrap;display:flex;gap:8px;align-items:center;font:600 14px Figtree">Mochilas<span style="font-size:16px;color:#5E6B62">×</span></span></div>
+    </div>
+    <div style="font:400 14px/1.5 Figtree;color:#4A574F;background:#EEF2E8;border-radius:14px;padding:12px 16px">A urgência é marcada depois, no painel, item por item.</div>
+  </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Texto livre é normalizado (minúsculas, sem acento) e sugere termos já usados. Itens livres citados por muitas ONGs viram candidatos para entrar na lista fixa.</p>
+  </div>
+  <div id="O1-6" data-screen-label="O1.6 Horários de voluntariado" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.6</span><span style="font:600 15px Figtree">Cadastro · passo 6 de 8 (Horários de voluntariado)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/voluntariado</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps6 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Quando vocês recebem voluntários</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Opcional. Cada horário aparece no filtro de voluntariado e na página da ONG. O contato é feito pelo WhatsApp ou e-mail informados.</div>
+          </div>
+          
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:900px">
+    <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:16px;padding:14px 18px;display:flex;gap:14px;align-items:center;max-width:560px">
+      <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font:600 15px Figtree">Aceitamos voluntários</span><span style="font:400 13px Figtree;color:#5E6B62">Desligado, os horários somem do perfil e dos filtros</span></div><div style="width:48px;height:28px;flex:none;border-radius:14px;background:#2E5E45;padding:3px;display:flex;justify-content:flex-end"><div style="width:22px;height:22px;border-radius:50%;background:#FFFDF8"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:180px 200px 1fr 40px;gap:12px;padding:0 15px;font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62"><span>Dia</span><span>Horário</span><span>Atividade</span><span></span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:grid;grid-template-columns:180px 200px 1fr 40px;gap:12px;align-items:center;background:#FFFDF8;border:1px solid #E3DED0;border-radius:14px;padding:10px 14px;font:500 15px Figtree"><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Sábado<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">8h – 12h<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Recreação<span>▾</span></span><span style="text-align:center;color:#5E6B62;font-size:18px">×</span></div>
+      <div style="display:grid;grid-template-columns:180px 200px 1fr 40px;gap:12px;align-items:center;background:#FFFDF8;border:1px solid #E3DED0;border-radius:14px;padding:10px 14px;font:500 15px Figtree"><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Quarta<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">14h – 17h<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Reforço escolar<span>▾</span></span><span style="text-align:center;color:#5E6B62;font-size:18px">×</span></div>
+      <div style="display:grid;grid-template-columns:180px 200px 1fr 40px;gap:12px;align-items:center;background:#FFFDF8;border:1px solid #E3DED0;border-radius:14px;padding:10px 14px;font:500 15px Figtree"><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Todo dia<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Horário livre<span>▾</span></span><span style="display:flex;justify-content:space-between;border:1px solid #DCD5C4;border-radius:10px;padding:9px 12px">Doação de sangue / triagem<span>▾</span></span><span style="text-align:center;color:#5E6B62;font-size:18px">×</span></div>
+    </div>
+    <span style="font:600 14px Figtree;color:#2E5E45">+ Adicionar horário</span>
+    <div style="display:flex;flex-direction:column;gap:7px;max-width:560px"><label style="font:600 14px Figtree">Requisitos <span style="font-weight:400;color:#5E6B62">· opcional</span></label><div style="height:64px;border-radius:13px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;font:400 15px/1.45 Figtree">Maiores de 18 anos. Primeira visita com agendamento.</div></div>
+  </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Turno (manhã/tarde/noite) é derivado do horário para o filtro. Atividades vêm de lista fixa, com opção “Outra”.</p>
+  </div>
+  <div id="O1-7" data-screen-label="O1.7 Foto e descrição" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.7</span><span style="font:600 15px Figtree">Cadastro · passo 7 de 8 (Foto e descrição)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/apresentacao</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps7 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Apresente a ONG</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">Foto e logo são opcionais, mas perfis com imagem recebem mais contatos.</div>
+          </div>
+          
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:32px;max-width:940px">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Logo</label><div style="width:120px;height:120px;border-radius:28px;border:2px dashed #BDB59F;background:#FFFDF8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 13px Figtree;color:#2E5E45"><span style="font-size:22px">+</span>Enviar</div><span style="font:400 13px Figtree;color:#5E6B62">Quadrada, mín. 400 px. Sem logo, usamos as iniciais.</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Foto de capa</label><div style="height:150px;border-radius:18px;background:repeating-linear-gradient(135deg,#D3DECB 0 14px,#DCE6D5 14px 28px);display:flex;align-items:center;justify-content:center;font:500 12px 'IBM Plex Mono';color:#5E6B62">capa.jpg · 1,2 MB</div><span style="font:600 13px Figtree;color:#2E5E45">Trocar foto</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Nome público</label><div style="height:52px;border-radius:14px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 16px Figtree">Casa Lar Esperança</div><span style="font:400 13px Figtree;color:#5E6B62">Pode ser diferente da razão social</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Descrição curta</label><div style="height:76px;border-radius:13px;background:#FFFDF8;border:2px solid #2E5E45;padding:12px 14px;font:400 15px/1.45 Figtree">Acolhemos 22 crianças de 0 a 12 anos desde 1998.</div><span style="font:400 13px Figtree;color:#5E6B62;align-self:flex-end">49 / 160 · aparece no card</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font:600 14px Figtree">Sobre a ONG <span style="font-weight:400;color:#5E6B62">· opcional</span></label><div style="height:130px;border-radius:13px;background:#FFFDF8;border:1px solid #DCD5C4;padding:12px 14px;font:400 15px/1.5 Figtree;color:#33403A">Somos uma casa de acolhimento institucional na Vila Mariana. Precisamos de doações regulares e de voluntários para recreação aos sábados e reforço escolar.</div><span style="font:400 13px Figtree;color:#5E6B62;align-self:flex-end">aparece na página completa</span></div>
+    </div>
+  </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Continuar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Imagens com moderação automática antes de publicar. Fotos de crianças: orientar a ONG a não mostrar rostos (texto de ajuda no upload).</p>
+  </div>
+  <div id="O1-8" data-screen-label="O1.8 Prévia e publicar" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O1.8</span><span style="font:600 15px Figtree">Cadastro · passo 8 de 8 (Prévia e publicar)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/cadastro/publicar</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span><span style="font:500 13px Figtree;color:#A9BFAF">para ONGs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ steps8 }}" as="s" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+                <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#4E7A62;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="font:500 15px Figtree;color:#D2E0D5">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.current }}" hint-placeholder-val="{{ false }}"><span style="width:26px;height:26px;border-radius:50%;background:#DDE7D6;color:#1F4232;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">{{ s.n }}</span><span style="font:600 15px Figtree;color:#FFFDF8">{{ s.label }}</span></sc-if>
+                <sc-if value="{{ s.later }}" hint-placeholder-val="{{ true }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #4E6E5D;color:#A9BFAF;display:flex;align-items:center;justify-content:center;font:600 12px Figtree">{{ s.n }}</span><span style="font:500 15px Figtree;color:#A9BFAF">{{ s.label }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;font:400 13px/1.5 Figtree;color:#A9BFAF">Seu progresso fica salvo. Dá para sair e voltar depois.</div>
+        </div>
+        <div style="padding:44px 72px 32px;display:flex;flex-direction:column;gap:24px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+            <div style="font:600 34px/1.1 'Bricolage Grotesque';letter-spacing:-0.02em">Tudo certo para aparecer no mapa</div>
+            <div style="font:400 16px/1.5 Figtree;color:#4A574F;text-wrap:pretty">É assim que as pessoas vão ver vocês. Tudo pode ser editado depois, no painel.</div>
+          </div>
+          
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:40px;max-width:960px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Card no mapa e na lista</div>
+      <div style="background:#FFFDF8;border:1px solid #E6E0D0;border-radius:20px;padding:14px;display:flex;gap:12px">
+        <div style="width:52px;height:52px;flex:none;border-radius:15px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 17px 'Bricolage Grotesque'">CE</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="font:600 16px Figtree">Casa Lar Esperança</div><div style="font:500 13px Figtree;color:#5E6B62">Orfanatos · Vila Mariana</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">Fraldas</span><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">Leite em pó</span><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">Material escolar</span></div></div>
+      </div>
+      <span style="font:600 14px Figtree;color:#2E5E45;text-decoration:underline;text-underline-offset:3px">Abrir prévia da página completa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Verificação</div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">CNPJ ativo e de entidade sem fins lucrativos</span></div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">E-mail confirmado</span></div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">Localização no mapa</span></div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">WhatsApp informado</span></div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">2 causas e 7 itens</span></div>
+      <div style="display:flex;gap:10px;align-items:center;font:500 15px Figtree"><span style="width:22px;height:22px;border-radius:50%;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span><span style="color:#1F2B24">Horários de voluntariado</span></div>
+      <div style="height:1px;background:#E3DED0;margin:6px 0"></div>
+      <div style="display:flex;gap:12px;align-items:flex-start;font:400 14px/1.5 Figtree;color:#33403A"><span style="width:22px;height:22px;flex:none;border-radius:6px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;justify-content:center;font:700 12px Figtree">✓</span>Li e aceito os termos de uso, incluindo o uso responsável da marcação de urgência.</div>
+    </div>
+  </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid #E3DED0">
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Voltar</span>
+            <span style="height:50px;border-radius:15px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 28px;font:600 16px Figtree">Publicar perfil</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Publicar é imediato, sem aprovação manual. Depois disso: tela de boas-vindas que leva ao painel (O2) e um e-mail com o link do perfil.</p>
+  </div>
+
+  <!-- O2 -->
+  <div id="O2" data-screen-label="O2 Painel da ONG" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O2</span><span style="font:600 15px Figtree">Painel · itens e urgência</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F6F3EA;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column;position:relative">
+      <div style="height:38px;flex:none;background:#E3DED0;display:flex;align-items:center;gap:14px;padding:0 14px"><div style="display:flex;gap:6px"><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span><span style="width:11px;height:11px;border-radius:50%;background:#C9C2B0"></span></div><div style="flex:1;max-width:420px;height:24px;border-radius:7px;background:#F6F3EA;font:400 12px 'IBM Plex Mono';color:#5E6B62;display:flex;align-items:center;padding:0 10px">perto.org.br/ong/painel</div></div>
+      <div style="flex:1;display:grid;grid-template-columns:240px 1fr;min-height:0">
+        <div style="background:#1F4232;color:#E6EEE1;padding:26px 16px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;align-items:center;gap:10px;padding:0 8px"><div style="width:30px;height:30px;border-radius:10px;background:#DDE7D6;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:#1F4232"></div></div><span style="font:700 18px 'Bricolage Grotesque'">perto</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px;font:500 15px Figtree">
+            <span style="padding:10px 12px;border-radius:11px;color:#A9BFAF">Início</span>
+            <span style="padding:10px 12px;border-radius:11px;background:#2E5E45;color:#FFFDF8;font-weight:600">Itens e urgência</span>
+            <span style="padding:10px 12px;border-radius:11px;color:#A9BFAF">Perfil público</span>
+            <span style="padding:10px 12px;border-radius:11px;color:#A9BFAF">Voluntariado</span>
+          </div>
+          <div style="margin-top:auto;padding:0 12px;display:flex;flex-direction:column;gap:2px"><span style="font:600 14px Figtree;color:#FFFDF8">Casa Lar Esperança</span><span style="font:400 12px Figtree;color:#A9BFAF">Perfil publicado</span></div>
+        </div>
+        <div style="padding:36px 44px;display:grid;grid-template-columns:1fr 340px;gap:32px;min-height:0;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:22px;min-width:0">
+            <div style="font:600 30px 'Bricolage Grotesque';letter-spacing:-0.015em">Itens e urgência</div>
+            <div style="background:#FFFDF8;border:1px solid #E3DED0;border-radius:18px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1fr 150px 190px;padding:12px 20px;background:#F1EDE2;font:700 12px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5E6B62"><span>Item</span><span>Tipo</span><span>Urgência</span></div>
+              <sc-for list="{{ ongItems }}" as="r" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:1fr 150px 190px;padding:14px 20px;border-top:1px solid #EDE8DC;align-items:center;font:500 15px Figtree">
+                  <span>{{ r.item }}</span>
+                  <span style="font:400 13px Figtree;color:#5E6B62">{{ r.kind }}</span>
+                  <sc-if value="{{ r.urgent }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px"><span style="background:#B9472F;color:#FFFDF8;border-radius:6px;padding:3px 8px;font:700 11px Figtree;letter-spacing:.03em">URGENTE</span><span style="font:600 13px Figtree;color:#5E6B62">Encerrar</span></span></sc-if>
+                  <sc-if value="{{ r.normal }}" hint-placeholder-val="{{ true }}"><span style="justify-self:start;border:1px solid #DCD5C4;border-radius:10px;padding:6px 11px;font:600 13px Figtree;color:#8A2F1C">Marcar urgente</span></sc-if>
+                </div>
+              </sc-for>
+              <div style="padding:14px 20px;border-top:1px solid #EDE8DC;font:600 14px Figtree;color:#2E5E45">+ Adicionar item</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:700 12px Figtree;letter-spacing:.06em;text-transform:uppercase;color:#5E6B62">Como aparece no mapa</div>
+            <div style="background:#FFFDF8;border:1px solid #E6E0D0;border-radius:20px;padding:14px;display:flex;gap:12px">
+              <div style="width:52px;height:52px;flex:none;border-radius:15px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 17px 'Bricolage Grotesque'">CE</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <div style="font:600 16px Figtree">Casa Lar Esperança</div>
+                <div style="display:flex;gap:8px;align-items:center;font:500 13px Figtree;color:#5E6B62">Orfanatos · 0,8 km<span style="background:#B9472F;color:#FFFDF8;border-radius:6px;padding:2px 7px;font:700 11px Figtree">URGENTE</span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">Fraldas G</span><span style="background:#EEF2E8;color:#2E4A3A;border-radius:8px;padding:4px 8px;font:500 12px Figtree">Leite em pó</span></div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- O3 -->
+  <div id="O3" data-screen-label="O3 Marcar urgência" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">O3</span><span style="font:600 15px Figtree">Marcar item como urgente</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#59625B;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;align-items:center;justify-content:center">
+      <div style="width:720px;background:#FFFDF8;border-radius:24px;padding:32px 36px;display:grid;grid-template-columns:1fr 260px;gap:28px;box-shadow:0 30px 70px rgba(0,0,0,.3)">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div style="font:600 26px/1.15 'Bricolage Grotesque';letter-spacing:-0.015em">Marcar “Fraldas G” como urgente</div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 13px Figtree">Detalhe (até 120 caracteres)</label><div style="height:76px;border-radius:13px;background:#F6F3EA;border:1px solid #DCD5C4;padding:12px 14px;font:400 15px/1.45 Figtree">200 unidades até sexta. Pode entregar na portaria, 8h–18h.</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="font:600 13px Figtree">Urgente até</label>
+            <div style="display:flex;gap:8px">
+              <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;padding:0 14px;font:500 14px Figtree">3 dias</span>
+              <span style="height:40px;border-radius:11px;background:#2E5E45;color:#FFFDF8;display:flex;align-items:center;padding:0 14px;font:600 14px Figtree">7 dias</span>
+              <span style="height:40px;border-radius:11px;background:#FFFDF8;border:1px solid #DCD5C4;display:flex;align-items:center;padding:0 14px;font:500 14px Figtree">14 dias</span>
+            </div>
+            <span style="font:400 13px Figtree;color:#5E6B62">Depois disso o selo sai sozinho. Dá para encerrar antes no painel.</span>
+          </div>
+          <div style="display:flex;gap:10px;padding-top:4px">
+            <span style="height:50px;border-radius:15px;background:#B9472F;color:#FFFDF8;display:flex;align-items:center;padding:0 22px;font:600 15px Figtree">Marcar como urgente</span>
+            <span style="height:50px;border-radius:15px;background:#EEF2E8;color:#2E5E45;display:flex;align-items:center;padding:0 18px;font:600 15px Figtree">Cancelar</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font:600 12px Figtree;color:#5E6B62">Como aparece no mapa</span>
+          <div style="background:#F6F3EA;border:1px solid #E6E0D0;border-radius:18px;padding:12px;display:flex;gap:10px"><div style="width:44px;height:44px;flex:none;border-radius:13px;background:#DDE7D6;color:#2E5E45;display:flex;align-items:center;justify-content:center;font:700 15px 'Bricolage Grotesque'">CE</div><div style="display:flex;flex-direction:column;gap:5px"><span style="font:600 14px Figtree">Casa Lar Esperança</span><span style="align-self:flex-start;background:#B9472F;color:#FFFDF8;border-radius:6px;padding:2px 7px;font:700 11px Figtree">URGENTE · Fraldas G</span></div></div>
+          <span style="font:400 12px/1.45 Figtree;color:#5E6B62">O pin fica terracota e o item aparece em “Urgente agora” na página da ONG.</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Sem envio de mensagens: a urgência só muda o selo, o pin e a ordenação. Prazo de expiração evita selos esquecidos.</p>
+  </div>
+  </div>
+</section>
+
+<!-- ============ ADMIN ============ -->
+<section style="display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #D2CCBB;padding-bottom:14px">
+    <h2 style="margin:0;font:600 32px 'Bricolage Grotesque';letter-spacing:-0.02em">Área admin</h2>
+    <span style="font:500 15px Figtree;color:#5E6B62">/admin · visual neutro e denso, sem o creme do site público</span>
+  </div>
+  <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start;max-width:2700px">
+
+  <!-- A1 -->
+  <div id="A1" data-screen-label="A1 Gestão de ONGs" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">A1</span><span style="font:600 15px Figtree">ONGs + auditoria</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F4F5F3;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:52px;flex:none;background:#1C211E;color:#E8ECE9;display:flex;align-items:center;gap:28px;padding:0 22px">
+        <span style="font:700 15px 'Bricolage Grotesque'">perto <span style="font:500 12px 'IBM Plex Mono';color:#8E9A92">/admin</span></span>
+        <div style="display:flex;gap:4px;font:500 14px Figtree"><span style="padding:7px 12px;border-radius:8px;background:#323A35;color:#FFFFFF">ONGs</span><span style="padding:7px 12px;color:#A5B0A9">Denúncias <span style="background:#B9472F;color:#fff;border-radius:6px;padding:0 5px;font:700 11px Figtree">5</span></span><span style="padding:7px 12px;color:#A5B0A9">Registro de ações</span><span style="padding:7px 12px;color:#A5B0A9">Listas</span></div>
+      </div>
+      <div style="flex:1;display:grid;grid-template-columns:1fr 400px;min-height:0">
+        <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="flex:1;min-width:0;height:36px;border-radius:9px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 12px;font:400 13px Figtree;color:#6B756F">Nome, CNPJ ou cidade</div>
+            <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Todas 327</span>
+            <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Ativas 312</span>
+            <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Suspensas 7</span>
+            <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">CNPJ com problema 3</span>
+            <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Denunciadas 5</span>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #DFE2DF;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.6fr 1.3fr 1fr 110px 80px 80px;padding:10px 16px;background:#F0F2EF;font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F"><span>ONG</span><span>CNPJ</span><span>Cidade</span><span>Status</span><span>Urgências</span><span>Denúncias</span></div>
+            <sc-for list="{{ adminRows }}" as="r" hint-placeholder-count="8">
+              <div style="display:grid;grid-template-columns:1.6fr 1.3fr 1fr 110px 80px 80px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree">
+                <span style="font-weight:600">{{ r.name }}</span>
+                <span style="font:400 12px 'IBM Plex Mono';color:#3F4843">{{ r.cnpj }}</span>
+                <span style="color:#4E5852">{{ r.city }}</span>
+                <span>
+                  <sc-if value="{{ r.active }}" hint-placeholder-val="{{ true }}"><span style="background:#E3EEE2;color:#24533B;border-radius:6px;padding:3px 8px;font:600 12px Figtree">Ativa</span></sc-if>
+                  <sc-if value="{{ r.susp }}" hint-placeholder-val="{{ false }}"><span style="background:#ECEDEC;color:#4E5852;border-radius:6px;padding:3px 8px;font:600 12px Figtree">Suspensa</span></sc-if>
+                  <sc-if value="{{ r.flag }}" hint-placeholder-val="{{ false }}"><span style="background:#F6DED5;color:#8A2F1C;border-radius:6px;padding:3px 8px;font:600 12px Figtree">Revisar</span></sc-if>
+                </span>
+                <span style="font-variant-numeric:tabular-nums">{{ r.alerts }}</span>
+                <span style="font-variant-numeric:tabular-nums">{{ r.reports }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border-left:1px solid #DFE2DF;padding:18px 22px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 19px 'Bricolage Grotesque'">Abrigo Novo Horizonte</span><span style="font:400 12px 'IBM Plex Mono';color:#5B655F">45.112.908/0001-30</span></div>
+          <div style="display:flex;gap:8px">
+            <span style="flex:1;height:36px;border-radius:9px;background:#1C211E;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Ver página pública ↗</span>
+            <span style="flex:1;height:36px;border-radius:9px;border:1px solid #D9DDD9;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Abrir no WhatsApp</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">WhatsApp</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">(11) 96402-1180</span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">E-mail contato</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">contato@novohorizonte.org</span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">E-mail acesso</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">adm.novohorizonte@gmail.com <span style="font:500 11px Figtree;color:#8A2F1C">interno</span></span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">Instagram</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@abrigonovohorizonte <span style="font:500 11px Figtree;color:#8A2F1C">oculto</span></span><span style="font:600 12px Figtree;color:#2E5E45">Abrir</span></div>
+            <div style="font:400 11px 'IBM Plex Mono';color:#5B655F;padding-top:4px">perto.org.br/ong/abrigo-novo-horizonte</div>
+          </div>
+          <div style="font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F">Receita Federal × declarado</div>
+          <div style="border:1px solid #ECEEEB;border-radius:10px;overflow:hidden;font:400 13px Figtree">
+            <div style="display:grid;grid-template-columns:90px 1fr 1fr;padding:9px 12px;background:#F7F8F6;font:600 11px Figtree;color:#5B655F"><span></span><span>Receita</span><span>Declarado</span></div>
+            <div style="display:grid;grid-template-columns:90px 1fr 1fr;padding:9px 12px;border-top:1px solid #ECEEEB;gap:8px"><span style="color:#5B655F">Situação</span><span style="color:#8A2F1C;font-weight:600">Baixada (08/2026)</span><span>—</span></div>
+            <div style="display:grid;grid-template-columns:90px 1fr 1fr;padding:9px 12px;border-top:1px solid #ECEEEB;gap:8px"><span style="color:#5B655F">Natureza</span><span>399-9 Associação</span><span>—</span></div>
+            <div style="display:grid;grid-template-columns:90px 1fr 1fr;padding:9px 12px;border-top:1px solid #ECEEEB;gap:8px;background:#FDF4F0"><span style="color:#5B655F">Cidade</span><span>Guarulhos/SP</span><span style="color:#8A2F1C;font-weight:600">São Paulo/SP</span></div>
+          </div>
+          <div style="font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F">Sinais</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font:400 13px/1.45 Figtree">
+            <span>• CNPJ baixado na revalidação de 28/09</span>
+            <span>• 3 denúncias: “ONG fechou”</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:auto">
+            <label style="font:600 12px Figtree">Motivo (obrigatório)</label>
+            <div style="height:38px;border-radius:9px;border:1px solid #D9DDD9;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:500 13px Figtree">CNPJ inativo na Receita<span>▾</span></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <span style="flex:1;height:40px;border-radius:9px;background:#1C211E;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Suspender</span>
+            <span style="flex:1;height:40px;border-radius:9px;border:1px solid #D9B7AC;color:#8A2F1C;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Excluir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Contatos com copiar/abrir e link para a página pública no topo da ficha (também em A2). “Interno” e “oculto” indicam o que não aparece na página. Admin não edita perfis. Suspensão tira do mapa; a ONG é avisada por e-mail com o motivo. Toda ação vai para o registro.</p>
+  </div>
+
+
+
+
+  <!-- A2 -->
+  <div id="A2" data-screen-label="A2 Denúncias" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">A2</span><span style="font:600 15px Figtree">Fila de denúncias</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F4F5F3;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:52px;flex:none;background:#1C211E;color:#E8ECE9;display:flex;align-items:center;gap:28px;padding:0 22px">
+        <span style="font:700 15px 'Bricolage Grotesque'">perto <span style="font:500 12px 'IBM Plex Mono';color:#8E9A92">/admin</span></span>
+        <div style="display:flex;gap:4px;font:500 14px Figtree"><span style="padding:7px 12px;color:#A5B0A9">ONGs</span><span style="padding:7px 12px;border-radius:8px;background:#323A35;color:#FFFFFF">Denúncias</span><span style="padding:7px 12px;color:#A5B0A9">Registro de ações</span><span style="padding:7px 12px;color:#A5B0A9">Listas</span></div>
+        <span style="margin-left:auto;font:500 13px Figtree;color:#A5B0A9">ana@perto.org.br</span>
+      </div>
+      
+      <div style="flex:1;display:grid;grid-template-columns:1fr 460px;min-height:0">
+        <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;gap:8px"><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Abertas 5</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Arquivadas 41</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Com ação 12</span></div>
+          <div style="background:#FFFFFF;border:1px solid #DFE2DF;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:10px 16px;background:#F0F2EF;font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F"><span>ONG</span><span>Motivo</span><span>Denúncias</span><span>Última</span></div>
+            <div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree;background:#F3F6F2;box-shadow:inset 3px 0 0 #1C211E"><span style="font-weight:600">Abrigo Novo Horizonte</span><span style="color:#4E5852">ONG fechou</span><span style="font-variant-numeric:tabular-nums">3</span><span style="color:#5B655F">há 2 h</span></div><div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree;"><span style="font-weight:600">Projeto Rua Viva</span><span style="color:#4E5852">Pedido de dinheiro por fora</span><span style="font-variant-numeric:tabular-nums">1</span><span style="color:#5B655F">ontem</span></div><div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree;"><span style="font-weight:600">Sopa Solidária Centro</span><span style="color:#4E5852">Endereço não existe</span><span style="font-variant-numeric:tabular-nums">1</span><span style="color:#5B655F">29/09</span></div><div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree;"><span style="font-weight:600">Lar Bem Viver</span><span style="color:#4E5852">Fotos inadequadas</span><span style="font-variant-numeric:tabular-nums">1</span><span style="color:#5B655F">28/09</span></div><div style="display:grid;grid-template-columns:1.4fr 1.4fr 90px 90px;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree;"><span style="font-weight:600">Associação Amigos do Bairro</span><span style="color:#4E5852">Não é ONG / empresa</span><span style="font-variant-numeric:tabular-nums">2</span><span style="color:#5B655F">27/09</span></div>
+          </div>
+          <div style="font:400 13px/1.5 Figtree;color:#5B655F">Denúncias da mesma ONG e do mesmo motivo são agrupadas. Com 3 ou mais em 7 dias, a ONG vai para o topo da fila.</div>
+        </div>
+        <div style="background:#FFFFFF;border-left:1px solid #DFE2DF;padding:18px 22px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 19px 'Bricolage Grotesque'">Abrigo Novo Horizonte</span><span style="font:400 13px Figtree;color:#5B655F">3 denúncias · “ONG fechou” · <span style="background:#F6DED5;color:#8A2F1C;border-radius:6px;padding:3px 8px;font:600 12px Figtree;white-space:nowrap">Revisar</span></span></div>
+          <div style="display:flex;gap:8px">
+            <span style="flex:1;height:36px;border-radius:9px;background:#1C211E;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Ver página pública ↗</span>
+            <span style="flex:1;height:36px;border-radius:9px;border:1px solid #D9DDD9;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Abrir no WhatsApp</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">WhatsApp</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">(11) 96402-1180</span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">E-mail contato</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">contato@novohorizonte.org</span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">E-mail acesso</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">adm.novohorizonte@gmail.com <span style="font:500 11px Figtree;color:#8A2F1C">interno</span></span><span style="font:600 12px Figtree;color:#2E5E45">Copiar</span></div>
+            <div style="display:grid;grid-template-columns:118px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #ECEEEB;font:400 13px Figtree"><span style="color:#5B655F">Instagram</span><span style="font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@abrigonovohorizonte <span style="font:500 11px Figtree;color:#8A2F1C">oculto</span></span><span style="font:600 12px Figtree;color:#2E5E45">Abrir</span></div>
+            <div style="font:400 11px 'IBM Plex Mono';color:#5B655F;padding-top:4px">perto.org.br/ong/abrigo-novo-horizonte</div>
+          </div>
+          <div style="font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F">Relatos</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="border:1px solid #ECEEEB;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px"><span style="font:400 13px/1.45 Figtree">Fui entregar doação e o local está fechado, com placa de aluga-se.</span><span style="font:400 12px Figtree;color:#5B655F">01/10 16:40 · anônimo</span></div>
+            <div style="border:1px solid #ECEEEB;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px"><span style="font:400 13px/1.45 Figtree">WhatsApp não responde há semanas.</span><span style="font:400 12px Figtree;color:#5B655F">30/09 09:12 · anônimo</span></div>
+            <span style="font:600 12px Figtree;color:#2E5E45">+ 1 relato</span>
+          </div>
+          <div style="font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F">Contexto</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font:400 13px/1.45 Figtree">
+            <span>• CNPJ baixado na Receita (revalidação de 28/09)</span>
+            <span>• Perfil sem edição há 7 meses</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:auto">
+            <label style="font:600 12px Figtree">Motivo (obrigatório)</label>
+            <div style="height:38px;border-radius:9px;border:1px solid #D9DDD9;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:500 13px Figtree">ONG encerrada<span>▾</span></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <span style="flex:1;height:40px;border-radius:9px;background:#1C211E;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Suspender ONG</span>
+            <span style="flex:1;height:40px;border-radius:9px;border:1px solid #D9DDD9;color:#1C211E;display:flex;align-items:center;justify-content:center;font:600 13px Figtree">Arquivar denúncia</span>
+          </div>
+          <span style="font:600 13px Figtree;color:#2E5E45;text-decoration:underline;text-underline-offset:3px">Abrir ficha da ONG (A1)</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Denúncia pública vem do link “Denunciar perfil” na página da ONG (motivo de lista fixa + relato, e-mail opcional). Arquivar exige motivo e fica no registro. A ONG não vê quem denunciou.</p>
+  </div>
+
+  <!-- A3 -->
+  <div id="A3" data-screen-label="A3 Registro de ações" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">A3</span><span style="font:600 15px Figtree">Registro de ações (auditoria)</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F4F5F3;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:52px;flex:none;background:#1C211E;color:#E8ECE9;display:flex;align-items:center;gap:28px;padding:0 22px">
+        <span style="font:700 15px 'Bricolage Grotesque'">perto <span style="font:500 12px 'IBM Plex Mono';color:#8E9A92">/admin</span></span>
+        <div style="display:flex;gap:4px;font:500 14px Figtree"><span style="padding:7px 12px;color:#A5B0A9">ONGs</span><span style="padding:7px 12px;color:#A5B0A9">Denúncias <span style="background:#B9472F;color:#fff;border-radius:6px;padding:0 5px;font:700 11px Figtree">5</span></span><span style="padding:7px 12px;border-radius:8px;background:#323A35;color:#FFFFFF">Registro de ações</span><span style="padding:7px 12px;color:#A5B0A9">Listas</span></div>
+        <span style="margin-left:auto;font:500 13px Figtree;color:#A5B0A9">ana@perto.org.br</span>
+      </div>
+      
+      <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1;min-width:0;max-width:320px;height:36px;border-radius:9px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 12px;font:400 13px Figtree;color:#6B756F">Buscar ONG, CNPJ ou admin</div>
+          <span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Todas</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Suspensões</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Exclusões</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Denúncias</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Listas</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Sistema</span>
+          <span style="margin-left:auto;height:32px;border-radius:8px;border:1px solid #D9DDD9;background:#FFFFFF;display:flex;align-items:center;padding:0 12px;font:600 13px Figtree">Exportar CSV</span>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DFE2DF;border-radius:12px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:10px 16px;background:#F0F2EF;font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F"><span>Quando</span><span>Quem</span><span>Ação</span><span>Alvo</span><span>Motivo</span></div>
+          <div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">02/10 14:20</span><span><span style="font:500 13px Figtree">ana@</span></span><span style="font-weight:600">Suspendeu ONG</span><span>Abrigo Novo Horizonte</span><span style="color:#4E5852">ONG encerrada · 3 denúncias</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">02/10 11:05</span><span><span style="background:#ECEDEC;color:#4E5852;border-radius:6px;padding:3px 8px;font:600 12px Figtree;white-space:nowrap">sistema</span></span><span style="font-weight:600">Suspendeu ONG</span><span>Sopa Solidária Centro</span><span style="color:#4E5852">CNPJ inapto na revalidação</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">01/10 18:32</span><span><span style="font:500 13px Figtree">bruno@</span></span><span style="font-weight:600">Arquivou denúncia</span><span>Lar São Vicente</span><span style="color:#4E5852">Sem procedência</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">01/10 10:14</span><span><span style="font:500 13px Figtree">ana@</span></span><span style="font-weight:600">Adicionou item à lista</span><span>“Ventilador”</span><span style="color:#4E5852">5 ONGs usavam em texto livre</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">30/09 17:48</span><span><span style="font:500 13px Figtree">bruno@</span></span><span style="font-weight:600">Reativou ONG</span><span>Instituto Mãos Dadas</span><span style="color:#4E5852">CNPJ regularizado</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">30/09 09:00</span><span><span style="background:#ECEDEC;color:#4E5852;border-radius:6px;padding:3px 8px;font:600 12px Figtree;white-space:nowrap">sistema</span></span><span style="font-weight:600">Revalidou CNPJs</span><span>327 ONGs</span><span style="color:#4E5852">2 com mudança de situação</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">29/09 15:21</span><span><span style="font:500 13px Figtree">ana@</span></span><span style="font-weight:600">Excluiu ONG</span><span>Associação Teste 123</span><span style="color:#4E5852">Cadastro fraudulento</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">28/09 13:07</span><span><span style="font:500 13px Figtree">bruno@</span></span><span style="font-weight:600">Unificou itens</span><span>“Fralda G” → “Fraldas”</span><span style="color:#4E5852">Duplicado</span></div><div style="display:grid;grid-template-columns:130px 110px 190px 1.2fr 1.4fr;padding:12px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="font:400 12px 'IBM Plex Mono';color:#3F4843">27/09 19:40</span><span><span style="font:500 13px Figtree">ana@</span></span><span style="font-weight:600">Encerrou urgência</span><span>Projeto Rua Viva</span><span style="color:#4E5852">Urgência repetida há 6 semanas</span></div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Somente leitura: nenhuma linha pode ser editada ou apagada. Ações automáticas (revalidação de CNPJ, expiração) aparecem como “sistema”.</p>
+  </div>
+
+  <!-- A4 -->
+  <div id="A4" data-screen-label="A4 Listas fixas" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;gap:10px;align-items:center"><span style="font:700 12px Figtree;background:#1F2B24;color:#F6F3EA;padding:4px 9px;border-radius:7px">A4</span><span style="font:600 15px Figtree">Listas de causas, itens e atividades</span></div>
+    <div style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F4F5F3;box-shadow:0 30px 60px -24px rgba(31,43,36,.35);display:flex;flex-direction:column">
+      <div style="height:52px;flex:none;background:#1C211E;color:#E8ECE9;display:flex;align-items:center;gap:28px;padding:0 22px">
+        <span style="font:700 15px 'Bricolage Grotesque'">perto <span style="font:500 12px 'IBM Plex Mono';color:#8E9A92">/admin</span></span>
+        <div style="display:flex;gap:4px;font:500 14px Figtree"><span style="padding:7px 12px;color:#A5B0A9">ONGs</span><span style="padding:7px 12px;color:#A5B0A9">Denúncias <span style="background:#B9472F;color:#fff;border-radius:6px;padding:0 5px;font:700 11px Figtree">5</span></span><span style="padding:7px 12px;color:#A5B0A9">Registro de ações</span><span style="padding:7px 12px;border-radius:8px;background:#323A35;color:#FFFFFF">Listas</span></div>
+        <span style="margin-left:auto;font:500 13px Figtree;color:#A5B0A9">ana@perto.org.br</span>
+      </div>
+      
+      <div style="flex:1;display:grid;grid-template-columns:1fr 470px;min-height:0">
+        <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;gap:8px;align-items:center"><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Causas 12</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 13px Figtree">Itens 58</span><span style="height:32px;flex:none;white-space:nowrap;border-radius:8px;background:#FFFFFF;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:500 13px Figtree">Atividades 14</span><span style="margin-left:auto;height:32px;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 12px;font:600 13px Figtree">+ Novo item</span></div>
+          <div style="background:#FFFFFF;border:1px solid #DFE2DF;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:10px 16px;background:#F0F2EF;font:600 11px Figtree;letter-spacing:.05em;text-transform:uppercase;color:#5B655F"><span></span><span>Item</span><span>Grupo</span><span>ONGs usando</span><span></span></div>
+            <div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Fraldas</span><span style="color:#4E5852">Higiene e cuidado</span><span style="font-variant-numeric:tabular-nums">64</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Alimentos</span><span style="color:#4E5852">Alimentação</span><span style="font-variant-numeric:tabular-nums">121</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Leite em pó</span><span style="color:#4E5852">Alimentação</span><span style="font-variant-numeric:tabular-nums">48</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Roupas</span><span style="color:#4E5852">Vestuário</span><span style="font-variant-numeric:tabular-nums">97</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Cobertores</span><span style="color:#4E5852">Vestuário</span><span style="font-variant-numeric:tabular-nums">73</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Ração</span><span style="color:#4E5852">Animais</span><span style="font-variant-numeric:tabular-nums">39</span><span style="color:#2E5E45;font-weight:600">Editar</span></div><div style="display:grid;grid-template-columns:28px 1.3fr 1fr 110px 90px;padding:11px 16px;border-top:1px solid #ECEEEB;align-items:center;font:500 13px Figtree"><span style="color:#A5B0A9;letter-spacing:-2px">⋮⋮</span><span style="font-weight:600">Material escolar</span><span style="color:#4E5852">Educação</span><span style="font-variant-numeric:tabular-nums">44</span><span style="color:#2E5E45;font-weight:600">Editar</span></div>
+          </div>
+          <div style="font:400 13px/1.5 Figtree;color:#5B655F">Arrastar define a ordem nos filtros. Itens em uso não podem ser excluídos, só unificados com outro.</div>
+        </div>
+        <div style="background:#FFFFFF;border-left:1px solid #DFE2DF;padding:22px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 18px 'Bricolage Grotesque'">Sugestões do texto livre</span><span style="font:400 13px/1.45 Figtree;color:#5B655F">Itens que as ONGs escreveram à mão, agrupados por semelhança.</span></div>
+          <div style="border:1px solid #ECEEEB;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 14px Figtree">Ventilador de teto</span><span style="font:500 12px Figtree;color:#5B655F">4 ONGs</span></div>
+            <span style="font:400 12px Figtree;color:#5B655F">Parecido com “Ventilador”, já na lista</span>
+            <div style="display:flex;gap:6px">
+              <span style="height:32px;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Unificar com “Ventilador”</span>
+              <span style="height:32px;border-radius:8px;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Manter como texto livre</span>
+            </div>
+          </div><div style="border:1px solid #ECEEEB;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 14px Figtree">Bolsa de colostomia</span><span style="font:500 12px Figtree;color:#5B655F">6 ONGs</span></div>
+            
+            <div style="display:flex;gap:6px">
+              <span style="height:32px;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Adicionar à lista</span>
+              <span style="height:32px;border-radius:8px;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Manter como texto livre</span>
+            </div>
+          </div><div style="border:1px solid #ECEEEB;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 14px Figtree">Cadeira de rodas</span><span style="font:500 12px Figtree;color:#5B655F">9 ONGs</span></div>
+            
+            <div style="display:flex;gap:6px">
+              <span style="height:32px;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Adicionar à lista</span>
+              <span style="height:32px;border-radius:8px;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Manter como texto livre</span>
+            </div>
+          </div><div style="border:1px solid #ECEEEB;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 14px Figtree">Fralda geriátrica G</span><span style="font:500 12px Figtree;color:#5B655F">3 ONGs</span></div>
+            <span style="font:400 12px Figtree;color:#5B655F">Parecido com “Fraldas”, já na lista</span>
+            <div style="display:flex;gap:6px">
+              <span style="height:32px;border-radius:8px;background:#1C211E;color:#fff;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Unificar com “Fraldas”</span>
+              <span style="height:32px;border-radius:8px;border:1px solid #D9DDD9;display:flex;align-items:center;padding:0 11px;font:600 12px Figtree">Manter como texto livre</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;max-width:1280px;font:400 13px/1.5 Figtree;color:#5E6B62">Ao adicionar ou unificar, as ONGs que usavam o texto livre passam automaticamente para o item da lista e o filtro do mapa passa a encontrá-las. Causas e atividades seguem o mesmo padrão.</p>
+  </div>
+
+  </div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;cardContext&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;nenhum&quot;,&quot;item&quot;,&quot;voluntariado&quot;],&quot;default&quot;:&quot;nenhum&quot;,&quot;tsType&quot;:&quot;'nenhum'|'item'|'voluntariado'&quot;,&quot;section&quot;:&quot;P1 · card&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const ctx = this.props.cardContext ?? 'nenhum';
+    const base = [
+      { name: 'Casa Lar Esperança', initials: 'CE', cause: 'Orfanatos', dist: '0,8 km', urgent: true, items: ['Fraldas G', 'Leite em pó', 'Material escolar'], matchItem: 'Fraldas', matchNote: 'Urgente: 200 unidades até sexta', slots: ['✓ Sáb · 8h–12h · Recreação'] },
+      { name: 'Lar São Vicente', initials: 'SV', cause: 'Idosos', dist: '1,4 km', urgent: false, items: ['Fraldas geriátricas', 'Visitas'], matchItem: 'Fraldas geriátricas', matchNote: 'Sempre precisa', slots: ['✓ Sáb · 9h–11h · Visitas'] },
+      { name: 'Abrigo Patas Amigas', initials: 'PA', cause: 'Animais', dist: '2,1 km', urgent: false, items: ['Ração', 'Cobertores', 'Jornal'], matchItem: 'Jornal (para forrar)', matchNote: 'Sempre precisa', slots: ['✓ Sáb · 8h–10h · Passeio com cães'] }
+    ];
+    const chipsBy = {
+      nenhum: [{ label: 'Orfanatos', idle: true }, { label: 'Animais', idle: true }, { label: 'Idosos', idle: true }],
+      item: [{ label: 'Fraldas', active: true }, { label: 'Orfanatos', idle: true }, { label: 'Animais', idle: true }],
+      voluntariado: [{ label: 'Sáb · manhã', active: true }, { label: 'Orfanatos', idle: true }, { label: 'Animais', idle: true }]
+    };
+    const p3Cards = [
+      { name: 'Casa Lar Esperança', initials: 'CE', cause: 'Orfanatos', dist: '0,8 km', urgent: true, matchItem: 'Fraldas G', others: '+ 3 outros itens', slots: ['Sáb 8h–12h · Recreação'] },
+      { name: 'Lar São Vicente', initials: 'SV', cause: 'Idosos', dist: '1,4 km', urgent: false, matchItem: 'Fraldas geriátricas', others: '+ 2 outros itens', slots: ['Sáb 9h–11h · Visitas'] },
+      { name: 'Instituto Mãos Dadas', initials: 'MD', cause: 'Pessoas com deficiência', dist: '6,2 km', urgent: false, outside: true, matchItem: 'Fraldas M e G', others: '+ 1 outro item', slots: ['Sáb 8h–12h · Oficinas'] },
+      { name: 'Creche Pequeno Príncipe', initials: 'PP', cause: 'Educação', dist: '7,9 km', urgent: true, outside: true, matchItem: 'Fraldas P', others: '+ 4 outros itens', slots: ['Sáb 10h–12h · Contação'] }
+    ];
+    const steps = ['CNPJ', 'Criar acesso', 'Localização no mapa', 'Contatos e redes', 'Causas e itens', 'Horários de voluntariado', 'Foto e descrição', 'Prévia e publicar']
+      .map((label, i) => ({ n: i + 1, label, current: i === 0, later: i !== 0 }));
+    const stepLabels = ['CNPJ', 'Criar acesso', 'Localização no mapa', 'Contatos e redes', 'Causas e itens', 'Horários de voluntariado', 'Foto e descrição', 'Prévia e publicar'];
+    const mk = k => stepLabels.map((label, i) => ({ n: i + 1, label, done: i < k - 1, current: i === k - 1, later: i > k - 1 }));
+    const ongItems = [
+      { item: 'Fraldas G', kind: 'Sempre precisa', urgent: true },
+      { item: 'Leite em pó', kind: 'Sempre precisa' },
+      { item: 'Material escolar', kind: 'Sempre precisa' },
+      { item: 'Roupas infantis', kind: 'Sempre precisa' },
+      { item: 'Ventilador (texto livre)', kind: 'Pontual' }
+    ].map(r => ({ ...r, normal: !r.urgent }));
+    const adminRows = [
+      { name: 'Casa Lar Esperança', cnpj: '12.345.678/0001-95', city: 'São Paulo', active: true, alerts: 1, reports: 0 },
+      { name: 'Abrigo Novo Horizonte', cnpj: '45.112.908/0001-30', city: 'São Paulo', flag: true, alerts: 3, reports: 3 },
+      { name: 'Lar São Vicente', cnpj: '61.009.441/0001-02', city: 'São Paulo', active: true, alerts: 0, reports: 0 },
+      { name: 'Abrigo Patas Amigas', cnpj: '33.871.220/0001-48', city: 'Osasco', active: true, alerts: 2, reports: 0 },
+      { name: 'Sopa Solidária Centro', cnpj: '08.554.317/0001-77', city: 'São Paulo', susp: true, alerts: 0, reports: 1 },
+      { name: 'Instituto Mãos Dadas', cnpj: '27.690.105/0001-61', city: 'Santo André', active: true, alerts: 1, reports: 0 },
+      { name: 'Creche Pequeno Príncipe', cnpj: '19.432.876/0001-09', city: 'São Paulo', active: true, alerts: 1, reports: 0 },
+      { name: 'Projeto Rua Viva', cnpj: '52.118.630/0001-84', city: 'São Paulo', flag: true, alerts: 6, reports: 1 }
+    ];
+    return {
+      showDefault: ctx === 'nenhum', showItem: ctx === 'item', showVol: ctx === 'voluntariado',
+      p1HasFilter: ctx !== 'nenhum',
+      p1Count: ctx === 'nenhum' ? '24 ONGs perto de você' : (ctx === 'item' ? '9 ONGs precisam de fraldas' : '7 ONGs aos sábados de manhã'),
+      p1Chips: chipsBy[ctx] || chipsBy.nenhum,
+      p1Cards: base, p3Cards, steps,
+      steps2: mk(2), steps3: mk(3), steps4: mk(4), steps5: mk(5), steps6: mk(6), steps7: mk(7), steps8: mk(8),
+      ongItems, adminRows,
+      p5Variants: (() => {
+        const order = ['WhatsApp', 'E-mail', 'Site', 'Instagram'];
+        const label = { Site: 'Site ↗', Instagram: 'Instagram ↗' };
+        const build = (title, has) => {
+          const got = order.filter(k => has.includes(k));
+          const inBar = got.slice(0, 2), rest = got.slice(2);
+          const prim = inBar.includes('WhatsApp') ? 'WhatsApp' : (inBar.includes('E-mail') ? 'E-mail' : inBar[0]);
+          const bar = inBar.slice().reverse().map(k => ({ label: label[k] || k, primary: k === prim, secondary: k !== prim }));
+          const rule = rest.length ? 'Fim da página: ' + rest.join(' e ') : (got.length === 1 ? 'Um botão em largura total' : 'Tudo cabe na barra');
+          return { title, rule, bar, endLinks: rest.map(k => label[k] || k), hasEnd: rest.length > 0 };
+        };
+        return [
+          build('Todos os contatos', ['WhatsApp', 'E-mail', 'Site', 'Instagram']),
+          build('WhatsApp + e-mail + Instagram', ['WhatsApp', 'E-mail', 'Instagram']),
+          build('WhatsApp + site + Instagram', ['WhatsApp', 'Site', 'Instagram']),
+          build('Só WhatsApp + Instagram', ['WhatsApp', 'Instagram']),
+          build('Só e-mail + site', ['E-mail', 'Site']),
+          build('Só e-mail + Instagram', ['E-mail', 'Instagram']),
+          build('Só um contato', ['WhatsApp'])
+        ];
+      })(),    };
+  }
+}
+</script>
+</body>
+</html>
