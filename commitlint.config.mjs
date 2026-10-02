@@ -1,5 +1,5 @@
 // Conventional Commits: tipo(escopo opcional): descrição
-// regras completas em .claude/docs/git.md
+// regras completas em docs/git.md
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {

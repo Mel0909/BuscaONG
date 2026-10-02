@@ -17,17 +17,18 @@ Hoje existe um único workspace, o `web/` (pacote `web`). Se no futuro surgir ou
 
 ```
 BuscaONG/
-├── .claude/              docs para o Claude Code e para o time
-│   └── docs/             toda a documentação técnica (versionada) · estado-anterior.md (só local)
+├── .claude/              configurações do Claude Code (settings.local.json fica fora do git)
 ├── .github/workflows/    CI: convencoes.yml confere branch, título e commits dos PRs
 ├── .husky/               hooks do git (pre-commit, commit-msg, pre-push) + validar-branch.sh
 ├── .vscode/              configurações compartilhadas do editor
 ├── bruno/                coleção de requisições da API (app Bruno)
 ├── design/               material de design (PDF, protótipo do mapa)
+├── docs/                 documentação técnica (versionada) · estado-anterior.md (só local)
 ├── web/                  o app Next.js
 ├── .gitignore            o que o git não versiona
 ├── .npmrc                como o pnpm instala
-├── CLAUDE.md             regras de git e índice lidos pelo Claude Code em toda sessão
+├── AGENTS.md             instruções para agentes de IA (Codex/GPT, Claude, Cursor...): regras e índice dos docs
+├── CLAUDE.md             importa o AGENTS.md para o Claude Code
 ├── commitlint.config.mjs regras de mensagem de commit (Conventional Commits)
 ├── README.md             apresentação e setup para pessoas
 ├── package.json          "identidade" do repositório (private, não é publicado)
@@ -64,7 +65,8 @@ O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e co
 | `bruno/` | Requisições prontas (auth, session, users) e ambientes Dev/Prod para testar a API no app [Bruno](https://www.usebruno.com/). Também documenta a API. |
 | `.vscode/settings.json` | Indentação de 2 espaços para todo o time. |
 | `README.md` | Para pessoas: o que é o projeto e como rodar. |
-| `CLAUDE.md` + `.claude/docs/` | Para o Claude Code e como referência técnica do time. |
+| `docs/` | Documentação técnica do time (produto, arquitetura, padrões, git, bugs). |
+| `AGENTS.md` | Instruções para agentes de IA: regras obrigatórias, comandos e índice dos docs. É a **fonte única**; o `CLAUDE.md` só o importa (`@AGENTS.md`). |
 | `design/` | Referência visual. Não faz parte do build. |
 
 ## 3. O app (`web/`)

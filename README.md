@@ -39,17 +39,17 @@ pnpm --filter web dev
 - Commits e título do PR seguem o [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/), em português, e devem ser atômicos.
 - Hooks do git e um workflow no GitHub conferem essas regras.
 
-Detalhes e exemplos em [.claude/docs/git.md](.claude/docs/git.md).
+Detalhes e exemplos em [docs/git.md](docs/git.md).
 
 ## Documentação
 
-A documentação técnica fica em [.claude/docs](.claude/docs):
+A documentação técnica fica em [docs](docs). Agentes de IA (Codex/GPT, Claude Code etc.) leem as instruções do projeto em [AGENTS.md](AGENTS.md).
 
-- [git.md](.claude/docs/git.md): branches, commits e PRs
-- [buscaong.md](.claude/docs/buscaong.md): produto, escopo, stack e identidade visual
-- [arquitetura.md](.claude/docs/arquitetura.md): estrutura do repositório e onde colocar código novo
-- [padroes-api.md](.claude/docs/padroes-api.md): como escrever rotas da API
-- [padroes-frontend.md](.claude/docs/padroes-frontend.md): como organizar páginas e componentes
-- [autenticacao.md](.claude/docs/autenticacao.md): better-auth e regras de conta
-- [erros-a-consertar.md](.claude/docs/erros-a-consertar.md): bugs conhecidos
-- [codigo-herdado.md](.claude/docs/codigo-herdado.md): código do template a reescrever
+- [git.md](docs/git.md): branches, commits e PRs
+- [buscaong.md](docs/buscaong.md): produto, escopo, stack e identidade visual
+- [arquitetura.md](docs/arquitetura.md): estrutura do repositório e onde colocar código novo
+- [padroes-api.md](docs/padroes-api.md): como escrever rotas da API
+- [padroes-frontend.md](docs/padroes-frontend.md): como organizar páginas e componentes
+- [autenticacao.md](docs/autenticacao.md): better-auth e regras de conta
+- [erros-a-consertar.md](docs/erros-a-consertar.md): bugs conhecidos
+- [codigo-herdado.md](docs/codigo-herdado.md): código do template a reescrever

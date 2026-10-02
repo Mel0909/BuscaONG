@@ -78,4 +78,4 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 | `package.json`, `.npmrc`, `pnpm-workspace.yaml`, `.vscode/settings.json` | configuração trivial |
 | `web/public/icons/google-logo.png` | marca do Google, uso permitido no botão de login com Google |
 | `design/` | material do perto, exportado por ferramenta de design (`support.js` é o runtime da ferramenta; conferir se os termos permitem publicá-lo) |
-| `.claude/docs/*`, `CLAUDE.md`, `PertoLogo.tsx`, `icon.svg`, tokens do perto | escritos para o BuscaONG |
+| `docs/*`, `AGENTS.md`, `CLAUDE.md`, `PertoLogo.tsx`, `icon.svg`, tokens do perto | escritos para o BuscaONG |

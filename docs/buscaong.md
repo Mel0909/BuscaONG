@@ -158,7 +158,7 @@ O que mudou em relação aos alvos combinados antes ou merece atenção:
 
 ## 11. Identidade visual
 
-Extraída do protótipo [design/Mapa de ONGs.dc.html](../../design/Mapa%20de%20ONGs.dc.html) e aplicada em `web/src/app/globals.css` (tokens do Tailwind 4 em `@theme`).
+Extraída do protótipo [design/Mapa de ONGs.dc.html](../design/Mapa%20de%20ONGs.dc.html) e aplicada em `web/src/app/globals.css` (tokens do Tailwind 4 em `@theme`).
 
 ### Cores
 
