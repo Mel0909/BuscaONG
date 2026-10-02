@@ -1,4 +1,4 @@
-# Regras de branch (ver .claude/docs/git.md)
+# Regras de branch (ver docs/git.md)
 # vazio quando o HEAD está detached (ex.: durante um rebase)
 BRANCH=$(git symbolic-ref --short -q HEAD)
 

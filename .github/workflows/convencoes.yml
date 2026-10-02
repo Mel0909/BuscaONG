@@ -1,4 +1,4 @@
-# Confere as convenções de git em todo PR para a main (ver .claude/docs/git.md)
+# Confere as convenções de git em todo PR para a main (ver docs/git.md)
 name: Convenções
 
 on:

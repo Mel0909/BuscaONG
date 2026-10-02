@@ -1,4 +1,4 @@
-# Bloqueia push direto na main (ver .claude/docs/git.md)
+# Bloqueia push direto na main (ver docs/git.md)
 while read -r local_ref local_sha remote_ref remote_sha; do
   if [ "$remote_ref" = "refs/heads/main" ]; then
     echo "Push direto na main não é permitido. Envie a branch e abra um PR."
