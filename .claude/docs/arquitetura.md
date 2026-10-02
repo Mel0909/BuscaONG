@@ -19,14 +19,16 @@ Hoje existe um único workspace, o `web/` (pacote `web`). Se no futuro surgir ou
 BuscaONG/
 ├── .claude/              docs para o Claude Code e para o time
 │   └── docs/             toda a documentação técnica (versionada) · estado-anterior.md (só local)
-├── .husky/               hooks do git (pre-commit, pre-push)
+├── .github/workflows/    CI: convencoes.yml confere branch, título e commits dos PRs
+├── .husky/               hooks do git (pre-commit, commit-msg, pre-push) + validar-branch.sh
 ├── .vscode/              configurações compartilhadas do editor
 ├── bruno/                coleção de requisições da API (app Bruno)
 ├── design/               material de design (PDF, protótipo do mapa)
 ├── web/                  o app Next.js
 ├── .gitignore            o que o git não versiona
 ├── .npmrc                como o pnpm instala
-├── CLAUDE.md             índice lido pelo Claude Code em toda sessão
+├── CLAUDE.md             regras de git e índice lidos pelo Claude Code em toda sessão
+├── commitlint.config.mjs regras de mensagem de commit (Conventional Commits)
 ├── README.md             apresentação e setup para pessoas
 ├── package.json          "identidade" do repositório (private, não é publicado)
 ├── pnpm-lock.yaml        versões exatas de todas as dependências
@@ -49,8 +51,11 @@ Hooks do git, válidos para o repositório inteiro (por isso ficam na raiz, onde
 
 | Hook | Quando roda | O que faz |
 |---|---|---|
-| `pre-commit` | antes de cada commit | se há arquivos de `web/` no stage: `pnpm --filter web test` |
-| `pre-push` | antes de cada push | se há mudanças em `web/`: `lint`. Na branch `main`, também `test:e2e` e `build` |
+| `pre-commit` | antes de cada commit | bloqueia commit na `main` e valida o nome da branch; se há arquivos de `web/` no stage, `pnpm --filter web test` |
+| `commit-msg` | ao escrever a mensagem | valida a mensagem com o commitlint |
+| `pre-push` | antes de cada push | bloqueia push para a `main`; se há mudanças em `web/`, `lint` |
+
+O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e commit no servidor e valida o título do PR. Regras completas em [git.md](git.md).
 
 ### 2.3 Ferramentas e documentação
 
