@@ -43,7 +43,7 @@ Detalhes e exemplos em [docs/git.md](docs/git.md).
 
 ## Documentação
 
-A documentação técnica fica em [docs](docs):
+A documentação técnica fica em [docs](docs). Agentes de IA (Codex/GPT, Claude Code etc.) leem as instruções do projeto em [AGENTS.md](AGENTS.md).
 
 - [git.md](docs/git.md): branches, commits e PRs
 - [buscaong.md](docs/buscaong.md): produto, escopo, stack e identidade visual

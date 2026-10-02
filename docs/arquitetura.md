@@ -27,7 +27,8 @@ BuscaONG/
 ├── web/                  o app Next.js
 ├── .gitignore            o que o git não versiona
 ├── .npmrc                como o pnpm instala
-├── CLAUDE.md             regras de git e índice lidos pelo Claude Code em toda sessão
+├── AGENTS.md             instruções para agentes de IA (Codex/GPT, Claude, Cursor...): regras e índice dos docs
+├── CLAUDE.md             importa o AGENTS.md para o Claude Code
 ├── commitlint.config.mjs regras de mensagem de commit (Conventional Commits)
 ├── README.md             apresentação e setup para pessoas
 ├── package.json          "identidade" do repositório (private, não é publicado)
@@ -65,7 +66,7 @@ O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e co
 | `.vscode/settings.json` | Indentação de 2 espaços para todo o time. |
 | `README.md` | Para pessoas: o que é o projeto e como rodar. |
 | `docs/` | Documentação técnica do time (produto, arquitetura, padrões, git, bugs). |
-| `CLAUDE.md` | Para o Claude Code: regras obrigatórias e índice dos docs. |
+| `AGENTS.md` | Instruções para agentes de IA: regras obrigatórias, comandos e índice dos docs. É a **fonte única**; o `CLAUDE.md` só o importa (`@AGENTS.md`). |
 | `design/` | Referência visual. Não faz parte do build. |
 
 ## 3. O app (`web/`)
