@@ -1,0 +1,46 @@
+# Confere as convenções de git em todo PR para a main (ver .claude/docs/git.md)
+name: Convenções
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  convencoes:
+    name: Branch, título e commits
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Nome da branch
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: sh .husky/validar-branch.sh "$BRANCH"
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # só as dependências da raiz (commitlint), sem instalar o app
+      - name: Instalar dependências da raiz
+        run: pnpm install --frozen-lockfile --filter buscaong
+
+      - name: Título do PR
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$TITLE" | pnpm exec commitlint
+
+      - name: Commits do PR
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE" --to "$HEAD" --verbose

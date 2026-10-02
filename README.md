@@ -1,6 +1,6 @@
 # BuscaONG
 
-Site que conecta doadores a ONGs próximas: mapa e lista de ONGs, filtros por causa, item e voluntariado, e alertas de urgência via WhatsApp.
+**perto**: site que conecta doadores a ONGs próximas, com mapa e lista de ONGs, filtros por causa, item e voluntariado, e destaque visual para pedidos urgentes.
 
 ## Estrutura do repositório
 
@@ -8,7 +8,9 @@ Monorepo com pnpm workspaces:
 
 - `/web`: app Next.js (front e back), com Prisma, MongoDB e Better Auth
 - `/bruno`: coleção do [Bruno](https://www.usebruno.com/) para testar e documentar a API
-- `/.husky`: hooks do git (testes no pre-commit; lint, e2e e build no pre-push)
+- `/.husky`: hooks do git (regras de branch e commit, testes, lint)
+- `/.github`: workflow que confere as convenções de git nos PRs
+- `/design`: design e protótipo do perto
 - `/.vscode`: configurações compartilhadas do editor
 
 ## Setup
@@ -31,10 +33,19 @@ pnpm --filter web dev
 - **Back:** Prisma (ORM), Zod (validação), MongoDB, Better Auth (autenticação)
 - **Testes:** Vitest (integração), Playwright (e2e)
 
+## Contribuindo
+
+- Nada vai direto para a `main`: crie uma branch `<tipo>/<descricao>` (ex.: `feat/cadastro-ong`) e abra um PR.
+- Commits e título do PR seguem o [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/), em português, e devem ser atômicos.
+- Hooks do git e um workflow no GitHub conferem essas regras.
+
+Detalhes e exemplos em [.claude/docs/git.md](.claude/docs/git.md).
+
 ## Documentação
 
 A documentação técnica fica em [.claude/docs](.claude/docs):
 
+- [git.md](.claude/docs/git.md): branches, commits e PRs
 - [buscaong.md](.claude/docs/buscaong.md): produto, escopo, stack e identidade visual
 - [arquitetura.md](.claude/docs/arquitetura.md): estrutura do repositório e onde colocar código novo
 - [padroes-api.md](.claude/docs/padroes-api.md): como escrever rotas da API
