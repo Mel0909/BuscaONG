@@ -31,7 +31,7 @@ export default defineConfig({
     reporter: ['text', 'json', 'html'],
     reportsDirectory: './tests/coverage',
     include: [
-      'src/**',
+      'src/**/*.{ts,tsx}',      // só código; o Vitest 5 tenta parsear tudo que casar aqui
     ],
     exclude: [
       'src/generated/**',       // exclude prisma-generated files
