@@ -41,16 +41,20 @@ Idioma: documentação, commits, branches e textos da interface em **português*
 
 ## Comandos
 
-Requisitos: Node `>=24`, pnpm 10.
+Requisitos: Node `>=24` e pnpm 10.34.6 (fixado em `packageManager`; o pnpm troca de versão sozinho).
+
+Rode tudo da raiz:
 
 ```bash
-pnpm install                    # instala tudo (gera o cliente Prisma no postinstall)
-pnpm --filter web dev           # http://localhost:3000
-pnpm --filter web lint:check    # ESLint
-pnpm --filter web test          # Vitest (integração)
-pnpm --filter web test:e2e      # Playwright (precisa do dev rodando)
-pnpm --filter web build         # build de produção
+pnpm install       # instala tudo (gera o cliente Prisma no postinstall)
+pnpm dev           # http://localhost:3000
+pnpm lint          # ESLint (pnpm lint:fix corrige)
+pnpm test          # Vitest (integração)
+pnpm test:e2e      # Playwright (precisa do dev rodando)
+pnpm build         # build de produção
 ```
+
+Ferramentas de desenvolvimento (TypeScript, ESLint, Vitest, Playwright...) ficam no `package.json` da **raiz**; dependências do app ficam em `web/package.json`. Instale cada uma no lugar certo (`pnpm add -Dw <pkg>` para a raiz, `pnpm --filter web add <pkg>` para o app).
 
 O app precisa de `web/.env` (modelo em `web/.env.example`).
 
