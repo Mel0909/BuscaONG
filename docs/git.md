@@ -152,4 +152,3 @@ echo "feat(ong): adiciona mapa" | pnpm exec commitlint
   - bloquear force push e exclusão;
   - deixar só "merge commit" e/ou "rebase" habilitados (desabilitar squash).
 - **`.husky/pre-push`:** o trecho que roda e2e e build quando a branch atual é `main` deixou de ser alcançável na prática, já que não se trabalha mais na `main`. Avaliar mover build e e2e para um workflow de CI no PR.
-- **`pnpm/action-setup` com `version: 10` fixo no workflow:** remover quando o `packageManager` for definido no `package.json` (Etapa 4).
