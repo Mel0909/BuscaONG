@@ -1,0 +1,25 @@
+meta {
+  name: passo 7 - url de envio de imagem
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/minha/imagens
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "tipo": "logo",
+    "contentType": "image/png",
+    "tamanho": 150000
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Devolve { chave, urlEnvio, url }. Envie o arquivo com PUT em urlEnvio (Content-Type igual ao declarado)
+  e depois mande a chave no passo 7. Responde 503 sem as variáveis R2_* configuradas.
+}

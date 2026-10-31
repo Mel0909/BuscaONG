@@ -76,12 +76,16 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 | Função | Uso |
 |---|---|
 | `blockForbiddenRequests(request, roles)` | exige sessão e, se `roles` for passado, um dos perfis |
+| `exigirSessaoOng(request)` | exige a sessão de uma conta `ONG` e devolve `{ userId, email }` (ou a resposta 401/403, no formato novo) |
+| `rateLimit(chave, { limit, windowMs })` + `tooManyRequests(s)` | limite simples em memória por chave (IP ou usuário) |
 | `getUserFromRequest(request)` | usuário da sessão com `role` (ou resposta 401) |
 | `validBody(request)` | lê o JSON do corpo ⚠️ ver bug #10 em [erros-a-consertar.md](erros-a-consertar.md) |
 | `returnInvalidDataErrors(zodError)` | resposta 400 padronizada a partir de um erro do Zod |
 | `zodErrorHandler(error)` | para o `catch`: 400 se for Zod, 500 caso contrário |
 
 E `toErrorMessage(message, details?)` em `@/utils/api/toErrorMessage`.
+
+**Rotas do cadastro da ONG** (`api/ongs/minha/*`): todas seguem o mesmo roteiro (sessão de ONG → corpo validado → service), montado por `rotaDoCadastro(schema, service)` em `api/ongs/minha/_utils/rotaDoCadastro.ts`, que também traduz os erros dos services em respostas HTTP. Agem sempre sobre a ONG do usuário da sessão, nunca sobre um ID vindo da requisição.
 
 ## 6. Autenticação nas rotas
 

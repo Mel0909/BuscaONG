@@ -1,0 +1,37 @@
+meta {
+  name: passo 4 - contatos
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/minha/contatos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "whatsapp": {
+      "valor": "(11) 97123-4567",
+      "visivel": true
+    },
+    "email": {
+      "valor": "contato@exemplo.org.br",
+      "visivel": true
+    },
+    "site": {
+      "valor": "exemplo.org.br",
+      "visivel": false
+    },
+    "instagram": {
+      "valor": "@exemplo",
+      "visivel": true
+    }
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Pelo menos WhatsApp ou e-mail preenchido e visível. Valores vazios viram null.
+}

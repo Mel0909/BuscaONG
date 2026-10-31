@@ -1,0 +1,33 @@
+meta {
+  name: passo 5 - causas e itens
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/minha/causas-itens
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "causas": [
+      "orfanatos",
+      "educacao"
+    ],
+    "itens": [
+      "fraldas",
+      "leite-em-po"
+    ],
+    "itensLivres": [
+      "Ventilador"
+    ]
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Slugs das listas fixas (pnpm db:seed). 1 a 3 causas e pelo menos um item.
+  Item livre com o mesmo nome de um item da lista vira o item da lista.
+}

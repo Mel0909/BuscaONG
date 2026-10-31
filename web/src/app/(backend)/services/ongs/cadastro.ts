@@ -1,0 +1,222 @@
+import prisma from "@/backend/services/db";
+import { buscarOpcoes } from "@/backend/services/listas";
+import type { Ong } from "@/generated/prisma";
+import type {
+  ApresentacaoData,
+  CausasItensData,
+  ContatosData,
+  EnvioImagemData,
+  LocalizacaoData,
+  VoluntariadoData,
+} from "@/backend/schemas";
+import { urlDeEnvio } from "@/lib/armazenamento";
+import { ATIVIDADE_OUTRA, calcularTurnos } from "@/lib/cadastro/voluntariado";
+import { normalizarChave } from "@/utils/formatters/texto";
+import {
+  CadastroIncompletoError,
+  ImagemInvalidaError,
+  OngNaoEncontradaError,
+  OngSuspensaError,
+  OpcaoInvalidaError,
+} from "./erros";
+
+// Passos 3 a 8 do cadastro. Cada passo salva o que a ONG preencheu e avança o `passoAtual`,
+// que diz até onde ela pode ir. Tudo age sobre a ONG do usuário logado (nunca por ID vindo de fora).
+
+const ULTIMO_PASSO = 8;
+
+export async function buscarOngDoUsuario(userId: string) {
+  return prisma.ong.findUnique({ where: { userId } });
+}
+
+async function ongDoUsuario(userId: string) {
+  const ong = await buscarOngDoUsuario(userId);
+  if (!ong) throw new OngNaoEncontradaError();
+  return ong;
+}
+
+/** Depois de salvar o passo `passo`, o próximo fica liberado (sem voltar atrás). */
+function proximoPasso(ong: Pick<Ong, "passoAtual">, passo: number) {
+  return Math.max(ong.passoAtual, Math.min(passo + 1, ULTIMO_PASSO));
+}
+
+const resumo = { id: true, status: true, passoAtual: true } as const;
+
+/** Passo 3. */
+export async function salvarLocalizacao(userId: string, dados: LocalizacaoData) {
+  const ong = await ongDoUsuario(userId);
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: {
+      endereco: dados.endereco,
+      localizacao: { type: "Point", coordinates: [dados.longitude, dados.latitude] },
+      mostrarSoBairro: dados.mostrarSoBairro,
+      passoAtual: proximoPasso(ong, 3),
+    },
+    select: resumo,
+  });
+}
+
+/** Passo 4. */
+export async function salvarContatos(userId: string, dados: ContatosData) {
+  const ong = await ongDoUsuario(userId);
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: { contatos: dados, passoAtual: proximoPasso(ong, 4) },
+    select: resumo,
+  });
+}
+
+/** Passo 5. Item livre com o mesmo nome de um item da lista vira o item da lista. */
+export async function salvarCausasItens(userId: string, dados: CausasItensData) {
+  const ong = await ongDoUsuario(userId);
+
+  const causas = [...new Set(dados.causas)];
+  if ((await buscarOpcoes("CAUSA", causas)).length !== causas.length) {
+    throw new OpcaoInvalidaError("causas");
+  }
+
+  const itens = new Set(dados.itens);
+  if ((await buscarOpcoes("ITEM", [...itens])).length !== itens.size) {
+    throw new OpcaoInvalidaError("itens");
+  }
+
+  const listaDeItens = await prisma.opcaoLista.findMany({
+    where: { tipo: "ITEM" },
+    select: { slug: true, nome: true },
+  });
+  const itemPorChave = new Map(listaDeItens.map((i) => [normalizarChave(i.nome), i.slug]));
+
+  const itensLivres = new Map<string, { nome: string; chave: string }>();
+  for (const nome of dados.itensLivres) {
+    const chave = normalizarChave(nome);
+    const daLista = itemPorChave.get(chave);
+    if (daLista) itens.add(daLista);
+    else if (!itensLivres.has(chave)) itensLivres.set(chave, { nome: nome.replace(/\s+/g, " "), chave });
+  }
+
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: {
+      causas,
+      itens: [...itens],
+      itensLivres: [...itensLivres.values()],
+      passoAtual: proximoPasso(ong, 5),
+    },
+    select: resumo,
+  });
+}
+
+export type SugestaoItem = { nome: string; chave: string; ongs: number };
+
+/**
+ * Itens livres já usados por outras ONGs que começam com o texto digitado
+ * ("Ventil" → "Ventilador", usado por 4 ONGs). Usar o mesmo nome ajuda quem filtra.
+ */
+export async function sugerirItensLivres(userId: string, texto: string): Promise<SugestaoItem[]> {
+  const prefixo = normalizarChave(texto).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (!prefixo) return [];
+
+  const resultado = await prisma.ong.aggregateRaw({
+    pipeline: [
+      { $match: { userId: { $ne: userId }, "itensLivres.chave": { $regex: `^${prefixo}` } } },
+      { $unwind: "$itensLivres" },
+      { $match: { "itensLivres.chave": { $regex: `^${prefixo}` } } },
+      { $group: { _id: "$itensLivres.chave", nome: { $first: "$itensLivres.nome" }, ongs: { $sum: 1 } } },
+      { $sort: { ongs: -1, _id: 1 } },
+      { $limit: 5 },
+      { $project: { _id: 0, chave: "$_id", nome: 1, ongs: 1 } },
+    ],
+  });
+
+  return resultado as unknown as SugestaoItem[];
+}
+
+/** Passo 6. */
+export async function salvarVoluntariado(userId: string, dados: VoluntariadoData) {
+  const ong = await ongDoUsuario(userId);
+
+  const atividades = [...new Set(dados.horarios.map((h) => h.atividade).filter((a) => a !== ATIVIDADE_OUTRA))];
+  if ((await buscarOpcoes("ATIVIDADE", atividades)).length !== atividades.length) {
+    throw new OpcaoInvalidaError("horarios");
+  }
+
+  // desligado, os horários ficam guardados (somem do perfil e dos filtros, mas não se perdem)
+  const horariosVoluntariado = dados.horarios.map((h) => ({
+    dia: h.dia,
+    inicio: h.inicio,
+    fim: h.fim,
+    atividade: h.atividade,
+    atividadeOutra: h.atividade === ATIVIDADE_OUTRA ? h.atividadeOutra : null,
+    turnos: calcularTurnos(h.inicio, h.fim),
+  }));
+
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: {
+      aceitaVoluntarios: dados.aceitaVoluntarios,
+      horariosVoluntariado,
+      requisitosVoluntariado: dados.requisitos,
+      passoAtual: proximoPasso(ong, 6),
+    },
+    select: resumo,
+  });
+}
+
+/** Prefixo das chaves de imagem de uma ONG no R2: ongs/<id>/logo-<uuid>.jpg */
+const prefixoImagem = (ongId: string, tipo: "logo" | "capa") => `ongs/${ongId}/${tipo}`;
+
+/** URL assinada para o navegador enviar a logo ou a capa direto para o R2. */
+export async function criarEnvioImagem(userId: string, { tipo, contentType, tamanho }: EnvioImagemData) {
+  const ong = await ongDoUsuario(userId);
+  return urlDeEnvio(prefixoImagem(ong.id, tipo), contentType, tamanho);
+}
+
+/** Passo 7. Só aceita chaves de imagem geradas para esta ONG. */
+export async function salvarApresentacao(userId: string, dados: ApresentacaoData) {
+  const ong = await ongDoUsuario(userId);
+
+  for (const campo of ["logo", "capa"] as const) {
+    const chave = dados[campo];
+    if (chave && chave !== ong[campo] && !chave.startsWith(`${prefixoImagem(ong.id, campo)}-`)) {
+      throw new ImagemInvalidaError(campo);
+    }
+  }
+
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: { ...dados, passoAtual: proximoPasso(ong, 7) },
+    select: resumo,
+  });
+}
+
+/** O que ainda falta para publicar (vazio = pode publicar). Também alimenta a lista do passo 8. */
+export function pendenciasParaPublicar(ong: Ong): string[] {
+  const pendencias: string[] = [];
+  if (!ong.localizacao) pendencias.push("localização no mapa");
+  if (!ong.contatos?.whatsapp?.visivel && !ong.contatos?.email?.visivel) pendencias.push("um contato visível");
+  if (ong.causas.length === 0) pendencias.push("pelo menos uma causa");
+  if (ong.itens.length + ong.itensLivres.length === 0) pendencias.push("pelo menos um item");
+  if (!ong.nomePublico || !ong.descricaoCurta) pendencias.push("nome público e descrição curta");
+  return pendencias;
+}
+
+/** Passo 8: publica na hora, sem aprovação manual. Publicar de novo não muda nada. */
+export async function publicarOng(userId: string) {
+  const ong = await ongDoUsuario(userId);
+
+  if (ong.status === "SUSPENSA") throw new OngSuspensaError();
+  if (ong.status === "PUBLICADA") {
+    return { id: ong.id, status: ong.status, passoAtual: ong.passoAtual, publicadaEm: ong.publicadaEm };
+  }
+
+  const pendencias = pendenciasParaPublicar(ong);
+  if (pendencias.length > 0) throw new CadastroIncompletoError(pendencias);
+
+  const agora = new Date();
+  return prisma.ong.update({
+    where: { id: ong.id },
+    data: { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO },
+    select: { ...resumo, publicadaEm: true },
+  });
+}

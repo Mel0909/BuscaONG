@@ -1,0 +1,26 @@
+meta {
+  name: passo 7 - apresentacao
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/minha/apresentacao
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nomePublico": "Casa Lar Esperança",
+    "descricaoCurta": "Acolhemos 22 crianças de 0 a 12 anos desde 1998.",
+    "sobre": "",
+    "logo": null,
+    "capa": null
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  logo e capa: chaves devolvidas por passo 7 - url de envio de imagem (ou null).
+}

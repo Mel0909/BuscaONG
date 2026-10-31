@@ -9,3 +9,5 @@ export const hasMinLength = (password: string) => password.length >= 8;
 
 export * from './zod'
 export * from './cnpj'
+export * from './contatos'
+export * from './endereco'

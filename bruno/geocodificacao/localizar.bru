@@ -1,0 +1,17 @@
+meta {
+  name: localizar endereco
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}?logradouro=Rua Domingos de Morais&numero=1200&municipio=São Paulo&uf=SP
+  body: none
+  auth: inherit
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Endereço → { latitude, longitude, precisao: endereco | cidade } pelo Nominatim (10 por minuto por conta).
+  404 se nem a cidade for encontrada; 503 se o Nominatim falhar.
+}

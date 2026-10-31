@@ -1,14 +1,19 @@
-// os 8 passos do cadastro da ONG (docs/buscaong.md §4); só os implementados têm rota
+// os 8 passos do cadastro da ONG (docs/buscaong.md §4)
 export const PASSOS = [
   { numero: 1, nome: "CNPJ", rota: "/ong/cadastro" },
   { numero: 2, nome: "Criar acesso", rota: "/ong/cadastro/acesso" },
   { numero: 3, nome: "Localização no mapa", rota: "/ong/cadastro/localizacao" },
-  { numero: 4, nome: "Contatos e redes", rota: null },
-  { numero: 5, nome: "Causas e itens", rota: null },
-  { numero: 6, nome: "Horários de voluntariado", rota: null },
-  { numero: 7, nome: "Foto e descrição", rota: null },
-  { numero: 8, nome: "Prévia e publicar", rota: null },
+  { numero: 4, nome: "Contatos e redes", rota: "/ong/cadastro/contatos" },
+  { numero: 5, nome: "Causas e itens", rota: "/ong/cadastro/causas-itens" },
+  { numero: 6, nome: "Horários de voluntariado", rota: "/ong/cadastro/voluntariado" },
+  { numero: 7, nome: "Foto e descrição", rota: "/ong/cadastro/apresentacao" },
+  { numero: 8, nome: "Prévia e publicar", rota: "/ong/cadastro/publicar" },
 ] as const;
+
+/** Rota de um passo (1 a 8). */
+export function rotaDoPasso(numero: number): string {
+  return PASSOS[Math.min(Math.max(numero, 1), PASSOS.length) - 1].rota;
+}
 
 /** Número do passo da rota atual (1 quando não reconhece). */
 export function passoDaRota(pathname: string): number {
