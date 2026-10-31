@@ -8,3 +8,4 @@ export const hasNumber = (password: string) => /\d/.test(password);
 export const hasMinLength = (password: string) => password.length >= 8;
 
 export * from './zod'
+export * from './cnpj'
