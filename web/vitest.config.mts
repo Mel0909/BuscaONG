@@ -1,6 +1,9 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
- import { resolve } from 'path'
+import { fileURLToPath } from 'node:url'
+
+// caminho absoluto a partir desta pasta (ESM não tem __dirname)
+const dir = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 
 export default defineConfig({
   plugins: [react()],
@@ -14,15 +17,15 @@ export default defineConfig({
     alias: [
       { 
         find: '@/backend',
-        replacement: resolve(__dirname, './src/app/(backend)') 
+        replacement: dir('./src/app/(backend)') 
       },
       {
         find: '@/frontend',
-        replacement: resolve(__dirname, './src/app/(frontend)')
+        replacement: dir('./src/app/(frontend)')
       },
       {
         find: '@',
-        replacement: resolve(__dirname, './src')
+        replacement: dir('./src')
       },
     ],
   

@@ -98,7 +98,7 @@ Atualizadas na Etapa 4 (revalidadas em 2026-10-30). Ficam no `package.json` da r
 | @types/react / @types/react-dom | 19.2.18 / 19.2.7 | Acompanham a linha do React (19.2) | junto com o React, na Etapa 5 |
 | commitlint, husky | 21.2.4, 9.1.7 | — | — |
 
-**Removido:** `vite-tsconfig-paths`. Era redundante, porque os aliases já estão no `vitest.config.ts`, e dependia do `tsconfck` 3.1.6 (deprecated), que só declara suporte ao TypeScript 5.
+**Removido:** `vite-tsconfig-paths`. Era redundante, porque os aliases já estão no `vitest.config.mts`, e dependia do `tsconfck` 3.1.6 (deprecated), que só declara suporte ao TypeScript 5.
 
 **Prisma e MongoDB:**
 - O **Prisma 7 não suporta MongoDB**.

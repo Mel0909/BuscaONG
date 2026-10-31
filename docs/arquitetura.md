@@ -88,7 +88,7 @@ web/
 ├── playwright.config.ts configuração dos testes e2e
 ├── postcss.config.mjs   plugin do Tailwind CSS 4
 ├── tsconfig.json        estende ../tsconfig.base.json; opções do Next + aliases de import
-├── vitest.config.ts     configuração dos testes de integração
+├── vitest.config.mts    configuração dos testes unitários e de integração
 └── package.json         dependências do app (runtime + configs ligadas ao Next) e scripts
 ```
 
@@ -187,7 +187,7 @@ src/
 | `@/backend/*` | `src/app/(backend)/*` |
 | `@/frontend/*` | `src/app/(frontend)/*` |
 
-O `vitest.config.ts` repete esses aliases para os testes.
+O `vitest.config.mts` repete esses aliases para os testes.
 
 ## 5. Fluxos
 
