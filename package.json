@@ -16,8 +16,8 @@
     "test:e2e": "pnpm --filter web test:e2e"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@eslint/eslintrc": "^3.3.7",
     "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
