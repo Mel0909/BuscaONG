@@ -75,7 +75,8 @@ O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e co
 ```
 web/
 ├── prisma/
-│   └── schema.prisma    modelos do banco (MongoDB)
+│   ├── schema.prisma    modelos do banco (MongoDB)
+│   └── seed.mts         listas fixas (causas, itens, atividades) e índice geográfico (pnpm db:seed)
 ├── public/              arquivos estáticos servidos na raiz do site (/favicon, /icons/...)
 ├── src/                 código do app (ver §4)
 ├── tests/
@@ -85,7 +86,7 @@ web/
 ├── .env.example         modelo das variáveis de ambiente (copiar para .env)
 ├── components.json      configuração do shadcn/ui (onde gerar componentes)
 ├── eslint.config.mjs    regras de lint (eslint-config-next)
-├── next.config.ts       configuração do Next (raiz do Turbopack, SVG via SVGR, env do Resend)
+├── next.config.ts       configuração do Next (raiz do Turbopack, SVG via SVGR)
 ├── playwright.config.ts configuração dos testes e2e
 ├── postcss.config.mjs   plugin do Tailwind CSS 4
 ├── tsconfig.json        estende ../tsconfig.base.json; opções do Next + aliases de import
@@ -105,8 +106,10 @@ Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.
 | `test` / `test:watch` / `coverage` | Vitest (integração) |
 | `test:e2e` / `test:complete` | Playwright / Vitest + Playwright |
 | `postinstall` | `prisma generate` (automático após `pnpm install`) |
+| `db:push` | `prisma db push`: cria coleções e índices únicos no MongoDB a partir do schema |
+| `db:seed` | preenche as listas fixas e cria o índice `2dsphere` (rodar depois do `db:push`; pode repetir) |
 
-Da raiz, os principais têm atalho: `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint` (= `lint:check`), `pnpm lint:fix`, `pnpm test`, `pnpm test:e2e`. Os demais: `pnpm --filter web <script>`.
+Da raiz, os principais têm atalho: `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint` (= `lint:check`), `pnpm lint:fix`, `pnpm test`, `pnpm test:e2e`, `pnpm db:push`, `pnpm db:seed`. Os demais: `pnpm --filter web <script>`.
 
 **Onde fica cada dependência:**
 - **`web/package.json`:** o que o site usa para funcionar (Next, React, Prisma Client, better-auth...) e as configs ligadas ao Next (`eslint-config-next`, `prisma` CLI, Tailwind, SVGR).
@@ -142,11 +145,14 @@ src/
 │   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
 │   │   ├── admin/                /admin (login do admin), /admin/dashboard
-│   │   └── ong/cadastro/         /ong/cadastro (passos 1 a 3 do cadastro da ONG)
-│   │       └── _components/      barra de passos, campos e estado do cadastro
+│   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG)
+│   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx)
+│   │   │   ├── _actions/         chamadas à API dos passos 3 a 8
+│   │   │   └── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
-│   │   ├── api/                  endpoints REST (route.ts)
-│   │   ├── services/             acesso ao banco via Prisma (ongs/: elegibilidade e criação de conta)
+│   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = passos 3 a 8 do cadastro
+│   │   ├── services/             acesso ao banco via Prisma (ongs/: conta e cadastro; listas/: listas fixas)
 │   │   └── schemas/              validação de entrada com Zod
 │   ├── layout.tsx                layout raiz (fontes do perto, <html>, toasts)
 │   ├── globals.css               Tailwind, tokens de cor/fonte do perto e estilos globais
@@ -157,19 +163,23 @@ src/
 │   ├── base/                     componentes do projeto (ValidatedInput, BaseCheckbox, InitialNav...)
 │   │   └── brand/PertoLogo.tsx   logo do perto (PertoMark + PertoLogo)
 │   ├── auth/                     peças de login usadas em mais de uma tela
+│   ├── ong/                      peças da ONG usadas em mais de uma tela (CartaoOng)
 │   └── common/                   globais (ToastProvider)
 ├── hooks/                        hooks React reutilizáveis (use-mobile)
 ├── lib/                          integração com libs e serviços
 │   ├── auth-client.ts            cliente better-auth para o navegador
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
+│   ├── armazenamento/            URLs assinadas para enviar imagens ao Cloudflare R2
+│   ├── cadastro/                 limites e regras do cadastro usados no servidor e na tela (turnos, tipos de imagem)
 │   ├── cnpj/                     consulta de CNPJ (BrasilAPI → Minha Receita → OpenCNPJ)
 │   ├── email/                    envio via Resend (no terminal em dev) + templates de e-mail
+│   ├── geocodificacao/           endereço → coordenadas pelo Nominatim (fila de 1/s e cache)
 │   └── utils.ts                  cn() para combinar classes Tailwind
 ├── utils/                        funções auxiliares do projeto
-│   ├── api/server/               helpers das rotas: blockForbiddenRequests, getUserFromRequest, validBody, errorHandlers, rateLimit
+│   ├── api/server/               helpers das rotas: blockForbiddenRequests, exigirSessaoOng, getUserFromRequest, validBody, errorHandlers, rateLimit
 │   ├── api/toErrorMessage.ts     erro → texto legível
-│   ├── formatters/               formatação para a tela (dados da Receita)
-│   └── validations/              regras de senha e e-mail; CNPJ (dígito verificador, máscara)
+│   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
+│   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
 ├── types/                        tipos compartilhados (AllowedRoutes)
 ├── generated/                    cliente Prisma gerado (não editar, não versionado)
 ├── auth.ts                       configuração central do better-auth

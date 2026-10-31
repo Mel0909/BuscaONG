@@ -38,7 +38,12 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
    2. **Consulta à BrasilAPI**, com fallback para Minha Receita e OpenCNPJ (ver §8.4).
    3. **Situação cadastral ativa** e **natureza jurídica sem fins lucrativos**.
 2. Criar acesso (login da ONG).
-3. Localização.
+3. Localização no mapa.
+4. Contatos e redes sociais.
+5. Causas e itens.
+6. Horários de voluntariado.
+7. Foto e descrição.
+8. Prévia e publicar.
 
 ### 4.1 Passos 1 e 2: como está implementado
 
@@ -56,14 +61,69 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - E-mail e senha. A regra é 8+ caracteres, com maiúscula, minúscula e número; a tela marca os requisitos ao vivo e o servidor aplica a mesma regra.
 - `POST /api/ongs` (pública, 5 tentativas por minuto por IP) revalida o CNPJ no servidor e só então cria o usuário (perfil `ONG`, e-mail não verificado) e a `Ong` em `RASCUNHO` com `passoAtual: 3`. Se a `Ong` falhar, o usuário é apagado (sem conta órfã).
 - O better-auth envia um **código de 6 dígitos** por e-mail (Resend), válido por 10 minutos e guardado com hash. A tela tem 6 campos e reenvio depois de 60 s.
-- Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3, que por enquanto só avisa que o acesso foi criado.
+- Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3.
 
 **Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
-4. Contatos e redes sociais.
-5. Causas e itens.
-6. Horários de voluntariado.
-7. Foto e descrição.
-8. Prévia e publicar.
+
+### 4.2 Passos 3 a 8: como está implementado
+
+A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao clicar em Continuar (o rascunho fica salvo). As páginas são Server Components que leem a ONG do usuário logado; o envio vai para `PUT /api/ongs/minha/<seção>`.
+
+**Regras comuns:**
+- Só a conta de perfil `ONG` mexe no próprio cadastro. As rotas agem sobre a ONG **do usuário da sessão**, sem ID na URL (assim não dependem do erro #5, sobre o formato de ID).
+- `passoAtual` marca o passo mais adiantado liberado. Salvar o passo *n* libera o *n+1*; voltar e salvar de novo não reduz. Abrir um passo além do liberado redireciona para o primeiro que falta.
+- Sem login, as páginas levam a `/login`; outro perfil vai para `/`. Depois de publicada, qualquer passo leva ao 8, que mostra o perfil publicado.
+- O passo 3 não tem "Voltar": os passos 1 e 2 não se refazem depois que a conta existe.
+
+| Passo | Tela | API | O que grava |
+|---|---|---|---|
+| 3 Localização | `/ong/cadastro/localizacao` | `PUT /api/ongs/minha/localizacao` | `endereco`, `localizacao` (ponto GeoJSON `[lng, lat]`), `mostrarSoBairro` |
+| 4 Contatos | `/ong/cadastro/contatos` | `PUT /api/ongs/minha/contatos` | `contatos` (WhatsApp, e-mail, site, Instagram, cada um com `visivel`) |
+| 5 Causas e itens | `/ong/cadastro/causas-itens` | `PUT /api/ongs/minha/causas-itens` | `causas`, `itens` (slugs das listas fixas), `itensLivres` |
+| 6 Voluntariado | `/ong/cadastro/voluntariado` | `PUT /api/ongs/minha/voluntariado` | `aceitaVoluntarios`, `horariosVoluntariado` (com `turnos`), `requisitosVoluntariado` |
+| 7 Apresentação | `/ong/cadastro/apresentacao` | `PUT /api/ongs/minha/apresentacao` e `POST /api/ongs/minha/imagens` | `nomePublico`, `descricaoCurta`, `sobre`, `logo`, `capa` |
+| 8 Publicar | `/ong/cadastro/publicar` | `POST /api/ongs/minha/publicacao` | `status: PUBLICADA`, `publicadaEm`, `termosAceitosEm` |
+
+**Passo 3, Localização:**
+- O endereço vem da Receita (a menos que a ONG tenha dito no passo 1 que mudou) e pode ser editado.
+- O pin começa na posição aproximada do endereço, calculada pelo **Nominatim** (OpenStreetMap) via `GET /api/geocodificacao`. Se não acha a rua, usa o centro da cidade. A ONG arrasta o pin (ou clica no mapa) até a entrada; o pin arrastado é o que vale.
+- O mapa é o **Mapbox GL JS**. A geocodificação do Mapbox não é usada porque os termos dele **não permitem guardar** o resultado da geocodificação comum; a "permanente" exige cartão de crédito e é paga por consulta. O Nominatim permite guardar (dados ODbL, com atribuição) e é gratuito, com limite de 1 consulta por segundo: o servidor enfileira as chamadas, guarda as respostas em cache e limita a 10 consultas por minuto por conta. Não há autocompletar, que a política do Nominatim proíbe.
+- Sem `NEXT_PUBLIC_MAPBOX_TOKEN`, a tela mostra "Mapa indisponível" e usa a posição calculada pelo endereço.
+- "Mostrar só o bairro" só é guardado; o perfil público é que vai mostrar a área aproximada.
+- A posição precisa estar dentro do retângulo do Brasil (pega latitude e longitude trocadas).
+
+**Passo 4, Contatos:**
+- Pelo menos WhatsApp ou e-mail, preenchido e visível.
+- WhatsApp vira E.164 (`+5511971234567`) e tem o link "Testar no WhatsApp" (wa.me). Aceita celular e fixo (WhatsApp Business).
+- Instagram aceita `@usuario` ou link e vira `@usuario`. Site ganha `https://` quando falta.
+- O e-mail de acesso aparece como atalho ("Usar ..."). Desmarcar "Visível na página" não apaga o dado.
+
+**Passo 5, Causas e itens:**
+- 1 a 3 causas e pelo menos um item (da lista ou livre).
+- As listas fixas ficam na coleção `opcao_lista` (modelo `OpcaoLista`, tipos `CAUSA`, `ITEM` e `ATIVIDADE`), preenchida por `pnpm db:seed` com as listas do protótipo. O admin vai gerenciá-las; a ONG guarda o `slug`, que não muda quando o nome muda.
+- Item livre (até 20, de 2 a 40 caracteres) é guardado com o nome digitado e uma `chave` normalizada (minúsculas, sem acento). Se a chave bate com um item da lista, vira o item da lista.
+- Enquanto a ONG digita (3+ letras), `GET /api/itens-livres?q=` sugere itens livres que outras ONGs já usaram, com quantas ONGs usam.
+
+**Passo 6, Voluntariado (opcional):**
+- Ligado, exige pelo menos um horário (até 20). Desligado, os horários ficam guardados, mas não aparecem.
+- Cada horário tem dia (dias da semana, dias úteis, fim de semana ou todo dia), início e fim em horas cheias ou "horário livre", e atividade da lista fixa ou "Outra" com texto.
+- Os **turnos** (manhã até 12h, tarde até 18h, noite depois) são calculados no servidor para o filtro de voluntariado. Horário livre conta nos três.
+- A lista de atividades tem as três do protótipo e cinco provisórias (cozinha, limpeza e manutenção, cuidado com animais, apoio administrativo, eventos e campanhas), para revisar.
+
+**Passo 7, Apresentação:**
+- Nome público (a primeira sugestão é a razão social) e descrição curta (até 160 caracteres) são obrigatórios; "Sobre a ONG" é opcional.
+- Logo (mín. 400 px de lado, até 2 MB) e capa (até 5 MB) são opcionais, em JPG, PNG ou WebP. O navegador pede uma URL assinada (`POST /api/ongs/minha/imagens`) e envia o arquivo **direto para o Cloudflare R2**. Tipo e tamanho entram na assinatura, então o R2 recusa um arquivo diferente do declarado.
+- O banco guarda a **chave** do arquivo (`ongs/<id>/logo-<uuid>.png`); o `PUT` só aceita chaves com o prefixo da própria ONG.
+- Sem as variáveis `R2_*`, o envio aparece como indisponível e a ONG segue sem imagens.
+- O bucket precisa de CORS liberando `PUT` a partir do domínio do site (e de `http://localhost:3000` em desenvolvimento).
+
+**Passo 8, Prévia e publicar:**
+- Mostra o card como vai aparecer no mapa e na lista (`components/ong/CartaoOng.tsx`) e a verificação do que está completo, com link para completar o que falta.
+- Publicar exige aceitar os termos de uso (`/termos`, texto provisório). A publicação é imediata, sem aprovação manual. Se faltar algo, a API responde 422 com `details.pendencias`.
+- ONG suspensa não publica (403). Publicar de novo não muda nada.
+- Depois de publicar, a tela mostra "Perfil publicado!" e o card. A tela de boas-vindas e o e-mail com o link do perfil, previstos no protótipo, ficaram fora desta entrega.
+
+**Erros das rotas `/api/ongs/minha/*`:** 400 dados inválidos ou opção/imagem que não existe (`details[].campo`) · 401 sem login · 403 outro perfil ou ONG suspensa · 404 conta sem ONG · 422 cadastro incompleto · 503 R2 não configurado (imagens).
 
 ## 5. Painel da ONG
 
@@ -95,7 +155,8 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 | React / React DOM | **19.3.0** (09/09/2026) | 19.2.0 | — | Última da linha 19.2: **19.2.8**. ⚠️ ver §10 |
 | Prisma / @prisma/client | **6.19.3** (linha 6) | 6.19.1 | `>=18.18` | ⚠️ ver nota abaixo |
 | better-auth | **1.7.7** | ^1.5.5 | — | Última da linha 1.6: **1.6.33**. Peers: `next ^14\|\|^15\|\|^16`, `prisma`/`@prisma/client ^5\|\|^6\|\|^7`. ⚠️ ver §10 |
-| Mapbox GL JS | — | não instalado | — | Ver §9 |
+| Mapbox GL JS (`mapbox-gl`) | 3.34.1 | ^3.34.1 | — | Licença própria da Mapbox (não é open source); exige token. Usado no passo 3 do cadastro |
+| AWS SDK S3 (`@aws-sdk/client-s3`, `s3-request-presigner`) | 3.1161.0 | ^3.1161.0 | — | Só no servidor, para as URLs assinadas do Cloudflare R2 (API compatível com S3) |
 
 O TypeScript e as demais ferramentas de desenvolvimento estão na §8.1.1.
 
@@ -146,6 +207,7 @@ Todos os pacotes da tabela §8.1 aceitam Node 24 (o mínimo mais alto é o do Ne
 | Serviço | Uso | Tier gratuito atual | Depois do gratuito |
 |---|---|---|---|
 | **Mapbox GL JS** | mapa | **50.000 map loads/mês** (sem mudança) | US$ 5,00 por 1.000 loads (50k–100k), com faixas decrescentes |
+| **Nominatim** (OpenStreetMap) | endereço → coordenadas no cadastro (passo 3) | gratuito, **1 consulta/s**, sem autocompletar, User-Agent identificado | — (para volume maior, hospedar um Nominatim próprio) |
 | **Resend** | e-mail transacional (login, reset de senha) | **3.000 e-mails/mês, limite de 100/dia**, 3 domínios | Pro: US$ 20/mês (50.000 e-mails) |
 | **Brevo** | alternativa ao Resend | **300 e-mails/dia** (~9.000/mês), contatos ilimitados — ⚠️ revalidado só parcialmente (ver abaixo) | a partir de ~US$ 9/mês (5.000 e-mails) |
 | **Cloudflare R2** | armazenamento de fotos das ONGs | **10 GB-mês**, 1 mi operações Classe A, 10 mi Classe B, **egress grátis** | US$ 0,015/GB-mês; US$ 4,50/mi Classe A; US$ 0,36/mi Classe B |
@@ -184,11 +246,15 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 
 ## 9. Decisões em aberto
 
-- **Moderação automática de imagem:** ferramenta ainda não escolhida.
+- **Moderação automática de imagem:** ferramenta ainda não escolhida. O protótipo prevê moderar antes de publicar; hoje as imagens do passo 7 vão direto para o R2 e aparecem no perfil.
 - **Telas de login:** design pendente.
 - **Tela de confirmação de denúncia:** design pendente.
 - **Selo de CNPJ verificado:** exibir ou não.
-- **`mapbox-gl`:** entra como dependência agora ou só quando a feature do mapa for implementada? **Decisão adiada.**
+- **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).
+- **Endereço diferente do da Receita:** o protótipo prevê virar "sinal para a auditoria" do admin, sem bloquear. Não implementado (depende do admin).
+- **Retomar o cadastro depois do login:** hoje o login leva para `/`. Quem sai no meio precisa abrir `/ong/cadastro/localizacao`, que leva ao passo que falta.
+- **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
+- **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
 - **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.
 - **E-mail já cadastrado no passo 2:** hoje a resposta diz explicitamente que o e-mail já tem conta. Isso revela se um e-mail está cadastrado, mas só para quem tem um CNPJ elegível e ainda sem conta, e com limite de tentativas. A alternativa é uma mensagem genérica.
 - **Cor de erro:** a paleta não tem cor de erro (terracota é só para urgência). Os erros de formulário usam borda `tinta` e texto neutro.
