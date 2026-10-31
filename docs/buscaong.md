@@ -57,7 +57,7 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - "O endereço mudou" segue igual, mas grava `usarEnderecoReceita: false` (o endereço será pedido no passo 3).
 
 **Passo 2, Criar acesso** (`/ong/cadastro/acesso`):
-- E-mail e senha. A regra é 8+ caracteres, com maiúscula, minúscula e número; a tela marca os requisitos ao vivo e o servidor aplica a mesma regra.
+- E-mail, senha e confirmação da senha, com botão para mostrar o que foi digitado. A regra é 8+ caracteres, com maiúscula, minúscula e número; a tela marca os requisitos ao vivo e o servidor aplica a mesma regra. A confirmação é conferida só na tela.
 - `POST /api/ongs` (pública, 5 tentativas por minuto por IP) revalida o CNPJ no servidor e só então cria o usuário (perfil `ONG`, e-mail não verificado) e a `Ong` em `RASCUNHO` com `passoAtual: 3`. Se a `Ong` falhar, o usuário é apagado (sem conta órfã).
 - O better-auth envia um **código de 6 dígitos** por e-mail (Resend), válido por 10 minutos e guardado com hash. A tela tem 6 campos e reenvio depois de 60 s.
 - Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3.

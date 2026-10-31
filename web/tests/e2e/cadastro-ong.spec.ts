@@ -71,6 +71,17 @@ test.describe('cadastro da ONG', () => {
     await expect(page.getByRole('button', { name: 'Criar acesso' })).toBeDisabled()
     await page.locator('#senha').fill('Senha123')
 
+    // confirmação diferente: avisa e não deixa criar
+    await page.locator('#confirmacao-senha').fill('Senha12')
+    await expect(page.getByText('As senhas não são iguais.')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Criar acesso' })).toBeDisabled()
+    await page.locator('#confirmacao-senha').fill('Senha123')
+    await expect(page.getByText('As senhas não são iguais.')).toBeHidden()
+
+    // o olho mostra a senha digitada
+    await page.getByRole('button', { name: 'Mostrar senha' }).first().click()
+    await expect(page.locator('#senha')).toHaveAttribute('type', 'text')
+
     const criacao = page.waitForRequest('**/api/ongs')
     await page.getByRole('button', { name: 'Criar acesso' }).click()
     expect((await criacao).postDataJSON()).toEqual({
