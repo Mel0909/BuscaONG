@@ -30,12 +30,13 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
 | 11 | 🟡 | Reset de senha sem validação da política | `api/password/reset/route.ts` |
-| 12 | 🟡 | Admin pode apagar Super Admin e outros admins | `api/users/[id]/route.ts` |
+| 12 | 🟡 | Admin pode apagar ou editar outros admins | `api/users/[id]/route.ts` |
 | 13 | 🟡 | Regras de senha inconsistentes entre telas e rotas | vários |
 | 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
 | 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
 | 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
+| 18 | 🟡 | Falha intermitente ao baixar a fonte Bricolage no `next dev`/`next build` | `app/layout.tsx` |
 
 ## Detalhes
 
@@ -178,3 +179,9 @@ Caminhos relativos a `web/src/`.
 - **Onde:** `next build` (Turbopack), trace a partir do `proxy.ts`
 - **Problema:** o build avisa "Encountered unexpected file in NFT list". O cliente Prisma gerado em `src/generated/prisma`, que faz operações de sistema de arquivos, entra no trace do `proxy.ts` via `auth.ts` → `services/db`. O build conclui, mas o trace pode incluir arquivos demais.
 - **Correção:** avaliar ao reescrever o `proxy.ts`. Por exemplo, checar só o cookie de sessão no proxy, sem importar o Prisma, e validar a sessão nas páginas e rotas. Outra opção é mudar o `output` do gerador do Prisma.
+
+### 18. 🟡 Falha intermitente ao baixar a fonte Bricolage
+
+- **Onde:** `app/layout.tsx` (`next/font/google`), no `next dev` e no `next build` com Turbopack
+- **Problema:** de vez em quando o Turbopack falha ao baixar os arquivos da Bricolage Grotesque e mostra `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`. No dev, a página responde 500; no build, ele falha. Aconteceu 2 vezes em muitas execuções (2026-10-31), sempre só com a Bricolage; a Figtree e a IBM Plex Mono nunca falharam. Rodar de novo resolve.
+- **Correção:** hospedar as fontes no próprio projeto com `next/font/local` (arquivos `.woff2` versionados; as três fontes têm licença OFL). Isso tira a dependência de rede do build. Alternativa: pedir a Bricolage como fonte variável, sem listar pesos, para reduzir o número de arquivos baixados.

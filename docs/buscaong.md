@@ -39,6 +39,26 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
    3. **Situação cadastral ativa** e **natureza jurídica sem fins lucrativos**.
 2. Criar acesso (login da ONG).
 3. Localização.
+
+### 4.1 Passos 1 e 2: como está implementado
+
+**Passo 1, CNPJ** (`/ong/cadastro`):
+- O campo aplica a máscara e valida o dígito verificador no navegador (`utils/validations/cnpj.ts`), inclusive o **CNPJ alfanumérico** (válido desde jul/2026): mesmo módulo 11, com cada caractere valendo o código ASCII menos 48.
+- Com 14 caracteres válidos, consulta `GET /api/cnpj/[cnpj]`. A rota:
+  - é pública, com limite de 20 consultas por minuto por IP;
+  - responde `JA_CADASTRADO` sem consultar a Receita quando o CNPJ já tem conta;
+  - responde `ELEGIVEL` ou `NAO_ELEGIVEL` (com o motivo) junto com os dados da Receita.
+- Estados do campo: digitando, validando, válido, inválido, já cadastrado, não elegível, não encontrado e erro (Receita indisponível ou limite atingido).
+- O CNPJ validado fica na **sessionStorage** do navegador até a conta ser criada. Nada vai para o banco antes disso.
+- "O endereço mudou" segue igual, mas grava `usarEnderecoReceita: false` (o endereço será pedido no passo 3).
+
+**Passo 2, Criar acesso** (`/ong/cadastro/acesso`):
+- E-mail e senha. A regra é 8+ caracteres, com maiúscula, minúscula e número; a tela marca os requisitos ao vivo e o servidor aplica a mesma regra.
+- `POST /api/ongs` (pública, 5 tentativas por minuto por IP) revalida o CNPJ no servidor e só então cria o usuário (perfil `ONG`, e-mail não verificado) e a `Ong` em `RASCUNHO` com `passoAtual: 3`. Se a `Ong` falhar, o usuário é apagado (sem conta órfã).
+- O better-auth envia um **código de 6 dígitos** por e-mail (Resend), válido por 10 minutos e guardado com hash. A tela tem 6 campos e reenvio depois de 60 s.
+- Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3, que por enquanto só avisa que o acesso foi criado.
+
+**Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
 4. Contatos e redes sociais.
 5. Causas e itens.
 6. Horários de voluntariado.
@@ -152,7 +172,10 @@ Campos para a validação do passo 1:
   - OpenCNPJ: `situacao_cadastral` (`"Ativa"`).
 - **Natureza jurídica:**
   - BrasilAPI e Minha Receita: têm `codigo_natureza_juridica`. Na tabela da Receita, o grupo **3xxx = entidades sem fins lucrativos** (ex.: 3999 associação privada, 3069 fundação privada).
-  - OpenCNPJ: traz só a descrição em `natureza_juridica`, sem código. O fallback para ela precisa mapear pelo texto.
+  - OpenCNPJ: também traz `codigo_natureza_juridica` (como texto, ex.: `"3999"`), revalidado em 2026-10-30. O código é o mesmo nas três APIs.
+- **CNPJ alfanumérico:** BrasilAPI e Minha Receita já aceitam o formato (respondem "não encontrado" para `12ABC34501DE35`, e não "inválido").
+
+Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesma estrutura de dados para as três).
 
 ### 8.5 Infraestrutura
 
@@ -166,6 +189,10 @@ Campos para a validação do passo 1:
 - **Tela de confirmação de denúncia:** design pendente.
 - **Selo de CNPJ verificado:** exibir ou não.
 - **`mapbox-gl`:** entra como dependência agora ou só quando a feature do mapa for implementada? **Decisão adiada.**
+- **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.
+- **E-mail já cadastrado no passo 2:** hoje a resposta diz explicitamente que o e-mail já tem conta. Isso revela se um e-mail está cadastrado, mas só para quem tem um CNPJ elegível e ainda sem conta, e com limite de tentativas. A alternativa é uma mensagem genérica.
+- **Cor de erro:** a paleta não tem cor de erro (terracota é só para urgência). Os erros de formulário usam borda `tinta` e texto neutro.
+- **Conta com e-mail não confirmado:** se a pessoa fechar o navegador antes de digitar o código, a conta existe, mas o login exige e-mail verificado. Falta o fluxo de "entrar e confirmar o e-mail" ou de recuperar o acesso.
 
 ## 10. Pontos sinalizados nesta revalidação
 

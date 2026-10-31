@@ -13,6 +13,9 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 | Peça | Arquivo |
 |---|---|
 | Configuração do servidor | `web/src/auth.ts` |
+| Hook que roda antes das rotas do better-auth | `web/src/lib/auth-hooks.ts` |
+| E-mail do código de verificação | `web/src/lib/email/templates/codigoVerificacao.ts` |
+| Criação de conta (ONG) | `POST /api/ongs` → `services/ongs` (`criarContaOng`) |
 | Endpoints do better-auth (`/api/auth/*`) | `web/src/app/(backend)/api/auth/[...all]/route.ts` |
 | Cliente para o navegador | `web/src/lib/auth-client.ts` |
 | Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) |
@@ -21,7 +24,11 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 
 Configuração atual do `auth.ts`:
 - Adapter Prisma com MongoDB.
-- Login por e-mail e senha.
+- Login por e-mail e senha, com **e-mail verificado obrigatório** (`requireEmailVerification`).
+- **Verificação por código** (plugin `emailOTP` com `overrideDefaultEmailVerification`): 6 dígitos, válido por 10 minutos, guardado com hash e enviado pelo Resend. Na criação da conta o código é enviado automaticamente (`sendOnSignUp`), e confirmar o código já cria a sessão (`autoSignInAfterVerification`).
+- **Hook `before`** (`lib/auth-hooks.ts`):
+  - aplica a regra de senha (8+, maiúscula, minúscula e número) em cadastro, troca e redefinição de senha;
+  - **bloqueia o cadastro direto** em `/api/auth/sign-up/email` vindo do HTTP. Só o servidor cria contas (`auth.api.signUpEmail`, sem `request`), pelo `POST /api/ongs`, junto com a ONG.
 - Exclusão e troca de e-mail habilitadas.
 - O plugin `customSession` acrescenta o `role` do usuário à sessão.
 - O plugin `nextCookies` cuida dos cookies em Server Actions.
@@ -34,6 +41,8 @@ Configuração atual do `auth.ts`:
 4. **Exceção conhecida:** a exclusão de usuário pelo admin hoje apaga `Session`, `Account` e `User` direto via Prisma (`services/users`). Ao reescrever, preferir o fluxo do better-auth ou do plugin admin.
 5. **Funções de servidor precisam da sessão:** chamadas como `auth.api.getSession`, `changePassword` e `changeEmail` exigem `headers: await headers()`. Sem isso, falham (bug #6 em [erros-a-consertar.md](erros-a-consertar.md)).
 6. **Não editar os modelos do better-auth no `schema.prisma`** sem conferir a documentação; campos novos de usuário entram como `additionalFields` na configuração.
+7. **Contas só nascem pelo `POST /api/ongs`.** Não reabra o cadastro direto do better-auth: uma conta de perfil ONG sem `Ong` ligada fica num estado inválido.
+8. **E-mail repetido não dá erro no `signUpEmail`:** com a verificação obrigatória, o better-auth devolve um usuário falso para não revelar quais e-mails existem. Quem cria conta precisa checar o e-mail antes, como `criarContaOng` faz.
 
 ## 4. Como usar
 
