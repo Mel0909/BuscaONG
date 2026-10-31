@@ -27,15 +27,51 @@ model User {
   role          Role      @default(ONG)
   // < e aqui
 
-
+  ong Ong?
 
   @@map("user")
 }
 
 // crie modelos novos!
 
+enum OngStatus {
+  RASCUNHO // conta criada, cadastro em andamento (passos 3 a 8)
+  PUBLICADA // visível no mapa e na lista
+  SUSPENSA // retirada do ar pelo admin
+}
 
+// endereço como veio da Receita Federal na validação do CNPJ
+type EnderecoReceita {
+  tipoLogradouro String?
+  logradouro     String?
+  numero         String?
+  complemento    String?
+  bairro         String?
+  municipio      String?
+  uf             String?
+  cep            String?
+}
 
+model Ong {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  cnpj                String           @unique // sem máscara; interno, não aparece no perfil público
+  razaoSocial         String
+  naturezaJuridica    String // código de 4 dígitos da tabela da Receita (ex.: 3999)
+  situacaoCadastral   String // como estava na validação (ex.: ATIVA)
+  enderecoReceita     EnderecoReceita?
+  // false quando a ONG indicou no passo 1 que o endereço da Receita mudou
+  usarEnderecoReceita Boolean          @default(true)
+  receitaConsultadaEm DateTime
+  status              OngStatus        @default(RASCUNHO)
+  // próximo passo do cadastro (1 a 8); a conta nasce no passo 2, então começa no 3
+  passoAtual          Int              @default(3)
+  userId              String           @unique
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@map("ong")
+}
 
 // evitar mexer daqui pra baixo
 // nesses 3 modelos do better auth
