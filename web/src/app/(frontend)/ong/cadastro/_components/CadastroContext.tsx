@@ -12,7 +12,7 @@ export type DadosCadastro = {
   emailPendente?: string;
 };
 
-const CHAVE = "perto:cadastro-ong";
+const CHAVE = "buscaong:cadastro-ong";
 
 // store mínimo sobre a sessionStorage, lido com useSyncExternalStore
 let cache: DadosCadastro | null | undefined; // undefined = ainda não lido

@@ -6,7 +6,7 @@
 // o app, no máximo 1 consulta por segundo, cache das respostas e nada de autocompletar.
 
 const URL_NOMINATIM = "https://nominatim.openstreetmap.org/search";
-const USER_AGENT = "perto (cadastro de ONGs; BuscaONG)";
+const USER_AGENT = "BuscaONG (cadastro de ONGs)";
 const INTERVALO_MS = 1100;
 const CACHE_MAX = 500;
 

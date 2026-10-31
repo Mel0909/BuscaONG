@@ -31,7 +31,7 @@ O `_` no nome da pasta (`_components`, `_utils`, `_actions`) a torna **privada**
 
 - **Ícones:** `lucide-react`.
 - **Fontes:** só via `next/font` (já configuradas no `layout.tsx`); use as classes `font-sans`, `font-display` e `font-mono`.
-- **Cores:** só os tokens do perto (`bg-musgo`, `text-tinta`, `border-borda`...). **Terracota é exclusiva de urgência.**
+- **Cores:** só os tokens do projeto (`bg-musgo`, `text-tinta`, `border-borda`...). **Terracota é exclusiva de urgência.**
 - **Feedback ao usuário:** `toast.success(...)` e `toast.error(...)` do `react-hot-toast` (o `ToastProvider` já está no layout).
 - **Classes condicionais:** `cn()` de `@/lib/utils`.
 

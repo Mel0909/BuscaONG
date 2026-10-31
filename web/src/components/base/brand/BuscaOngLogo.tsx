@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-// marca do perto: quadrado arredondado com um pin (ver design/)
+// marca do BuscaONG: quadrado arredondado com um pin (ver design/)
 // "light" é para fundos claros e "dark" para fundos escuros
 type Variant = "light" | "dark";
 
@@ -9,7 +9,7 @@ const markColors: Record<Variant, { bg: string; pin: string }> = {
   dark: { bg: "var(--color-salvia)", pin: "var(--color-musgo-escuro)" },
 };
 
-export function PertoMark({ size = 34, variant = "light", className }: { size?: number; variant?: Variant; className?: string }) {
+export function BuscaOngMark({ size = 34, variant = "light", className }: { size?: number; variant?: Variant; className?: string }) {
   const { bg, pin } = markColors[variant];
 
   return (
@@ -24,18 +24,18 @@ export function PertoMark({ size = 34, variant = "light", className }: { size?: 
   );
 }
 
-function PertoLogo({ size = 34, variant = "light", className }: { size?: number; variant?: Variant; className?: string }) {
+function BuscaOngLogo({ size = 34, variant = "light", className }: { size?: number; variant?: Variant; className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <PertoMark size={size} variant={variant} />
+      <BuscaOngMark size={size} variant={variant} />
       <span
         className={cn("font-display font-bold tracking-tight", variant === "light" ? "text-tinta" : "text-papel")}
         style={{ fontSize: size * 0.6 }}
       >
-        perto
+        BuscaONG
       </span>
     </span>
   );
 }
 
-export default PertoLogo;
+export default BuscaOngLogo;

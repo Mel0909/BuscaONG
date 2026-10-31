@@ -40,7 +40,7 @@ function Publicado({ cartao }: { cartao: DadosCartaoOng }) {
   return (
     <div className="flex max-w-[560px] flex-col gap-6">
       <CabecalhoPasso titulo="Perfil publicado!">
-        A ONG já está no perto. Quem procura ONGs por perto vai encontrar vocês com o card abaixo.
+        A ONG já está no BuscaONG. Quem procura ONGs por perto vai encontrar vocês com o card abaixo.
       </CabecalhoPasso>
       <CartaoOng {...cartao} />
       <Link href="/" className={cn(estiloBotaoPrimario, "flex items-center self-start")}>
@@ -59,7 +59,7 @@ export function PassoPublicar({ cartao, verificacao, status }: Props) {
   if (status === "SUSPENSA") {
     return (
       <CabecalhoPasso titulo="Perfil suspenso">
-        O perfil desta ONG foi retirado do ar pela equipe do perto. Fale com a gente para entender o motivo.
+        O perfil desta ONG foi retirado do ar pela equipe do BuscaONG. Fale com a gente para entender o motivo.
       </CabecalhoPasso>
     );
   }

@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* identidade visual do perto (ver design/) */
+/* identidade visual do BuscaONG (ver design/) */
 @theme {
   --font-sans: var(--font-figtree), system-ui, sans-serif;
   --font-display: var(--font-bricolage), var(--font-figtree), system-ui, sans-serif;

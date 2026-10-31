@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { UserRound } from "lucide-react";
-import PertoLogo from "@/components/base/brand/PertoLogo";
+import BuscaOngLogo from "@/components/base/brand/BuscaOngLogo";
 
 function LandingPagesNav({ isLogged }: { isLogged: boolean }) {
   return (
     <nav className="w-full py-6 px-8
     flex items-center justify-between">
       <Link href='/'>
-        <PertoLogo />
+        <BuscaOngLogo />
       </Link>
 
       <ul className="flex items-center gap-4 text-xl">

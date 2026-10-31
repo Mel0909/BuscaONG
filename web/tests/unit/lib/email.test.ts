@@ -42,13 +42,13 @@ describe("sendEmail", () => {
 
   it("com RESEND_API_KEY, envia pelo Resend com o remetente do EMAIL_FROM", async () => {
     vi.stubEnv("RESEND_API_KEY", "re_teste");
-    vi.stubEnv("EMAIL_FROM", "perto <oi@perto.org.br>");
+    vi.stubEnv("EMAIL_FROM", "BuscaONG <oi@buscaong.org.br>");
     sendMock.mockResolvedValue({ data: { id: "1" }, error: null });
 
     await sendEmail(email);
 
     expect(sendMock).toHaveBeenCalledWith(
-      expect.objectContaining({ from: "perto <oi@perto.org.br>", to: "ong@exemplo.org" })
+      expect.objectContaining({ from: "BuscaONG <oi@buscaong.org.br>", to: "ong@exemplo.org" })
     );
   });
 

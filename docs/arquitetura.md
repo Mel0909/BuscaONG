@@ -1,6 +1,6 @@
 # Arquitetura do repositório
 
-Como o repositório do BuscaONG (marca pública **perto**) está organizado, para que serve cada parte e onde colocar código novo. Produto e stack ficam em [buscaong.md](buscaong.md).
+Como o repositório do BuscaONG está organizado, para que serve cada parte e onde colocar código novo. Produto e stack ficam em [buscaong.md](buscaong.md).
 
 ## 1. Visão geral
 
@@ -154,14 +154,14 @@ src/
 │   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = passos 3 a 8 do cadastro
 │   │   ├── services/             acesso ao banco via Prisma (ongs/: conta e cadastro; listas/: listas fixas)
 │   │   └── schemas/              validação de entrada com Zod
-│   ├── layout.tsx                layout raiz (fontes do perto, <html>, toasts)
-│   ├── globals.css               Tailwind, tokens de cor/fonte do perto e estilos globais
-│   ├── icon.svg                  favicon (marca do perto; convenção do Next)
+│   ├── layout.tsx                layout raiz (fontes, <html>, toasts)
+│   ├── globals.css               Tailwind, tokens de cor e fonte e estilos globais
+│   ├── icon.svg                  favicon (marca do BuscaONG; convenção do Next)
 │   └── not-found.tsx             404
 ├── components/                   peças visuais reutilizáveis
 │   ├── ui/                       shadcn/ui (button, input, sidebar, sheet, tooltip...)
 │   ├── base/                     componentes do projeto (ValidatedInput, BaseCheckbox, InitialNav...)
-│   │   └── brand/PertoLogo.tsx   logo do perto (PertoMark + PertoLogo)
+│   │   └── brand/BuscaOngLogo.tsx   logo do BuscaONG (BuscaOngMark + BuscaOngLogo)
 │   ├── auth/                     peças de login usadas em mais de uma tela
 │   ├── ong/                      peças da ONG usadas em mais de uma tela (CartaoOng)
 │   └── common/                   globais (ToastProvider)

@@ -46,7 +46,7 @@ export class CadastroIncompletoError extends Error {
 
 export class OngSuspensaError extends Error {
   constructor() {
-    super("O perfil desta ONG está suspenso. Fale com a equipe do perto.");
+    super("O perfil desta ONG está suspenso. Fale com a equipe do BuscaONG.");
     this.name = "OngSuspensaError";
   }
 }

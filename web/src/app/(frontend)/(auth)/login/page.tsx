@@ -1,5 +1,5 @@
 import LoginForm from './_components/LoginForm';
-import PertoLogo from '@/components/base/brand/PertoLogo';
+import BuscaOngLogo from '@/components/base/brand/BuscaOngLogo';
 
 function LoginPage() {
   return (
@@ -10,7 +10,7 @@ function LoginPage() {
 
       <div className="login-background h-full w-[45%] flex flex-col items-center py-32">
         <h1>
-          <PertoLogo size={80} variant="dark" />
+          <BuscaOngLogo size={80} variant="dark" />
         </h1>
       </div>
     </main>
