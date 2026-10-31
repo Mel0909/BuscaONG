@@ -33,14 +33,15 @@ BuscaONG/
 ├── README.md             apresentação e setup para pessoas
 ├── package.json          "identidade" do repositório (private, não é publicado)
 ├── pnpm-lock.yaml        versões exatas de todas as dependências
-└── pnpm-workspace.yaml   lista dos workspaces (hoje só web)
+├── pnpm-workspace.yaml   lista dos workspaces (hoje só web)
+└── tsconfig.base.json    opções comuns do TypeScript (estendido pelo web/tsconfig.json)
 ```
 
 ### 2.1 Gerenciamento de dependências
 
 | Item | Função |
 |---|---|
-| `package.json` | Nome do repo (`buscaong`), devDependencies compartilhadas, scripts e configurações do pnpm. |
+| `package.json` | Nome do repo (`buscaong`); `engines` (Node ≥ 24) e `packageManager` (pnpm 10.34.9); scripts atalho; **ferramentas de desenvolvimento** (TypeScript, ESLint, Vitest, Vite, Playwright, Testing Library, `@types/*`, commitlint, husky; versões e motivos em [buscaong.md §8.1.1](buscaong.md)); `pnpm.onlyBuiltDependencies` (libera os scripts de instalação do Prisma) e `pnpm.ignoredBuiltDependencies`. |
 | `pnpm-workspace.yaml` | Quais pastas são projetos. |
 | `pnpm-lock.yaml` | Versão **exata** de cada pacote, incluindo os transitivos. Um único lockfile para o monorepo todo; garante instalação idêntica em qualquer máquina e na Vercel. |
 | `.npmrc` | `node-linker=hoisted` instala tudo num `node_modules` único na raiz. `enable-pre-post-scripts=true` permite o `postinstall` do web (gera o cliente Prisma). |
@@ -83,12 +84,12 @@ web/
 ├── .env.example         modelo das variáveis de ambiente (copiar para .env)
 ├── components.json      configuração do shadcn/ui (onde gerar componentes)
 ├── eslint.config.mjs    regras de lint (eslint-config-next)
-├── next.config.ts       configuração do Next (SVG via SVGR, env do Resend)
+├── next.config.ts       configuração do Next (raiz do Turbopack, SVG via SVGR, env do Resend)
 ├── playwright.config.ts configuração dos testes e2e
 ├── postcss.config.mjs   plugin do Tailwind CSS 4
-├── tsconfig.json        TypeScript + aliases de import
+├── tsconfig.json        estende ../tsconfig.base.json; opções do Next + aliases de import
 ├── vitest.config.ts     configuração dos testes de integração
-└── package.json         dependências e scripts do app
+└── package.json         dependências do app (runtime + configs ligadas ao Next) e scripts
 ```
 
 Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.d.ts`, `src/generated/` (cliente Prisma) e `.env`.
@@ -104,7 +105,11 @@ Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.
 | `test:e2e` / `test:complete` | Playwright / Vitest + Playwright |
 | `postinstall` | `prisma generate` (automático após `pnpm install`) |
 
-Para rodar da raiz: `pnpm --filter web <script>`.
+Da raiz, os principais têm atalho: `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint` (= `lint:check`), `pnpm lint:fix`, `pnpm test`, `pnpm test:e2e`. Os demais: `pnpm --filter web <script>`.
+
+**Onde fica cada dependência:**
+- **`web/package.json`:** o que o site usa para funcionar (Next, React, Prisma Client, better-auth...) e as configs ligadas ao Next (`eslint-config-next`, `prisma` CLI, Tailwind, SVGR).
+- **Raiz:** as ferramentas de desenvolvimento.
 
 ## 4. Código do app (`web/src/`)
 
@@ -245,11 +250,3 @@ Os padrões de front-end estão em [padroes-frontend.md](padroes-frontend.md) e 
 - `app/(frontend)/admin/dashboard/components/` deveria ser `_components/` pela convenção do projeto. Funciona porque não há `page.tsx` dentro.
 - `app/(backend)/services/` e `schemas/` ficam dentro de `app/` sem serem rotas. É uma escolha do template para manter o back-end agrupado; funciona porque não têm `route.ts`.
 - Bugs de código (segurança e funcionalidade) estão em [erros-a-consertar.md](erros-a-consertar.md).
-
-## 8. Mudanças planejadas (Etapa 4)
-
-- Ferramentas de desenvolvimento (TypeScript, ESLint, Vitest, Playwright, Testing Library, jsdom, `@types/*`) vão para o `package.json` da **raiz**, com um `tsconfig.base.json` que o `web/tsconfig.json` estende.
-- A raiz ganha `engines` (Node ≥ 24), `packageManager` (pnpm) e scripts atalho (`pnpm dev`, `pnpm lint`, `pnpm build`, `pnpm test` → `pnpm --filter web ...`).
-- Saem os `pnpm.overrides` de React, que só existiam para sincronizar com o antigo app mobile.
-
-Atualize este documento quando essas mudanças forem aplicadas.

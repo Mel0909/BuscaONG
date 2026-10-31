@@ -36,26 +36,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@playwright/test": "^1.52.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.16",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@types/node": "^20.17.57",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "^5.1.0",
-    "@vitest/coverage-v8": "4.0.15",
-    "eslint": "^9",
     "eslint-config-next": "16.2.1",
-    "jsdom": "^26.1.0",
     "prisma": "^6.18.0",
     "tailwindcss": "^4.1.16",
-    "tw-animate-css": "^1.3.4",
-    "typescript": "^5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.5"
+    "tw-animate-css": "^1.3.4"
   }
 }

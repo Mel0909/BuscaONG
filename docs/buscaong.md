@@ -75,8 +75,30 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 | React / React DOM | **19.3.0** (09/09/2026) | 19.2.0 | — | Última da linha 19.2: **19.2.8**. ⚠️ ver §10 |
 | Prisma / @prisma/client | **6.19.3** (linha 6) | 6.19.1 | `>=18.18` | ⚠️ ver nota abaixo |
 | better-auth | **1.7.7** | ^1.5.5 | — | Última da linha 1.6: **1.6.33**. Peers: `next ^14\|\|^15\|\|^16`, `prisma`/`@prisma/client ^5\|\|^6\|\|^7`. ⚠️ ver §10 |
-| TypeScript | 7.0.2 (latest) · **6.0.3** (linha 6) | ^5 | — | O TS 7 não tem a API JS que o Next usa por padrão; com Next 16.3 use TS 6 (o TS 7 só com `experimental.useTypeScriptCli`) |
 | Mapbox GL JS | — | não instalado | — | Ver §9 |
+
+O TypeScript e as demais ferramentas de desenvolvimento estão na §8.1.1.
+
+### 8.1.1 Ferramentas de desenvolvimento (raiz)
+
+Atualizadas na Etapa 4 (revalidadas em 2026-10-30). Ficam no `package.json` da raiz.
+
+| Ferramenta | Versão | Por que essa e não a mais nova | Quando revisar |
+|---|---|---|---|
+| pnpm (`packageManager`) | 10.34.9 | As linhas 11 e 12 existem, mas trocar o gerenciador de pacotes muda o lockfile e exige o time e a Vercel na mesma versão | migração própria, quando o time quiser |
+| TypeScript | 6.0.3 | O TS 7 (latest) não expõe a API JS que o Next usa por padrão (só com `experimental.useTypeScriptCli`) | quando o Next suportar o TS 7 sem flag |
+| ESLint | 9.39.5 | **O ESLint 10 quebra o lint:** o `eslint-plugin-react` (usado pelo `eslint-config-next`, até a 16.4.3) trava, e `react`, `import` e `jsx-a11y` não declaram suporte ao 10. A linha 9 está marcada como sem suporte, então o install mostra um aviso de deprecated | quando o `eslint-config-next` e o `eslint-plugin-react` suportarem o 10 |
+| @types/node | 24.19.x | Alinhado ao Node 24 do `engines`, não ao 26 | ao subir o `engines` |
+| Vitest + @vitest/coverage-v8 | 5.0.5 | — | — |
+| Vite | 8.3.5 | Dependência explícita para fixar o Vite usado pelo Vitest e exigido pelo `@vitejs/plugin-react` 6 | — |
+| @vitejs/plugin-react | 6.1.2 | — | — |
+| jsdom | 29.1.1 | O jsdom 30 exige Node ≥ 24.15, acima do `engines` (≥ 24) | ao subir o `engines` para ≥ 24.15 |
+| @playwright/test | 1.64.1 | — (navegadores: `pnpm --filter web exec playwright install`) | — |
+| Testing Library (dom / react / jest-dom) | 10.4.2 / 16.3.3 / 7.0.1 | Não usados pelos testes atuais (ambiente `node`); mantidos para testes de componente | — |
+| @types/react / @types/react-dom | 19.2.18 / 19.2.7 | Acompanham a linha do React (19.2) | junto com o React, na Etapa 5 |
+| commitlint, husky | 21.2.4, 9.1.7 | — | — |
+
+**Removido:** `vite-tsconfig-paths`. Era redundante, porque os aliases já estão no `vitest.config.ts`, e dependia do `tsconfck` 3.1.6 (deprecated), que só declara suporte ao TypeScript 5.
 
 **Prisma e MongoDB:**
 - O **Prisma 7 não suporta MongoDB**.

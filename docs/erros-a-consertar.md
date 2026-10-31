@@ -34,6 +34,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
 | 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
+| 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
 
 ## Detalhes
 
@@ -165,7 +166,8 @@ Caminhos relativos a `web/src/`.
 - **Problema:** sem `.env`, o `next build` imprime `BetterAuthError: You are using the default secret` várias vezes. O build conclui, mas em produção sem a variável o app usaria o segredo padrão.
 - **Correção:** documentar no setup (o README já manda criar o `.env`) e garantir a variável na Vercel. Opcional: falhar o build de produção se ela faltar.
 
-## Fora desta lista (configuração, já planejado)
+### 17. 🟡 Aviso de "NFT list" no build
 
-- **pnpm `onlyBuiltDependencies`:** o pnpm 10 bloqueia os build scripts de `prisma`, `@prisma/engines`, `esbuild`, `sharp` e `unrs-resolver`. Revisar na Etapa 4.
-- **`pnpm.overrides` de React 19.2.0:** sobra do app mobile. Remover na Etapa 4.
+- **Onde:** `next build` (Turbopack), trace a partir do `proxy.ts`
+- **Problema:** o build avisa "Encountered unexpected file in NFT list". O cliente Prisma gerado em `src/generated/prisma`, que faz operações de sistema de arquivos, entra no trace do `proxy.ts` via `auth.ts` → `services/db`. O build conclui, mas o trace pode incluir arquivos demais.
+- **Correção:** avaliar ao reescrever o `proxy.ts`. Por exemplo, checar só o cookie de sessão no proxy, sem importar o Prisma, e validar a sessão nas páginas e rotas. Outra opção é mudar o `output` do gerador do Prisma.

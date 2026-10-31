@@ -1,10 +1,9 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
  import { resolve } from 'path'
- 
+
 export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
   test: {
     environment: 'node',
     include: ['tests/integration/**/*.test.ts'],
@@ -31,7 +30,7 @@ export default defineConfig({
     reporter: ['text', 'json', 'html'],
     reportsDirectory: './tests/coverage',
     include: [
-      'src/**',
+      'src/**/*.{ts,tsx}',      // só código; o Vitest 5 tenta parsear tudo que casar aqui
     ],
     exclude: [
       'src/generated/**',       // exclude prisma-generated files

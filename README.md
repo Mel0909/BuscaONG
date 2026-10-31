@@ -24,7 +24,7 @@ pnpm install
 Crie o arquivo `web/.env` a partir de `web/.env.example` e preencha as variáveis (URL do MongoDB, segredo do Better Auth etc.).
 
 ```bash
-pnpm --filter web dev
+pnpm dev
 ```
 
 ## Tecnologias
