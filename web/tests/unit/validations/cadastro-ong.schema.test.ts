@@ -12,15 +12,31 @@ const mensagens = (r: { success: boolean; error?: { issues: { message: string }[
 
 describe("localizacaoSchema", () => {
   const valido = {
-    endereco: { logradouro: "Rua Domingos de Morais", numero: "1200", municipio: "São Paulo", uf: "sp", cep: "04010-100" },
+    endereco: {
+      logradouro: "Rua Domingos de Morais",
+      numero: "1200",
+      bairro: "Vila Mariana",
+      municipio: "São Paulo",
+      uf: "sp",
+      cep: "04010-100",
+    },
     latitude: -23.5893,
     longitude: -46.6345,
   };
 
-  it("normaliza UF, CEP e campos vazios", () => {
-    const r = localizacaoSchema.parse({ ...valido, endereco: { ...valido.endereco, bairro: "  " } });
-    expect(r.endereco).toMatchObject({ uf: "SP", cep: "04010100", bairro: null, complemento: null });
+  it("normaliza UF, CEP e campos opcionais vazios", () => {
+    const r = localizacaoSchema.parse({ ...valido, endereco: { ...valido.endereco, complemento: "  " } });
+    expect(r.endereco).toMatchObject({ uf: "SP", cep: "04010100", bairro: "Vila Mariana", complemento: null });
     expect(r.mostrarSoBairro).toBe(false);
+  });
+
+  it("exige bairro e CEP", () => {
+    const { bairro: _bairro, cep: _cep, ...semBairroNemCep } = valido.endereco;
+    const faltando = localizacaoSchema.safeParse({ ...valido, endereco: semBairroNemCep });
+    expect(mensagens(faltando)).toEqual(expect.arrayContaining(["Informe o bairro", "Informe o CEP"]));
+
+    const vazios = localizacaoSchema.safeParse({ ...valido, endereco: { ...valido.endereco, bairro: " ", cep: "" } });
+    expect(mensagens(vazios)).toEqual(expect.arrayContaining(["Informe o bairro", "Informe o CEP"]));
   });
 
   it("recusa posição fora do Brasil (ex.: latitude e longitude trocadas)", () => {

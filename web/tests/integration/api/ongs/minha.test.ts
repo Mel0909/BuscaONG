@@ -75,7 +75,11 @@ describe("rotas /api/ongs/minha/*", () => {
   });
 
   describe("acesso", () => {
-    const corpo = { endereco: { logradouro: "Rua A", municipio: "São Paulo", uf: "SP" }, latitude: -23.5, longitude: -46.6 };
+    const corpo = {
+      endereco: { logradouro: "Rua A", bairro: "Centro", municipio: "São Paulo", uf: "SP", cep: "01001-000" },
+      latitude: -23.5,
+      longitude: -46.6,
+    };
 
     it("401 sem login", async () => {
       setCurrentRole(null);
@@ -105,7 +109,14 @@ describe("rotas /api/ongs/minha/*", () => {
   it("passo 3 grava o ponto GeoJSON [lng, lat] e libera o passo 4", async () => {
     const response = await putLocalizacao(
       requisicao("PUT", "localizacao", {
-        endereco: { logradouro: "Rua Domingos de Morais", numero: "1200", municipio: "São Paulo", uf: "SP", cep: "04010-100" },
+        endereco: {
+          logradouro: "Rua Domingos de Morais",
+          numero: "1200",
+          bairro: "Vila Mariana",
+          municipio: "São Paulo",
+          uf: "SP",
+          cep: "04010-100",
+        },
         latitude: -23.5893,
         longitude: -46.6345,
         mostrarSoBairro: true,

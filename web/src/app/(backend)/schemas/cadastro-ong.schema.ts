@@ -41,18 +41,17 @@ export const localizacaoSchema = z
         logradouro: z.string().trim().min(1, "Informe o endereço").max(150, "Endereço muito longo"),
         numero: textoOpcional(20, "Número"),
         complemento: textoOpcional(100, "Complemento"),
-        bairro: textoOpcional(100, "Bairro"),
+        bairro: z.string({ error: "Informe o bairro" }).trim().min(1, "Informe o bairro").max(100, "Bairro muito longo"),
         municipio: z.string().trim().min(1, "Informe a cidade").max(100, "Cidade muito longa"),
         uf: ufSchema,
-        cep: z
-          .string()
-          .nullish()
-          .transform((v, ctx) => {
-            if (!v) return null;
-            const cep = normalizarCep(v);
-            if (!cep) ctx.addIssue({ code: "custom", message: "CEP deve ter 8 dígitos" });
-            return cep;
-          }),
+        cep: z.string({ error: "Informe o CEP" }).transform((v, ctx) => {
+          const cep = normalizarCep(v);
+          if (!cep) {
+            ctx.addIssue({ code: "custom", message: v.trim() ? "CEP deve ter 8 dígitos" : "Informe o CEP" });
+            return z.NEVER;
+          }
+          return cep;
+        }),
       })
       .strict(),
     latitude: z

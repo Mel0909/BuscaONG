@@ -84,7 +84,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 | 8 Publicar | `/ong/cadastro/publicar` | `POST /api/ongs/minha/publicacao` | `status: PUBLICADA`, `publicadaEm`, `termosAceitosEm` |
 
 **Passo 3, Localização:**
-- O endereço vem da Receita (a menos que a ONG tenha dito no passo 1 que mudou) e pode ser editado.
+- O endereço vem da Receita (a menos que a ONG tenha dito no passo 1 que mudou) e pode ser editado. Endereço, bairro, CEP, cidade e UF são obrigatórios; número e complemento, opcionais.
 - O pin começa na posição aproximada do endereço, calculada pelo **Nominatim** (OpenStreetMap) via `GET /api/geocodificacao`. Se não acha a rua, usa o centro da cidade. A ONG arrasta o pin (ou clica no mapa) até a entrada; o pin arrastado é o que vale.
 - O mapa é o **Mapbox GL JS**. A geocodificação do Mapbox não é usada porque os termos dele **não permitem guardar** o resultado da geocodificação comum; a "permanente" exige cartão de crédito e é paga por consulta. O Nominatim permite guardar (dados ODbL, com atribuição) e é gratuito, com limite de 1 consulta por segundo: o servidor enfileira as chamadas, guarda as respostas em cache e limita a 10 consultas por minuto por conta. Não há autocompletar, que a política do Nominatim proíbe.
 - Sem `NEXT_PUBLIC_MAPBOX_TOKEN`, a tela mostra "Mapa indisponível" e usa a posição calculada pelo endereço.

@@ -39,8 +39,8 @@ type Props = {
 const CAMPOS: { nome: keyof EnderecoForm; rotulo: string; opcional?: boolean; autoComplete: string }[] = [
   { nome: "logradouro", rotulo: "Endereço", autoComplete: "address-line1" },
   { nome: "numero", rotulo: "Número", opcional: true, autoComplete: "off" },
-  { nome: "bairro", rotulo: "Bairro", opcional: true, autoComplete: "address-level3" },
-  { nome: "cep", rotulo: "CEP", opcional: true, autoComplete: "postal-code" },
+  { nome: "bairro", rotulo: "Bairro", autoComplete: "address-level3" },
+  { nome: "cep", rotulo: "CEP", autoComplete: "postal-code" },
   { nome: "municipio", rotulo: "Cidade", autoComplete: "address-level2" },
   { nome: "uf", rotulo: "UF", autoComplete: "address-level1" },
   { nome: "complemento", rotulo: "Complemento", opcional: true, autoComplete: "address-line2" },

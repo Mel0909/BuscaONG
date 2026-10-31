@@ -57,10 +57,10 @@ type Endereco {
   logradouro  String // com o tipo (ex.: Rua Domingos de Morais)
   numero      String?
   complemento String?
-  bairro      String?
+  bairro      String
   municipio   String
   uf          String
-  cep         String? // só dígitos
+  cep         String // só dígitos
 }
 
 // ponto GeoJSON: coordinates = [longitude, latitude] (formato do índice 2dsphere do MongoDB)
