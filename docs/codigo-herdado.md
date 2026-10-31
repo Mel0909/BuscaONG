@@ -27,7 +27,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Front-end (~610 linhas)
 
-- [ ] `app/(frontend)/(auth)/**` (login, cadastro, logout, `CadastroForm`, `PasswordRequirement`, `LoginForm`)
+- [ ] `app/(frontend)/(auth)/**` (login, logout, `LoginForm`). O cadastro genérico (`/cadastro`, `CadastroForm`, `PasswordRequirement`) e o `POST /api/users` já foram removidos
 - [ ] `app/(frontend)/(landing-pages)/page.tsx` (será substituído no Hello World da Etapa 5)
 - [ ] `app/(frontend)/admin/**` (página de login do admin, `AdminForm`, layout do dashboard, `AdminHeader`, sidebar, `admin.css`)
 - [ ] `app/not-found.tsx` (texto e estrutura; a imagem já foi trocada)

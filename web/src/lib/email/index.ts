@@ -1,18 +1,40 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { resend } from "./resend";
+import { Resend } from "resend";
 
-// type SendArgs =
-//   | { to: string; subject: string; html: string; text?: string }
-//   | { to: string; subject: string; react: React.ReactElement; text?: string };
+export type Email = {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+};
 
-// export async function sendEmail(args: SendArgs) {
-//   const { to, subject, ...content } = args as any;
-//   const { data, error } = await resend.emails.send({
-//     from: process.env.EMAIL_FROM!,
-//     to,
-//     subject,
-//     ...content, // html|react
-//   });
-//   if (error) throw new Error(error.message);
-//   return data;
-// }
+let client: Resend | null = null;
+
+/**
+ * Envia um e-mail pelo Resend (RESEND_API_KEY e EMAIL_FROM no .env).
+ * Em desenvolvimento, sem RESEND_API_KEY, só escreve o e-mail no terminal,
+ * para dar para testar fluxos como o código de verificação sem configurar nada.
+ */
+export async function sendEmail(email: Email): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("RESEND_API_KEY não configurada");
+    }
+    console.info(`\n[email] para: ${email.to}\n[email] assunto: ${email.subject}\n${email.text}\n`);
+    return;
+  }
+
+  client ??= new Resend(apiKey);
+  const { error } = await client.emails.send({
+    from: process.env.EMAIL_FROM ?? "perto <onboarding@resend.dev>",
+    to: email.to,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+  });
+
+  if (error) {
+    throw new Error(`Falha ao enviar e-mail: ${error.message}`);
+  }
+}

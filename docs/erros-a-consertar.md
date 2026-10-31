@@ -1,6 +1,6 @@
 # Erros a consertar
 
-Problemas encontrados no código herdado do template, numa revisão feita em 2026-10-02. **Nenhum foi corrigido ainda.**
+Problemas encontrados no código herdado do template, numa revisão feita em 2026-10-02. Os já corrigidos estão marcados com ✅ e continuam listados para manter a numeração.
 
 - **Escopo da revisão:** back-end (`app/(backend)/`), utils de API, configuração do better-auth e telas de auth.
 - **Fora do escopo:** componentes visuais (`components/ui`, `components/base`) e estilos.
@@ -13,6 +13,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 - 🔴 segurança
 - 🟠 funcionalidade quebrada
 - 🟡 menor / qualidade
+- ✅ corrigido
 
 ## Resumo
 
@@ -20,21 +21,22 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 |---|---|---|---|
 | 1 | 🔴 | Qualquer pessoa, sem login, lê qualquer usuário pelo ID | `api/users/[id]/route.ts` |
 | 2 | 🔴 | Qualquer usuário logado lista todos os usuários | `api/users/route.ts` |
-| 3 | 🔴 | Política de senha só existe no front; a API do better-auth aceita senhas fracas | `auth.ts`, `CadastroForm.tsx` |
-| 4 | 🔴 | Chaves do Resend embutidas no bundle via `next.config.ts` | `next.config.ts` |
+| 3 | ✅ | ~~Política de senha só existe no front; a API do better-auth aceita senhas fracas~~ | `auth.ts`, `CadastroForm.tsx` |
+| 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
 | 5 | 🟠 | Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos: todas as rotas `/api/users/[id]` respondem 400 | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
 | 7 | 🟠 | "Esqueci a senha" nunca funciona e não avisa | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | 🟠 | Botão "Entrar/Cadastro com Google" quebra (provedor desativado) | `GoogleLoginButton.tsx`, `auth.ts` |
-| 9 | 🟠 | `redirect()` dentro de `setTimeout` no cadastro | `CadastroForm.tsx` |
+| 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
 | 11 | 🟡 | Reset de senha sem validação da política | `api/password/reset/route.ts` |
-| 12 | 🟡 | Admin pode apagar Super Admin e outros admins | `api/users/[id]/route.ts` |
+| 12 | 🟡 | Admin pode apagar ou editar outros admins | `api/users/[id]/route.ts` |
 | 13 | 🟡 | Regras de senha inconsistentes entre telas e rotas | vários |
 | 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
 | 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
 | 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
+| 18 | 🟡 | Falha intermitente ao baixar a fonte Bricolage no `next dev`/`next build` | `app/layout.tsx` |
 
 ## Detalhes
 
@@ -54,14 +56,18 @@ Caminhos relativos a `web/src/`.
 - **Cenário:** um usuário comum logado chama `GET /api/users` e recebe a lista completa, com e-mails.
 - **Correção:** trocar por `allowedRoles.GET`.
 
-### 3. 🔴 Política de senha só no front
+### 3. ✅ Política de senha só no front
+
+> **Corrigido:** um hook `before` do better-auth (`lib/auth-hooks.ts`) aplica o `passwordSchema` em `/sign-up/email`, `/change-password`, `/reset-password` e `/email-otp/reset-password`, e bloqueia o cadastro direto pelo HTTP (`feat(auth): adiciona verificação de e-mail por código e regra de senha no servidor`).
 
 - **Onde:** [CadastroForm.tsx:36-46](../web/src/app/(frontend)/(auth)/cadastro/_components/CadastroForm.tsx#L36-L46) e [auth.ts](../web/src/auth.ts)
 - **Problema:** o cadastro chama `authClient.signUp.email` direto, que vai para `/api/auth/sign-up/email` (rota do better-auth). A política (maiúscula, minúscula, número) só é checada no navegador. O better-auth só exige 8 caracteres por padrão. O `POST /api/users`, que valida com `registerSchema`, não é usado pela tela.
 - **Cenário:** uma requisição direta para `/api/auth/sign-up/email` com senha `aaaaaaaa` cria a conta. A regex de nome também é ignorada.
 - **Correção:** validar no servidor com um hook `before` do better-auth (em `/sign-up/email`, `/reset-password` e `/change-password`), reutilizando `passwordSchema`. Ou fazer a tela usar `POST /api/users`.
 
-### 4. 🔴 Segredos do Resend no bundle
+### 4. ✅ Segredos do Resend no bundle
+
+> **Corrigido:** o bloco `env` foi removido do `next.config.ts` (`fix(web): remove segredos do bloco env do next.config`).
 
 - **Onde:** [next.config.ts](../web/next.config.ts) (bloco `env`)
 - **Problema:** o `env` do `next.config` **embute o valor no JavaScript em tempo de build**, onde quer que `process.env.RESEND_API_KEY` apareça. Hoje só o servidor referencia essa variável (em código comentado), mas basta um componente client usar a variável para a chave vazar para o navegador.
@@ -109,11 +115,13 @@ Caminhos relativos a `web/src/`.
 
 ### 8. 🟠 Botão do Google quebrado
 
-- **Onde:** [GoogleLoginButton.tsx](../web/src/components/auth/GoogleLoginButton.tsx), usado em `/login` e `/cadastro`
+- **Onde:** [GoogleLoginButton.tsx](../web/src/components/auth/GoogleLoginButton.tsx), usado em `/login`
 - **Problema:** `socialProviders.google` está comentado no [auth.ts](../web/src/auth.ts), então clicar no botão retorna erro do provedor.
 - **Correção:** decidir se o login com Google entra para ONG e Admin. Se não, remover os botões; se sim, configurar `GOOGLE_ID` e `GOOGLE_SECRET` e descomentar.
 
-### 9. 🟠 `redirect()` em `setTimeout` no cadastro
+### 9. ✅ `redirect()` em `setTimeout` no cadastro
+
+> **Corrigido:** a página `/cadastro` (e o `CadastroForm`) foi removida junto com o cadastro genérico (`feat(auth)!: remove o cadastro genérico de usuários`).
 
 - **Onde:** [CadastroForm.tsx:57-59](../web/src/app/(frontend)/(auth)/cadastro/_components/CadastroForm.tsx#L57-L59)
 - **Problema:** o `redirect()` do `next/navigation` não funciona em event handlers nem callbacks de Client Components; ele lança um erro interno em vez de navegar.
@@ -134,8 +142,8 @@ Caminhos relativos a `web/src/`.
 ### 12. 🟡 Sem hierarquia entre admins
 
 - **Onde:** [api/users/[id]/route.ts:38](../web/src/app/(backend)/api/users/[id]/route.ts#L38)
-- **Problema:** `ADMIN` pode apagar ou editar `SUPER_ADMIN` e outros admins.
-- **Correção:** é decisão de produto; definir junto com a feature de Admin. O BuscaONG talvez nem precise de `SUPER_ADMIN`.
+- **Problema:** `ADMIN` pode apagar ou editar outros admins.
+- **Correção:** é decisão de produto; definir junto com a feature de Admin.
 
 ### 13. 🟡 Regras de senha inconsistentes
 
@@ -171,3 +179,9 @@ Caminhos relativos a `web/src/`.
 - **Onde:** `next build` (Turbopack), trace a partir do `proxy.ts`
 - **Problema:** o build avisa "Encountered unexpected file in NFT list". O cliente Prisma gerado em `src/generated/prisma`, que faz operações de sistema de arquivos, entra no trace do `proxy.ts` via `auth.ts` → `services/db`. O build conclui, mas o trace pode incluir arquivos demais.
 - **Correção:** avaliar ao reescrever o `proxy.ts`. Por exemplo, checar só o cookie de sessão no proxy, sem importar o Prisma, e validar a sessão nas páginas e rotas. Outra opção é mudar o `output` do gerador do Prisma.
+
+### 18. 🟡 Falha intermitente ao baixar a fonte Bricolage
+
+- **Onde:** `app/layout.tsx` (`next/font/google`), no `next dev` e no `next build` com Turbopack
+- **Problema:** de vez em quando o Turbopack falha ao baixar os arquivos da Bricolage Grotesque e mostra `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`. No dev, a página responde 500; no build, ele falha. Aconteceu 2 vezes em muitas execuções (2026-10-31), sempre só com a Bricolage; a Figtree e a IBM Plex Mono nunca falharam. Rodar de novo resolve.
+- **Correção:** hospedar as fontes no próprio projeto com `next/font/local` (arquivos `.woff2` versionados; as três fontes têm licença OFL). Isso tira a dependência de rede do build. Alternativa: pedir a Bricolage como fonte variável, sem listar pesos, para reduzir o número de arquivos baixados.

@@ -89,7 +89,6 @@ E `toErrorMessage(message, details?)` em `@/utils/api/toErrorMessage`.
 - Os perfis permitidos por método ficam numa constante no topo da rota, tipada com `AllowedRoutes` (`@/types`):
 
 ```ts
-// "ONG" é ilustrativo: o enum Role ainda tem os perfis do template
 const allowedRoles: AllowedRoutes = {
   GET: ["ADMIN"],
   PATCH: ["ADMIN", "ONG"],

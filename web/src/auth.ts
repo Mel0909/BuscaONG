@@ -3,18 +3,33 @@ import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./app/(backend)/services/db";
 
-import { customSession } from "better-auth/plugins";
+import { customSession, emailOTP } from "better-auth/plugins";
+import { createAuthMiddleware } from "better-auth/api";
 import { getUserRole } from "@/backend/services/auth";
-// import { sendEmail } from "./lib/email";
-// import { ResetPasswordEmail } from "./lib/email/templates/ResetPasswordEmail";
- 
+import { sendEmail } from "./lib/email";
+import { codigoVerificacaoEmail } from "./lib/email/templates/codigoVerificacao";
+import { validarRequisicaoAuth } from "./lib/auth-hooks";
+
+// código de 6 dígitos por e-mail, válido por 10 minutos (protótipo, cadastro passo 2)
+export const OTP_VALIDADE_SEGUNDOS = 10 * 60;
+
 export const auth = betterAuth({
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     database: prismaAdapter(prisma, {
         provider: "mongodb",
     }),
-    emailAndPassword: {  
+    hooks: {
+        // bloqueia o cadastro direto pelo HTTP e aplica a regra de senha no servidor
+        before: createAuthMiddleware(async (ctx) => validarRequisicaoAuth(ctx)),
+    },
+    emailVerification: {
+        sendOnSignUp: true,
+        autoSignInAfterVerification: true,
+    },
+    emailAndPassword: {
       enabled: true,
+      requireEmailVerification: true,
+      minPasswordLength: 8,
       // sendResetPassword: async ({ user, url /*, token*/ }, ) => {
         // // url already includes the reset token; just email it.
         // await sendEmail({
@@ -51,6 +66,16 @@ export const auth = betterAuth({
     //     }, 
     // }, 
     plugins: [
+        // a verificação de e-mail usa código (OTP) em vez de link
+        emailOTP({
+            overrideDefaultEmailVerification: true,
+            otpLength: 6,
+            expiresIn: OTP_VALIDADE_SEGUNDOS,
+            storeOTP: "hashed",
+            async sendVerificationOTP({ email, otp, type }) {
+                await sendEmail(codigoVerificacaoEmail(email, otp, type, OTP_VALIDADE_SEGUNDOS / 60));
+            },
+        }),
         customSession(async ({ user, session }) => {
             const role = await getUserRole(session.userId);
             return {

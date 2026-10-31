@@ -24,7 +24,7 @@ function LandingPagesNav({ isLogged }: { isLogged: boolean }) {
               <Link href='/login' className="button-md ">Entrar</Link>
             </li>
             <li>
-              <Link href='/cadastro' className="button-md text-papel bg-musgo">Cadastro</Link>
+              <Link href="/ong/cadastro" className="button-md text-papel bg-musgo">Cadastrar ONG</Link>
             </li>
           </>
         )}

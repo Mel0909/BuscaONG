@@ -7,8 +7,8 @@ import { deleteUser, findUserById, updateUser } from "@/backend/services/users";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 const allowedRoles: AllowedRoutes = {
-  PATCH: ['SUPER_ADMIN', 'ADMIN', 'USER'],
-  DELETE: ['SUPER_ADMIN', 'ADMIN', 'USER']
+  PATCH: ['ADMIN', 'ONG'],
+  DELETE: ['ADMIN', 'ONG']
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -60,8 +60,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       )
     }
 
-    // só permite um usuário de role USER se auto deletar
-    if (userFromRequest.role === 'USER' && id !== userFromRequest.id) {
+    // só permite um usuário de role ONG se auto deletar
+    if (userFromRequest.role === 'ONG' && id !== userFromRequest.id) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
@@ -101,8 +101,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       )
     }
 
-    // só permite um usuário de role USER se auto atualizar
-    if (userFromRequest.role === 'USER' && id !== userFromRequest.id) {
+    // só permite um usuário de role ONG se auto atualizar
+    if (userFromRequest.role === 'ONG' && id !== userFromRequest.id) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 

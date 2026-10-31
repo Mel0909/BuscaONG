@@ -4,7 +4,7 @@ import { blockForbiddenRequests, validBody } from "@/utils/api/server";
 import { AllowedRoutes } from "@/types";
 
 const allowedRoles: AllowedRoutes = {
-  POST: ['SUPER_ADMIN', 'ADMIN', 'USER'],
+  POST: ['ADMIN', 'ONG'],
 }
 export async function POST(req: NextRequest) {
   try {

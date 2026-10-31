@@ -79,8 +79,9 @@ web/
 ├── public/              arquivos estáticos servidos na raiz do site (/favicon, /icons/...)
 ├── src/                 código do app (ver §4)
 ├── tests/
-│   ├── integration/     Vitest: testes das rotas da API, com mocks de auth e banco
-│   └── e2e/             Playwright: testes no navegador
+│   ├── unit/            Vitest: funções isoladas (validações, formatadores, consulta de CNPJ, hooks)
+│   ├── integration/     Vitest: testes das rotas da API, com mocks de auth, banco e Receita
+│   └── e2e/             Playwright: testes no navegador (APIs simuladas com page.route)
 ├── .env.example         modelo das variáveis de ambiente (copiar para .env)
 ├── components.json      configuração do shadcn/ui (onde gerar componentes)
 ├── eslint.config.mjs    regras de lint (eslint-config-next)
@@ -88,7 +89,7 @@ web/
 ├── playwright.config.ts configuração dos testes e2e
 ├── postcss.config.mjs   plugin do Tailwind CSS 4
 ├── tsconfig.json        estende ../tsconfig.base.json; opções do Next + aliases de import
-├── vitest.config.ts     configuração dos testes de integração
+├── vitest.config.mts    configuração dos testes unitários e de integração
 └── package.json         dependências do app (runtime + configs ligadas ao Next) e scripts
 ```
 
@@ -138,12 +139,14 @@ src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
 │   │   ├── (landing-pages)/      /            (home)
-│   │   ├── (auth)/               /login, /cadastro, /logout
+│   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
-│   │   └── admin/                /admin (login do admin), /admin/dashboard
+│   │   ├── admin/                /admin (login do admin), /admin/dashboard
+│   │   └── ong/cadastro/         /ong/cadastro (passos 1 a 3 do cadastro da ONG)
+│   │       └── _components/      barra de passos, campos e estado do cadastro
 │   ├── (backend)/                back-end
 │   │   ├── api/                  endpoints REST (route.ts)
-│   │   ├── services/             acesso ao banco via Prisma
+│   │   ├── services/             acesso ao banco via Prisma (ongs/: elegibilidade e criação de conta)
 │   │   └── schemas/              validação de entrada com Zod
 │   ├── layout.tsx                layout raiz (fontes do perto, <html>, toasts)
 │   ├── globals.css               Tailwind, tokens de cor/fonte do perto e estilos globais
@@ -158,12 +161,15 @@ src/
 ├── hooks/                        hooks React reutilizáveis (use-mobile)
 ├── lib/                          integração com libs e serviços
 │   ├── auth-client.ts            cliente better-auth para o navegador
-│   ├── email/                    envio via Resend + templates de e-mail
+│   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
+│   ├── cnpj/                     consulta de CNPJ (BrasilAPI → Minha Receita → OpenCNPJ)
+│   ├── email/                    envio via Resend (no terminal em dev) + templates de e-mail
 │   └── utils.ts                  cn() para combinar classes Tailwind
 ├── utils/                        funções auxiliares do projeto
-│   ├── api/server/               helpers das rotas: blockForbiddenRequests, getUserFromRequest, validBody, errorHandlers
+│   ├── api/server/               helpers das rotas: blockForbiddenRequests, getUserFromRequest, validBody, errorHandlers, rateLimit
 │   ├── api/toErrorMessage.ts     erro → texto legível
-│   └── validations/              regras de senha e e-mail
+│   ├── formatters/               formatação para a tela (dados da Receita)
+│   └── validations/              regras de senha e e-mail; CNPJ (dígito verificador, máscara)
 ├── types/                        tipos compartilhados (AllowedRoutes)
 ├── generated/                    cliente Prisma gerado (não editar, não versionado)
 ├── auth.ts                       configuração central do better-auth
@@ -175,8 +181,8 @@ src/
 - **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha, e o plugin `customSession`, que coloca o `role` do usuário na sessão. É importado por páginas, rotas da API e pelo proxy.
 - **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
   - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
-  - **Precisa de `ADMIN` ou `SUPER_ADMIN`:** `/admin/**`.
-  - **Quem já está logado é redirecionado para `/`:** `/login`, `/cadastro`.
+  - **Precisa de `ADMIN`:** `/admin/**`.
+  - **Quem já está logado é redirecionado para `/`:** `/login`.
   - O Next exige esse nome e esse local (no Next 16, `proxy.ts` substituiu o `middleware.ts`).
 
 ### 4.4 Aliases de import (`tsconfig.json`)
@@ -187,7 +193,7 @@ src/
 | `@/backend/*` | `src/app/(backend)/*` |
 | `@/frontend/*` | `src/app/(frontend)/*` |
 
-O `vitest.config.ts` repete esses aliases para os testes.
+O `vitest.config.mts` repete esses aliases para os testes.
 
 ## 5. Fluxos
 
@@ -239,6 +245,7 @@ Regras (detalhes em [padroes-api.md](padroes-api.md)):
 | Função auxiliar genérica | `utils/` |
 | Tipo compartilhado | `types/` |
 | Rota que exige login ou perfil | adicionar em `ROUTE_CONFIG` no `proxy.ts` |
+| Teste de função isolada (validação, formatação, regra) | `tests/unit/` |
 | Teste de API | `tests/integration/api/<recurso>/` |
 | Teste no navegador | `tests/e2e/` |
 | Requisição de exemplo da API | `bruno/<recurso>/` |

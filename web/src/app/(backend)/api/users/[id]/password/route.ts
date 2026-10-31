@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 const allowedRoles: AllowedRoutes = {
-  PATCH: ['SUPER_ADMIN', 'ADMIN', 'USER'],
+  PATCH: ['ADMIN', 'ONG'],
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

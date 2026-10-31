@@ -1,0 +1,17 @@
+meta {
+  name: consultar
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}/12345678000195
+  body: none
+  auth: none
+}
+
+docs {
+  Passo 1 do cadastro da ONG (pública, 20 consultas por minuto por IP).
+  Valida o dígito verificador, vê se o CNPJ já tem conta e consulta a Receita.
+  Resposta: { status: ELEGIVEL | NAO_ELEGIVEL | JA_CADASTRADO, cnpj, motivo?, receita? }
+}
