@@ -41,7 +41,7 @@ BuscaONG/
 
 | Item | Função |
 |---|---|
-| `package.json` | Nome do repo (`buscaong`); `engines` (Node ≥ 24) e `packageManager` (pnpm 10.34.6); scripts atalho; **ferramentas de desenvolvimento** (TypeScript, ESLint, Vitest, Playwright, Testing Library, `@types/*`, commitlint, husky); `pnpm.onlyBuiltDependencies` (libera os scripts de instalação do Prisma) e `pnpm.ignoredBuiltDependencies`. |
+| `package.json` | Nome do repo (`buscaong`); `engines` (Node ≥ 24) e `packageManager` (pnpm 10.34.9); scripts atalho; **ferramentas de desenvolvimento** (TypeScript, ESLint, Vitest, Vite, Playwright, Testing Library, `@types/*`, commitlint, husky; versões e motivos em [buscaong.md §8.1.1](buscaong.md)); `pnpm.onlyBuiltDependencies` (libera os scripts de instalação do Prisma) e `pnpm.ignoredBuiltDependencies`. |
 | `pnpm-workspace.yaml` | Quais pastas são projetos. |
 | `pnpm-lock.yaml` | Versão **exata** de cada pacote, incluindo os transitivos. Um único lockfile para o monorepo todo; garante instalação idêntica em qualquer máquina e na Vercel. |
 | `.npmrc` | `node-linker=hoisted` instala tudo num `node_modules` único na raiz. `enable-pre-post-scripts=true` permite o `postinstall` do web (gera o cliente Prisma). |

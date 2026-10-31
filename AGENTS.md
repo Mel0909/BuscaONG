@@ -41,7 +41,7 @@ Idioma: documentação, commits, branches e textos da interface em **português*
 
 ## Comandos
 
-Requisitos: Node `>=24` e pnpm 10.34.6 (fixado em `packageManager`; o pnpm troca de versão sozinho).
+Requisitos: Node `>=24` e pnpm 10.34.9 (fixado em `packageManager`; o pnpm troca de versão sozinho).
 
 Rode tudo da raiz:
 
