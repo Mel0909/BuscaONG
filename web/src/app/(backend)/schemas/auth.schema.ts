@@ -18,12 +18,6 @@ const registerBaseObject = z.object({
   confirmPassword: z.string()
 });
 
-export const registerSchema = registerBaseObject
-  .refine((data) => data.password === data.confirmPassword, {
-    error: "Senhas não conferem",
-    path: ["confirmPassword"],
-})
-
 // devemos atualizar email e senha apenas via better-auth
 // (para garantir que a verificação de email e o hash da senha sejam feitos corretamente)
 export const patchSchema = registerBaseObject

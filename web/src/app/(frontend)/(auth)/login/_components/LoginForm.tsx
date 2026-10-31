@@ -91,7 +91,7 @@ function LoginForm() {
 
       <GoogleAuthButton disabled={loading} text="Entrar com Google" />
 
-      <Link href='/cadastro' className="block w-fit mt-8 text-sm group">Ainda não tem uma conta? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Cadastre-se</span></Link>
+      <Link href='/ong/cadastro' className="block w-fit mt-8 text-sm group">Sua ONG ainda não tem conta? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Cadastre a ONG</span></Link>
     </div>
    );
 }

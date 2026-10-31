@@ -18,7 +18,6 @@ const ROUTE_CONFIG = {
   
   redirectIfAuth: [
     "/login",
-    "/cadastro",
   ],
   
   // Special routes with custom logic

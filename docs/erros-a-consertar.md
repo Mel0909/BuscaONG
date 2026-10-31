@@ -27,7 +27,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
 | 7 | 🟠 | "Esqueci a senha" nunca funciona e não avisa | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | 🟠 | Botão "Entrar/Cadastro com Google" quebra (provedor desativado) | `GoogleLoginButton.tsx`, `auth.ts` |
-| 9 | 🟠 | `redirect()` dentro de `setTimeout` no cadastro | `CadastroForm.tsx` |
+| 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
 | 11 | 🟡 | Reset de senha sem validação da política | `api/password/reset/route.ts` |
 | 12 | 🟡 | Admin pode apagar Super Admin e outros admins | `api/users/[id]/route.ts` |
@@ -114,11 +114,13 @@ Caminhos relativos a `web/src/`.
 
 ### 8. 🟠 Botão do Google quebrado
 
-- **Onde:** [GoogleLoginButton.tsx](../web/src/components/auth/GoogleLoginButton.tsx), usado em `/login` e `/cadastro`
+- **Onde:** [GoogleLoginButton.tsx](../web/src/components/auth/GoogleLoginButton.tsx), usado em `/login`
 - **Problema:** `socialProviders.google` está comentado no [auth.ts](../web/src/auth.ts), então clicar no botão retorna erro do provedor.
 - **Correção:** decidir se o login com Google entra para ONG e Admin. Se não, remover os botões; se sim, configurar `GOOGLE_ID` e `GOOGLE_SECRET` e descomentar.
 
-### 9. 🟠 `redirect()` em `setTimeout` no cadastro
+### 9. ✅ `redirect()` em `setTimeout` no cadastro
+
+> **Corrigido:** a página `/cadastro` (e o `CadastroForm`) foi removida junto com o cadastro genérico (`feat(auth)!: remove o cadastro genérico de usuários`).
 
 - **Onde:** [CadastroForm.tsx:57-59](../web/src/app/(frontend)/(auth)/cadastro/_components/CadastroForm.tsx#L57-L59)
 - **Problema:** o `redirect()` do `next/navigation` não funciona em event handlers nem callbacks de Client Components; ele lança um erro interno em vez de navegar.

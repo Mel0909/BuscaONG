@@ -138,9 +138,11 @@ src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
 │   │   ├── (landing-pages)/      /            (home)
-│   │   ├── (auth)/               /login, /cadastro, /logout
+│   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
-│   │   └── admin/                /admin (login do admin), /admin/dashboard
+│   │   ├── admin/                /admin (login do admin), /admin/dashboard
+│   │   └── ong/cadastro/         /ong/cadastro (passos 1 a 3 do cadastro da ONG)
+│   │       └── _components/      barra de passos, campos e estado do cadastro
 │   ├── (backend)/                back-end
 │   │   ├── api/                  endpoints REST (route.ts)
 │   │   ├── services/             acesso ao banco via Prisma
@@ -176,7 +178,7 @@ src/
 - **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
   - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
   - **Precisa de `ADMIN`:** `/admin/**`.
-  - **Quem já está logado é redirecionado para `/`:** `/login`, `/cadastro`.
+  - **Quem já está logado é redirecionado para `/`:** `/login`.
   - O Next exige esse nome e esse local (no Next 16, `proxy.ts` substituiu o `middleware.ts`).
 
 ### 4.4 Aliases de import (`tsconfig.json`)
