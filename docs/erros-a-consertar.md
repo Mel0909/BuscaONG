@@ -1,6 +1,6 @@
 # Erros a consertar
 
-Problemas encontrados no código herdado do template, numa revisão feita em 2026-10-02. **Nenhum foi corrigido ainda.**
+Problemas encontrados no código herdado do template, numa revisão feita em 2026-10-02. Os já corrigidos estão marcados com ✅ e continuam listados para manter a numeração.
 
 - **Escopo da revisão:** back-end (`app/(backend)/`), utils de API, configuração do better-auth e telas de auth.
 - **Fora do escopo:** componentes visuais (`components/ui`, `components/base`) e estilos.
@@ -13,6 +13,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 - 🔴 segurança
 - 🟠 funcionalidade quebrada
 - 🟡 menor / qualidade
+- ✅ corrigido
 
 ## Resumo
 
@@ -21,7 +22,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 1 | 🔴 | Qualquer pessoa, sem login, lê qualquer usuário pelo ID | `api/users/[id]/route.ts` |
 | 2 | 🔴 | Qualquer usuário logado lista todos os usuários | `api/users/route.ts` |
 | 3 | 🔴 | Política de senha só existe no front; a API do better-auth aceita senhas fracas | `auth.ts`, `CadastroForm.tsx` |
-| 4 | 🔴 | Chaves do Resend embutidas no bundle via `next.config.ts` | `next.config.ts` |
+| 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
 | 5 | 🟠 | Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos: todas as rotas `/api/users/[id]` respondem 400 | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
 | 7 | 🟠 | "Esqueci a senha" nunca funciona e não avisa | `api/password/forgot/route.ts`, `auth.ts` |
@@ -61,7 +62,9 @@ Caminhos relativos a `web/src/`.
 - **Cenário:** uma requisição direta para `/api/auth/sign-up/email` com senha `aaaaaaaa` cria a conta. A regex de nome também é ignorada.
 - **Correção:** validar no servidor com um hook `before` do better-auth (em `/sign-up/email`, `/reset-password` e `/change-password`), reutilizando `passwordSchema`. Ou fazer a tela usar `POST /api/users`.
 
-### 4. 🔴 Segredos do Resend no bundle
+### 4. ✅ Segredos do Resend no bundle
+
+> **Corrigido:** o bloco `env` foi removido do `next.config.ts` (`fix(web): remove segredos do bloco env do next.config`).
 
 - **Onde:** [next.config.ts](../web/next.config.ts) (bloco `env`)
 - **Problema:** o `env` do `next.config` **embute o valor no JavaScript em tempo de build**, onde quer que `process.env.RESEND_API_KEY` apareça. Hoje só o servidor referencia essa variável (em código comentado), mas basta um componente client usar a variável para a chave vazar para o navegador.
