@@ -52,6 +52,71 @@ type EnderecoReceita {
   cep            String?
 }
 
+// endereço confirmado pela ONG no passo 3
+type Endereco {
+  logradouro  String // com o tipo (ex.: Rua Domingos de Morais)
+  numero      String?
+  complemento String?
+  bairro      String?
+  municipio   String
+  uf          String
+  cep         String? // só dígitos
+}
+
+// ponto GeoJSON: coordinates = [longitude, latitude] (formato do índice 2dsphere do MongoDB)
+type Ponto {
+  type        String  @default("Point")
+  coordinates Float[]
+}
+
+type Contato {
+  valor   String
+  visivel Boolean @default(true) // desmarcado fica salvo, mas não aparece no perfil
+}
+
+// passo 4; a ordem dos campos é a ordem dos botões no perfil
+type Contatos {
+  whatsapp  Contato? // E.164, ex.: +5511971234567
+  email     Contato?
+  site      Contato? // URL completa, com https://
+  instagram Contato? // @usuario
+}
+
+// item fora da lista fixa, digitado pela ONG no passo 5
+type ItemLivre {
+  nome  String // como a ONG escreveu
+  chave String // minúsculas, sem acento: agrupa o mesmo item entre ONGs
+}
+
+enum DiaVoluntariado {
+  DOMINGO
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DIAS_UTEIS
+  FIM_DE_SEMANA
+  TODO_DIA
+}
+
+enum Turno {
+  MANHA
+  TARDE
+  NOITE
+}
+
+// passo 6
+type HorarioVoluntariado {
+  dia            DiaVoluntariado
+  inicio         Int? // hora cheia (0 a 23); sem início nem fim = horário livre
+  fim            Int? // hora cheia (1 a 24), maior que o início
+  atividade      String // slug de OpcaoLista ATIVIDADE, ou "outra"
+  atividadeOutra String? // texto quando a atividade é "outra"
+  turnos         Turno[] // derivado do horário, para o filtro de voluntariado
+}
+
 model Ong {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
   cnpj                String           @unique // sem máscara; interno, não aparece no perfil público
@@ -65,12 +130,64 @@ model Ong {
   status              OngStatus        @default(RASCUNHO)
   // próximo passo do cadastro (1 a 8); a conta nasce no passo 2, então começa no 3
   passoAtual          Int              @default(3)
-  userId              String           @unique
-  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
+
+  // passo 3: localização
+  endereco        Endereco?
+  localizacao     Ponto?
+  mostrarSoBairro Boolean   @default(false) // o perfil mostra só o bairro e um pin aproximado
+
+  // passo 4: contatos e redes
+  contatos Contatos?
+
+  // passo 5: causas e itens (slugs de OpcaoLista)
+  causas      String[] // 1 a 3
+  itens       String[]
+  itensLivres ItemLivre[]
+
+  // passo 6: voluntariado
+  aceitaVoluntarios      Boolean               @default(false)
+  horariosVoluntariado   HorarioVoluntariado[]
+  requisitosVoluntariado String?
+
+  // passo 7: apresentação
+  nomePublico    String?
+  descricaoCurta String? // até 160 caracteres; aparece no card
+  sobre          String?
+  logo           String? // chave do arquivo no R2
+  capa           String? // chave do arquivo no R2
+
+  // passo 8: publicação
+  termosAceitosEm DateTime?
+  publicadaEm     DateTime?
+
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("ong")
+}
+
+enum TipoLista {
+  CAUSA
+  ITEM
+  ATIVIDADE // atividades de voluntariado
+}
+
+// opções das listas fixas usadas no cadastro e nos filtros; o admin vai gerenciá-las
+// (preenchidas por prisma/seed.ts)
+model OpcaoLista {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  tipo      TipoLista
+  slug      String // chave estável, gravada na Ong; não muda quando o nome muda
+  nome      String
+  ordem     Int       @default(0)
+  ativa     Boolean   @default(true) // inativa some do cadastro, mas continua valendo para quem já usa
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([tipo, slug])
+  @@map("opcao_lista")
 }
 
 // evitar mexer daqui pra baixo
