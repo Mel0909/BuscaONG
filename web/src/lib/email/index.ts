@@ -27,7 +27,7 @@ export async function sendEmail(email: Email): Promise<void> {
 
   client ??= new Resend(apiKey);
   const { error } = await client.emails.send({
-    from: process.env.EMAIL_FROM ?? "perto <onboarding@resend.dev>",
+    from: process.env.EMAIL_FROM ?? "BuscaONG <onboarding@resend.dev>",
     to: email.to,
     subject: email.subject,
     text: email.text,

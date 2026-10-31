@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PertoLogo from "@/components/base/brand/PertoLogo";
+import BuscaOngLogo from "@/components/base/brand/BuscaOngLogo";
 
 export const metadata: Metadata = {
-  title: "Termos de uso · perto",
+  title: "Termos de uso · BuscaONG",
 };
 
 // ⚠️ texto provisório: precisa de revisão (inclusive jurídica) antes do lançamento
 const SECOES: { titulo: string; paragrafos: string[] }[] = [
   {
-    titulo: "1. O que é o perto",
+    titulo: "1. O que é o BuscaONG",
     paragrafos: [
-      "O perto é um site que ajuda pessoas a encontrar ONGs próximas e saber do que elas precisam. As doações e o voluntariado são combinados diretamente entre quem quer ajudar e a ONG: o perto não recebe, guarda nem repassa dinheiro ou itens.",
+      "O BuscaONG é um site que ajuda pessoas a encontrar ONGs próximas e saber do que elas precisam. As doações e o voluntariado são combinados diretamente entre quem quer ajudar e a ONG: o BuscaONG não recebe, guarda nem repassa dinheiro ou itens.",
     ],
   },
   {
@@ -37,7 +37,7 @@ const SECOES: { titulo: string; paragrafos: string[] }[] = [
   {
     titulo: "5. Denúncias e suspensão",
     paragrafos: [
-      "Qualquer visitante pode denunciar um perfil. A equipe do perto analisa as denúncias e pode suspender perfis com informações falsas, conteúdo impróprio ou que descumpram estes termos.",
+      "Qualquer visitante pode denunciar um perfil. A equipe do BuscaONG analisa as denúncias e pode suspender perfis com informações falsas, conteúdo impróprio ou que descumpram estes termos.",
     ],
   },
   {
@@ -59,7 +59,7 @@ export default function TermosPage() {
     <div className="min-h-screen">
       <header className="px-4 py-6 md:px-8">
         <Link href="/" aria-label="Início">
-          <PertoLogo />
+          <BuscaOngLogo />
         </Link>
       </header>
 

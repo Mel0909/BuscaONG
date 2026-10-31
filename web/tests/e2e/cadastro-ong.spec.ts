@@ -56,7 +56,7 @@ test.describe('cadastro da ONG', () => {
   test('mostra o caminho para entrar quando o CNPJ já tem conta', async ({ page }) => {
     await page.locator('#cnpj').pressSequentially('00000000000191')
 
-    await expect(page.getByText('Este CNPJ já tem uma conta no perto.')).toBeVisible()
+    await expect(page.getByText('Este CNPJ já tem uma conta no BuscaONG.')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Entrar ou recuperar o acesso' })).toBeVisible()
   })
 

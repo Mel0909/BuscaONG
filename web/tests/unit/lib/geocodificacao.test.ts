@@ -24,7 +24,7 @@ describe("geocodificar", () => {
     const [url, init] = fetchImpl.mock.calls[0];
     expect(url.searchParams.get("street")).toBe("1200 Rua Domingos de Morais");
     expect(url.searchParams.get("countrycodes")).toBe("br");
-    expect(init.headers["User-Agent"]).toMatch(/perto/);
+    expect(init.headers["User-Agent"]).toMatch(/BuscaONG/);
   });
 
   it("cai para o município quando não acha a rua", async () => {

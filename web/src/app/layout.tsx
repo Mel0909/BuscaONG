@@ -21,7 +21,7 @@ const plexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "perto",
+  title: "BuscaONG",
   description: "Encontre ONGs perto de você e descubra como ajudar",
 };
 

@@ -2,14 +2,14 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { PertoMark } from "@/components/base/brand/PertoLogo";
+import { BuscaOngMark } from "@/components/base/brand/BuscaOngLogo";
 import { AVISO_LATERAL, AVISO_LATERAL_PADRAO, PASSOS, passoDaRota } from "./passos";
 
 function MarcaParaOngs() {
   return (
     <div className="flex items-center gap-2.5">
-      <PertoMark size={30} variant="dark" />
-      <span className="font-display text-lg font-bold">perto</span>
+      <BuscaOngMark size={30} variant="dark" />
+      <span className="font-display text-lg font-bold">BuscaONG</span>
       <span className="text-[13px] font-medium text-salvia-apagada">para ONGs</span>
     </div>
   );

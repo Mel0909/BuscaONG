@@ -153,7 +153,7 @@ export function PassoCnpj() {
 
       {estado.tipo === "ja-cadastrado" && (
         <Aviso>
-          Este CNPJ já tem uma conta no perto.{" "}
+          Este CNPJ já tem uma conta no BuscaONG.{" "}
           <Link href="/login" className="font-semibold text-musgo underline underline-offset-2">
             Entrar ou recuperar o acesso
           </Link>
