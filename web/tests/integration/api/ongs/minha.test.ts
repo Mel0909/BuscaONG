@@ -219,10 +219,18 @@ describe("rotas /api/ongs/minha/*", () => {
     });
 
     it("pedir URL de envio sem o R2 configurado responde 503", async () => {
-      const response = await postImagens(
-        requisicao("POST", "imagens", { tipo: "logo", contentType: "image/png", tamanho: 1000 })
-      );
-      expect(response.status).toBe(503);
+      // o cliente do Prisma carrega o web/.env; o teste não pode depender das chaves de quem roda
+      for (const nome of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"]) {
+        vi.stubEnv(nome, "");
+      }
+      try {
+        const response = await postImagens(
+          requisicao("POST", "imagens", { tipo: "logo", contentType: "image/png", tamanho: 1000 })
+        );
+        expect(response.status).toBe(503);
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
   });
 
