@@ -21,7 +21,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 |---|---|---|---|
 | 1 | 🔴 | Qualquer pessoa, sem login, lê qualquer usuário pelo ID | `api/users/[id]/route.ts` |
 | 2 | 🔴 | Qualquer usuário logado lista todos os usuários | `api/users/route.ts` |
-| 3 | 🔴 | Política de senha só existe no front; a API do better-auth aceita senhas fracas | `auth.ts`, `CadastroForm.tsx` |
+| 3 | ✅ | ~~Política de senha só existe no front; a API do better-auth aceita senhas fracas~~ | `auth.ts`, `CadastroForm.tsx` |
 | 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
 | 5 | 🟠 | Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos: todas as rotas `/api/users/[id]` respondem 400 | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
@@ -55,7 +55,9 @@ Caminhos relativos a `web/src/`.
 - **Cenário:** um usuário comum logado chama `GET /api/users` e recebe a lista completa, com e-mails.
 - **Correção:** trocar por `allowedRoles.GET`.
 
-### 3. 🔴 Política de senha só no front
+### 3. ✅ Política de senha só no front
+
+> **Corrigido:** um hook `before` do better-auth (`lib/auth-hooks.ts`) aplica o `passwordSchema` em `/sign-up/email`, `/change-password`, `/reset-password` e `/email-otp/reset-password`, e bloqueia o cadastro direto pelo HTTP (`feat(auth): adiciona verificação de e-mail por código e regra de senha no servidor`).
 
 - **Onde:** [CadastroForm.tsx:36-46](../web/src/app/(frontend)/(auth)/cadastro/_components/CadastroForm.tsx#L36-L46) e [auth.ts](../web/src/auth.ts)
 - **Problema:** o cadastro chama `authClient.signUp.email` direto, que vai para `/api/auth/sign-up/email` (rota do better-auth). A política (maiúscula, minúscula, número) só é checada no navegador. O better-auth só exige 8 caracteres por padrão. O `POST /api/users`, que valida com `registerSchema`, não é usado pela tela.
