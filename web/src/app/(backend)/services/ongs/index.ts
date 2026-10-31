@@ -7,6 +7,7 @@ import { EmailEmUsoError, OngJaCadastradaError, OngNaoElegivelError } from "./er
 
 export * from "./elegibilidade";
 export * from "./erros";
+export * from "./cadastro";
 
 export async function findOngByCnpj(cnpj: string) {
   return prisma.ong.findUnique({ where: { cnpj } });

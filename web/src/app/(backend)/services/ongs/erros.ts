@@ -14,6 +14,43 @@ export class EmailEmUsoError extends Error {
   }
 }
 
+export class OngNaoEncontradaError extends Error {
+  constructor() {
+    super("Nenhuma ONG ligada a esta conta.");
+    this.name = "OngNaoEncontradaError";
+  }
+}
+
+/** Um valor que precisa vir de uma lista fixa (causa, item, atividade) não existe nela. */
+export class OpcaoInvalidaError extends Error {
+  constructor(public readonly campo: string) {
+    super("Uma das opções escolhidas não existe mais. Recarregue a página e tente de novo.");
+    this.name = "OpcaoInvalidaError";
+  }
+}
+
+/** A chave da imagem não foi gerada para esta ONG. */
+export class ImagemInvalidaError extends Error {
+  constructor(public readonly campo: "logo" | "capa") {
+    super("Imagem inválida. Envie a imagem de novo.");
+    this.name = "ImagemInvalidaError";
+  }
+}
+
+export class CadastroIncompletoError extends Error {
+  constructor(public readonly pendencias: string[]) {
+    super(`Falta completar: ${pendencias.join(", ")}.`);
+    this.name = "CadastroIncompletoError";
+  }
+}
+
+export class OngSuspensaError extends Error {
+  constructor() {
+    super("O perfil desta ONG está suspenso. Fale com a equipe do perto.");
+    this.name = "OngSuspensaError";
+  }
+}
+
 export class OngNaoElegivelError extends Error {
   constructor(public readonly motivo: MotivoNaoElegivel) {
     super(

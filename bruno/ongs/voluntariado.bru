@@ -1,0 +1,38 @@
+meta {
+  name: passo 6 - voluntariado
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/minha/voluntariado
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "aceitaVoluntarios": true,
+    "horarios": [
+      {
+        "dia": "SABADO",
+        "inicio": 8,
+        "fim": 12,
+        "atividade": "recreacao"
+      },
+      {
+        "dia": "TODO_DIA",
+        "inicio": null,
+        "fim": null,
+        "atividade": "outra",
+        "atividadeOutra": "Triagem de doações"
+      }
+    ],
+    "requisitos": "Maiores de 18 anos."
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  inicio/fim null = horário livre. Os turnos são calculados no servidor.
+}

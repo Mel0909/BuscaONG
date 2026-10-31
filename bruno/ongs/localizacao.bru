@@ -1,0 +1,33 @@
+meta {
+  name: passo 3 - localizacao
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/minha/localizacao
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "endereco": {
+      "logradouro": "Rua Domingos de Morais",
+      "numero": "1200",
+      "complemento": "portão lateral",
+      "bairro": "Vila Mariana",
+      "municipio": "São Paulo",
+      "uf": "SP",
+      "cep": "04010-100"
+    },
+    "latitude": -23.5893,
+    "longitude": -46.6345,
+    "mostrarSoBairro": false
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Grava o endereço e a posição do pin (ponto GeoJSON [lng, lat]). A posição precisa estar no Brasil.
+}

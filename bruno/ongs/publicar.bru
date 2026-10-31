@@ -1,0 +1,22 @@
+meta {
+  name: passo 8 - publicar
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/minha/publicacao
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "aceitaTermos": true
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Publica na hora. 422 com details.pendencias se faltar algo; 403 se a ONG estiver suspensa.
+}

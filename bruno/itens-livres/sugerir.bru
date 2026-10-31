@@ -1,0 +1,16 @@
+meta {
+  name: sugerir
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}?q=ventil
+  body: none
+  auth: inherit
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  Itens livres de outras ONGs que começam com o texto: [{ nome, chave, ongs }] (até 5).
+}
