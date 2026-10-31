@@ -82,9 +82,12 @@ test.describe('cadastro da ONG', () => {
 
     await expect(page.getByText('Digite o código enviado para contato@casalar.org.br')).toBeVisible()
     await page.getByLabel('Dígito 1').pressSequentially('481203')
+    const passo3 = page.waitForRequest((r) => r.url().startsWith(`${BASE}/ong/cadastro/localizacao`))
     await page.getByRole('button', { name: 'Confirmar e continuar' }).click()
+    await passo3
 
-    await expect(page).toHaveURL(`${BASE}/ong/cadastro/localizacao`)
-    await expect(page.getByRole('heading', { name: 'Acesso criado!' })).toBeVisible()
+    // a confirmação do código é simulada, então não há sessão de verdade:
+    // o passo 3 (que lê a ONG no servidor) manda para o login
+    await expect(page).toHaveURL(`${BASE}/login`)
   })
 })
