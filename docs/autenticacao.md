@@ -6,7 +6,7 @@ Como a autenticação funciona no BuscaONG e as regras para mexer nela. Document
 
 Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site sem login (ver [buscaong.md §2](buscaong.md)).
 
-> Os perfis no banco ainda são os do template (`USER`, `ADMIN`, `SUPER_ADMIN` no enum `Role` do `schema.prisma`). Ajustar para os perfis do BuscaONG faz parte das features de ONG e Admin.
+> Perfis no enum `Role` do `schema.prisma`: `ONG` (padrão) e `ADMIN`.
 
 ## 2. Onde está cada peça
 

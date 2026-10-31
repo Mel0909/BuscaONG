@@ -9,9 +9,8 @@ datasource db {
 }
 
 enum Role {
-  USER
+  ONG
   ADMIN
-  SUPER_ADMIN
 }
 
 model User {
@@ -25,7 +24,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
-  role          Role      @default(USER)
+  role          Role      @default(ONG)
   // < e aqui
 
 

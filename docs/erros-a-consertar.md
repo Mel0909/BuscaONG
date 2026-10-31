@@ -134,8 +134,8 @@ Caminhos relativos a `web/src/`.
 ### 12. 🟡 Sem hierarquia entre admins
 
 - **Onde:** [api/users/[id]/route.ts:38](../web/src/app/(backend)/api/users/[id]/route.ts#L38)
-- **Problema:** `ADMIN` pode apagar ou editar `SUPER_ADMIN` e outros admins.
-- **Correção:** é decisão de produto; definir junto com a feature de Admin. O BuscaONG talvez nem precise de `SUPER_ADMIN`.
+- **Problema:** `ADMIN` pode apagar ou editar outros admins.
+- **Correção:** é decisão de produto; definir junto com a feature de Admin.
 
 ### 13. 🟡 Regras de senha inconsistentes
 

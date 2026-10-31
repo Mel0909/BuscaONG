@@ -175,7 +175,7 @@ src/
 - **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha, e o plugin `customSession`, que coloca o `role` do usuário na sessão. É importado por páginas, rotas da API e pelo proxy.
 - **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
   - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
-  - **Precisa de `ADMIN` ou `SUPER_ADMIN`:** `/admin/**`.
+  - **Precisa de `ADMIN`:** `/admin/**`.
   - **Quem já está logado é redirecionado para `/`:** `/login`, `/cadastro`.
   - O Next exige esse nome e esse local (no Next 16, `proxy.ts` substituiu o `middleware.ts`).
 

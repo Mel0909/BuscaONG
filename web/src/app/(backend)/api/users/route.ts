@@ -7,7 +7,7 @@ import { AllowedRoutes } from "@/types";
 import { auth } from "@/auth";
 
 const allowedRoles: AllowedRoutes = {
-  GET: ["SUPER_ADMIN", "ADMIN"]
+  GET: ["ADMIN"]
 }
 
 // rota de get all users

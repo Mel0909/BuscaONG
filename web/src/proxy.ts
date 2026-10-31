@@ -11,7 +11,7 @@ const ROUTE_CONFIG = {
     "/settings",
   ],
   
-  // Pages that require ADMIN or SUPER_ADMIN role
+  // Pages that require the ADMIN role
   adminRequired: [
     "/admin/**",
   ],
@@ -59,7 +59,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
     
-    if (hasRequiredRole(userRole, ["ADMIN", "SUPER_ADMIN"])) {
+    if (hasRequiredRole(userRole, ["ADMIN"])) {
       // Redirect admin users to dashboard
       return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     } else {
@@ -81,7 +81,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
     
-    if (!hasRequiredRole(userRole, ["ADMIN", "SUPER_ADMIN"])) {
+    if (!hasRequiredRole(userRole, ["ADMIN"])) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     
