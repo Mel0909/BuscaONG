@@ -85,6 +85,7 @@ export function PassoAcesso() {
           email,
           password: senha,
           usarEnderecoReceita: dados.usarEnderecoReceita,
+          recomecar: dados.recomecar ?? false,
         }),
       });
       const body = await response.json().catch(() => null);
@@ -98,7 +99,18 @@ export function PassoAcesso() {
 
       const mensagem: string = body?.error?.message ?? "Não foi possível criar o acesso. Tente de novo.";
       const campo = body?.error?.details?.campo;
-      if (response.status === 409 && campo === "cnpj") {
+      if (response.status === 409 && body?.error?.details?.motivo === "EM_ANDAMENTO") {
+        setErro({
+          mensagem: (
+            <>
+              {mensagem}{" "}
+              <Link href="/ong/cadastro/continuar" className="font-semibold text-musgo underline underline-offset-2">
+                Continuar de onde parei
+              </Link>
+            </>
+          ),
+        });
+      } else if (response.status === 409 && campo === "cnpj") {
         setErro({
           mensagem: (
             <>

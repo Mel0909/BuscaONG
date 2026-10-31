@@ -57,14 +57,23 @@ describe("GET /api/cnpj/[cnpj]", () => {
     expect(lookupMock).not.toHaveBeenCalled();
   });
 
-  it("devolve JA_CADASTRADO sem consultar a Receita", async () => {
-    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ } as never);
+  it.each(["PUBLICADA", "SUSPENSA"])("devolve JA_CADASTRADO para ONG %s, sem consultar a Receita", async (status) => {
+    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status } as never);
 
     const response = await get(CNPJ);
     const body = await response.json();
 
     expect(body).toEqual({ status: "JA_CADASTRADO", cnpj: CNPJ });
     expect(lookupMock).not.toHaveBeenCalled();
+  });
+
+  it("devolve EM_ANDAMENTO (não 'já cadastrado') para cadastro não publicado", async () => {
+    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status: "RASCUNHO" } as never);
+    lookupMock.mockResolvedValue(cnpjDataMock());
+
+    const body = await (await get(CNPJ)).json();
+
+    expect(body).toMatchObject({ status: "EM_ANDAMENTO", cnpj: CNPJ, receita: { cnpj: CNPJ } });
   });
 
   it("devolve NAO_ELEGIVEL quando a situação não é ATIVA", async () => {

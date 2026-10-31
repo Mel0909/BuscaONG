@@ -7,6 +7,14 @@ export class OngJaCadastradaError extends Error {
   }
 }
 
+/** Já existe um cadastro não publicado para o CNPJ e a pessoa não escolheu recomeçar. */
+export class CadastroEmAndamentoError extends Error {
+  constructor() {
+    super("Este CNPJ tem um cadastro em andamento. Continue de onde parou ou escolha começar de novo.");
+    this.name = "CadastroEmAndamentoError";
+  }
+}
+
 export class EmailEmUsoError extends Error {
   constructor() {
     super("Este e-mail já tem uma conta. Entre ou use outro e-mail.");

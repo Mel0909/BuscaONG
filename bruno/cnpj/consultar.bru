@@ -13,5 +13,6 @@ get {
 docs {
   Passo 1 do cadastro da ONG (pública, 20 consultas por minuto por IP).
   Valida o dígito verificador, vê se o CNPJ já tem conta e consulta a Receita.
-  Resposta: { status: ELEGIVEL | NAO_ELEGIVEL | JA_CADASTRADO, cnpj, motivo?, receita? }
+  Resposta: { status: ELEGIVEL | NAO_ELEGIVEL | EM_ANDAMENTO | JA_CADASTRADO, cnpj, motivo?, receita? }
+  EM_ANDAMENTO: cadastro começado e não publicado (dá para continuar ou recomeçar).
 }

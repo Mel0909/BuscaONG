@@ -50,9 +50,11 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - O campo aplica a máscara e valida o dígito verificador no navegador (`utils/validations/cnpj.ts`), inclusive o **CNPJ alfanumérico** (válido desde jul/2026): mesmo módulo 11, com cada caractere valendo o código ASCII menos 48.
 - Com 14 caracteres válidos, consulta `GET /api/cnpj/[cnpj]`. A rota:
   - é pública, com limite de 20 consultas por minuto por IP;
-  - responde `JA_CADASTRADO` sem consultar a Receita quando o CNPJ já tem conta;
+  - responde `JA_CADASTRADO` sem consultar a Receita quando a ONG já está **publicada** (ou suspensa);
+  - responde `EM_ANDAMENTO` (com os dados da Receita) quando há um cadastro começado e não publicado. Até aceitar os termos no passo 8, o cadastro é um rascunho, não uma conta;
   - responde `ELEGIVEL` ou `NAO_ELEGIVEL` (com o motivo) junto com os dados da Receita.
-- Estados do campo: digitando, validando, válido, inválido, já cadastrado, não elegível, não encontrado e erro (Receita indisponível ou limite atingido).
+- Estados do campo: digitando, validando, válido, inválido, já cadastrado, em andamento, não elegível, não encontrado e erro (Receita indisponível ou limite atingido).
+- **Cadastro em andamento:** a tela oferece "Continuar de onde parei" (vai para `/ong/cadastro/continuar`) e "Começar de novo" (segue o fluxo normal, avisando que o cadastro anterior será apagado ao criar o acesso).
 - O CNPJ validado fica na **sessionStorage** do navegador até a conta ser criada. Nada vai para o banco antes disso.
 - "O endereço mudou" segue igual, mas grava `usarEnderecoReceita: false` (o endereço será pedido no passo 3).
 
@@ -61,8 +63,15 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - `POST /api/ongs` (pública, 5 tentativas por minuto por IP) revalida o CNPJ no servidor e só então cria o usuário (perfil `ONG`, e-mail não verificado) e a `Ong` em `RASCUNHO` com `passoAtual: 3`. Se a `Ong` falhar, o usuário é apagado (sem conta órfã).
 - O better-auth envia um **código de 6 dígitos** por e-mail (Resend), válido por 10 minutos e guardado com hash. A tela tem 6 campos e reenvio depois de 60 s.
 - Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3.
+- **Começar de novo:** com `recomecar: true`, o `POST /api/ongs` apaga o rascunho do CNPJ (o usuário dele, a `Ong`, sessões e contas) antes de criar a conta nova. O e-mail do rascunho apagado pode ser usado de novo. Sem `recomecar`, um CNPJ com rascunho responde 409 com `details.motivo: EM_ANDAMENTO`. ONG publicada nunca é apagada.
 
-**Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
+**Continuar o cadastro** (`/ong/cadastro/continuar`):
+- E-mail e senha do passo 2. Com login certo, `/ong/cadastro/retomar` leva ao passo em que a pessoa parou (`passoAtual`).
+- Se a pessoa saiu antes de confirmar o e-mail, o better-auth responde `EMAIL_NOT_VERIFIED` (só depois de conferir a senha). A tela manda um código novo e confirma ali mesmo; com o código, a sessão abre e o cadastro continua.
+- Quem não lembra a senha é orientado a começar de novo pelo CNPJ (o "esqueci a senha" ainda não funciona, erro #7).
+- Sem login, as páginas dos passos 3 a 8 levam para cá. O `/login` também tem o link "Continue de onde parou".
+
+**Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`), ou cadastro em andamento sem `recomecar` (`details.motivo: EM_ANDAMENTO`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
 
 ### 4.2 Passos 3 a 8: como está implementado
 
@@ -71,7 +80,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 **Regras comuns:**
 - Só a conta de perfil `ONG` mexe no próprio cadastro. As rotas agem sobre a ONG **do usuário da sessão**, sem ID na URL (assim não dependem do erro #5, sobre o formato de ID).
 - `passoAtual` marca o passo mais adiantado liberado. Salvar o passo *n* libera o *n+1*; voltar e salvar de novo não reduz. Abrir um passo além do liberado redireciona para o primeiro que falta.
-- Sem login, as páginas levam a `/login`; outro perfil vai para `/`. Depois de publicada, qualquer passo leva ao 8, que mostra o perfil publicado.
+- Sem login, as páginas levam a `/ong/cadastro/continuar`; outro perfil vai para `/`. Depois de publicada, qualquer passo leva ao 8, que mostra o perfil publicado.
 - O passo 3 não tem "Voltar": os passos 1 e 2 não se refazem depois que a conta existe.
 
 | Passo | Tela | API | O que grava |
@@ -251,13 +260,14 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **Selo de CNPJ verificado:** exibir ou não.
 - **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).
 - **Endereço diferente do da Receita:** o protótipo prevê virar "sinal para a auditoria" do admin, sem bloquear. Não implementado (depende do admin).
-- **Retomar o cadastro depois do login:** hoje o login leva para `/`. Quem sai no meio precisa abrir `/ong/cadastro/localizacao`, que leva ao passo que falta.
+- **Rascunho apagado por outra pessoa:** "Começar de novo" só exige saber o CNPJ, que é público. Alguém poderia apagar o rascunho de uma ONG que ainda não publicou. É o mesmo problema de fundo de qualquer pessoa poder cadastrar um CNPJ primeiro (não há prova de que quem cadastra representa a ONG). Ver junto com o selo de CNPJ verificado e o admin.
+- **Login comum (`/login`) de uma ONG em rascunho:** leva para `/`, não para o cadastro. Por enquanto há o link "Continue de onde parou" na própria tela de login.
+- **Rascunhos abandonados:** ficam no banco até alguém continuar ou recomeçar. Apagar sozinho depois de um tempo (ex.: 30 dias, com cron da Vercel) foi deixado para depois.
 - **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
 - **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
 - **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.
 - **E-mail já cadastrado no passo 2:** hoje a resposta diz explicitamente que o e-mail já tem conta. Isso revela se um e-mail está cadastrado, mas só para quem tem um CNPJ elegível e ainda sem conta, e com limite de tentativas. A alternativa é uma mensagem genérica.
 - **Cor de erro:** a paleta não tem cor de erro (terracota é só para urgência). Os erros de formulário usam borda `tinta` e texto neutro.
-- **Conta com e-mail não confirmado:** se a pessoa fechar o navegador antes de digitar o código, a conta existe, mas o login exige e-mail verificado. Falta o fluxo de "entrar e confirmar o e-mail" ou de recuperar o acesso.
 
 ## 10. Pontos sinalizados nesta revalidação
 

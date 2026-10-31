@@ -7,12 +7,12 @@ import { rotaDoPasso } from "../_components/passos";
 
 /**
  * Para as páginas dos passos 3 a 8 (Server Components): exige a conta da ONG logada e
- * devolve a ONG. Quem tenta pular um passo volta para o primeiro que falta;
+ * devolve a ONG. Sem login, leva à tela de continuar o cadastro (e-mail e senha). Quem tenta pular um passo volta para o primeiro que falta;
  * depois de publicado, só o passo 8 (que mostra o perfil publicado) abre.
  */
 export async function carregarPasso(passo: number) {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/ong/cadastro/continuar");
   if (session.role !== "ONG") redirect("/");
 
   const ong = await buscarOngDoUsuario(session.user.id);
