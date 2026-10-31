@@ -189,13 +189,17 @@ Extraída do protótipo [design/Mapa de ONGs.dc.html](../design/Mapa%20de%20ONGs
 | `creme` | `#F6F3EA` | fundo da página |
 | `papel` | `#FFFDF8` | cards; texto sobre fundo escuro |
 | `borda` | `#DCD5C4` | bordas e divisores |
+| `borda-suave` | `#E3DED0` | borda de cartões |
 | `tinta` | `#1F2B24` | texto principal; fundos escuros |
 | `tinta-suave` | `#5E6B62` | texto secundário |
 | `musgo` | `#2E5E45` | **ação** (botões, links) |
 | `musgo-escuro` | `#1F4232` | hover, borda de botão, fundo escuro |
+| `musgo-claro` | `#4E7A62` | passo concluído (sobre musgo-escuro) |
+| `musgo-linha` | `#4E6E5D` | contorno e trilho sobre musgo-escuro |
 | `salvia` | `#DDE7D6` | **superfície** |
 | `salvia-clara` | `#EEF2E8` | superfície suave (avisos) |
 | `salvia-apagada` | `#A9BFAF` | texto sobre fundo escuro |
+| `salvia-media` | `#D2E0D5` | texto de passo concluído (sobre musgo-escuro) |
 | `terracota` | `#B9472F` | **só para urgência** (selo, pin) |
 | `terracota-escura` | `#8A2F1C` | texto de urgência |
 | `mel` | `#FBE9B7` | **"por que apareceu"** (motivo do resultado) |

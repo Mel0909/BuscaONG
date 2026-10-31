@@ -13,17 +13,22 @@
   --color-creme: #F6F3EA;
   --color-papel: #FFFDF8;
   --color-borda: #DCD5C4;
+  --color-borda-suave: #E3DED0;
   --color-tinta: #1F2B24;
   --color-tinta-suave: #5E6B62;
 
   /* musgo: ação */
   --color-musgo: #2E5E45;
   --color-musgo-escuro: #1F4232;
+  /* tons do musgo sobre fundo musgo-escuro (barra lateral da área da ONG) */
+  --color-musgo-claro: #4E7A62;
+  --color-musgo-linha: #4E6E5D;
 
   /* sálvia: superfície */
   --color-salvia: #DDE7D6;
   --color-salvia-clara: #EEF2E8;
   --color-salvia-apagada: #A9BFAF;
+  --color-salvia-media: #D2E0D5;
 
   /* terracota: só para urgência */
   --color-terracota: #B9472F;
