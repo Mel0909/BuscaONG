@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { LADO_MINIMO_LOGO, TAMANHO_MAXIMO_IMAGEM, TIPOS_IMAGEM } from "@/lib/cadastro/limites";
+import { TAMANHO_MAXIMO_IMAGEM, TIPOS_IMAGEM } from "@/lib/cadastro/limites";
 import { enviarPasso } from "../_actions/enviarPasso";
 import { ErroCampo, estiloAjuda, estiloRotulo } from "./ui";
 
@@ -12,28 +12,14 @@ type Tipo = "logo" | "capa";
 
 const MB = 1024 * 1024;
 
-async function dimensoes(arquivo: File): Promise<{ largura: number; altura: number }> {
-  const bitmap = await createImageBitmap(arquivo);
-  const resultado = { largura: bitmap.width, altura: bitmap.height };
-  bitmap.close();
-  return resultado;
-}
-
-/** Confere tipo, tamanho e (na logo) o lado mínimo antes de enviar. */
-async function validar(tipo: Tipo, arquivo: File): Promise<string | null> {
+/**
+ * Confere tipo e tamanho do arquivo antes de enviar. Formato e dimensões são livres:
+ * logo e capa são cortadas no centro para caber no espaço (object-cover).
+ */
+function validar(tipo: Tipo, arquivo: File): string | null {
   if (!(arquivo.type in TIPOS_IMAGEM)) return "Envie uma imagem JPG, PNG ou WebP.";
   if (arquivo.size > TAMANHO_MAXIMO_IMAGEM[tipo]) {
     return `Imagem grande demais: o máximo é ${TAMANHO_MAXIMO_IMAGEM[tipo] / MB} MB.`;
-  }
-  if (tipo === "logo") {
-    try {
-      const { largura, altura } = await dimensoes(arquivo);
-      if (Math.min(largura, altura) < LADO_MINIMO_LOGO) {
-        return `A logo precisa ter pelo menos ${LADO_MINIMO_LOGO} px de lado.`;
-      }
-    } catch {
-      return "Não foi possível abrir a imagem.";
-    }
   }
   return null;
 }
@@ -62,7 +48,7 @@ export function EnvioImagem({
     if (!arquivo) return;
     setErro(null);
 
-    const invalido = await validar(tipo, arquivo);
+    const invalido = validar(tipo, arquivo);
     if (invalido) return setErro(invalido);
 
     setEnviando(true);
@@ -152,7 +138,7 @@ export function EnvioImagem({
         {!disponivel
           ? "O envio de imagens ainda não está disponível. Dá para adicionar depois, no painel."
           : ehLogo
-            ? `Quadrada, mín. ${LADO_MINIMO_LOGO} px. Sem logo, usamos as iniciais.`
+            ? "Até 2 MB, em qualquer formato: cortamos no centro para ficar quadrada. Sem logo, usamos as iniciais."
             : "Até 5 MB. Evitem mostrar o rosto de crianças."}
       </span>
       <ErroCampo id={`${id}-erro`}>{erro ?? undefined}</ErroCampo>
