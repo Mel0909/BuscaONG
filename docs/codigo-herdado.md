@@ -2,7 +2,7 @@
 
 Inventário do que ainda veio do template "monorepo base" (de onde saiu o projeto noctiluz), levantado em 2026-10-02.
 
-**Decisão:** o código abaixo é **mantido por enquanto e reescrito aos poucos**, conforme as features de ONG e Admin forem implementadas. A meta é não sobrar nada da seção 2 até o lançamento do perto.
+**Decisão:** o código abaixo é **mantido por enquanto e reescrito aos poucos**, conforme as features de ONG e Admin forem implementadas. A meta é não sobrar nada da seção 2 até o lançamento do BuscaONG.
 
 > Isto é um inventário técnico, não um parecer jurídico. O template não tinha arquivo LICENSE, o que por padrão significa "todos os direitos reservados" aos autores. A propriedade de software feito por membros de empresa júnior depende do estatuto e dos termos de voluntariado da organização.
 
@@ -13,7 +13,7 @@ O repositório não tem commits feitos antes da limpeza, então nada removido fi
 
 ## 2. A reescrever: autoria do template
 
-Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o código antigo**: partir do requisito do perto e da documentação oficial das bibliotecas. Marque `[x]` quando o item for substituído ou removido.
+Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o código antigo**: partir do requisito do BuscaONG e da documentação oficial das bibliotecas. Marque `[x]` quando o item for substituído ou removido.
 
 ### Back-end (~500 linhas)
 
@@ -39,7 +39,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [ ] `components/auth/*` (`CredentialsLoginForm`, `CredentialsButton`, `GoogleLoginButton`, `LoginOptionals`)
 - [ ] `components/common/ToastProvider.tsx`
 
-`components/base/brand/PertoLogo.tsx` é **novo**, feito a partir do design do perto.
+`components/base/brand/BuscaOngLogo.tsx` é **novo**, feito a partir do design do projeto.
 
 ### Utilitários e núcleo (~315 linhas)
 
@@ -52,7 +52,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Estilos
 
-- [ ] `app/globals.css`: os utilitários `button-md`, `button-lg`, `login-button`, `login-background`, `opacityTransition`, `colorTransition`, `optional-label`, `auth-*` e `divisor` são do template. Os tokens de cor e fonte já são do perto.
+- [ ] `app/globals.css`: os utilitários `button-md`, `button-lg`, `login-button`, `login-background`, `opacityTransition`, `colorTransition`, `optional-label`, `auth-*` e `divisor` são do template. Os tokens de cor e fonte já são do projeto.
 
 ### Testes (~135 linhas)
 
@@ -77,5 +77,5 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 | `playwright.config.ts`, `web/.gitignore`, `eslint.config.mjs`, `postcss.config.mjs`, base do `tsconfig.json`, `next.config.ts` | gerados ou descritos pela documentação de Next, Playwright, Tailwind |
 | `package.json`, `.npmrc`, `pnpm-workspace.yaml`, `.vscode/settings.json` | configuração trivial |
 | `web/public/icons/google-logo.png` | marca do Google, uso permitido no botão de login com Google |
-| `design/` | material do perto, exportado por ferramenta de design (`support.js` é o runtime da ferramenta; conferir se os termos permitem publicá-lo) |
-| `docs/*`, `AGENTS.md`, `CLAUDE.md`, `PertoLogo.tsx`, `icon.svg`, tokens do perto | escritos para o BuscaONG |
+| `design/` | material de design do projeto, exportado por ferramenta de design (`support.js` é o runtime da ferramenta; conferir se os termos permitem publicá-lo) |
+| `docs/*`, `AGENTS.md`, `CLAUDE.md`, `BuscaOngLogo.tsx`, `icon.svg`, tokens de cor | escritos para o BuscaONG |

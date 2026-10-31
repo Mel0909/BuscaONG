@@ -1,7 +1,6 @@
 # BuscaONG
 
-- **Nome interno do repositório:** BuscaONG
-- **Nome público da marca (visível no site):** **perto**
+- **Nome do projeto e do site:** **BuscaONG**
 - **Estrutura:** o app roda em `web/`; a raiz do monorepo cuida só de ferramentas compartilhadas
 
 > Versões e preços revalidados em **2026-10-02**. As versões vêm do registro do npm (`npm view`) e da agenda oficial do Node.js. Os preços vêm das páginas oficiais de cada serviço, exceto a Brevo (ver §8.3).
@@ -269,7 +268,7 @@ O que mudou em relação aos alvos combinados antes ou merece atenção:
 3. **Prisma:** a tag `latest` aponta para o RC do Prisma 8 (ver §8.1). Sempre instalar com a versão fixada.
 4. **Node 24** entra em Maintenance LTS em 20/10/2026, e o Node 26 vira LTS em 28/10/2026. `engines >=24` continua válido; não é preciso mudar agora.
 5. **Escopo:** em relação ao plano inicial, saíram os **alertas via WhatsApp** (e o toggle de custo no admin) e a **conta opcional de doador**. Urgência agora é só visual, e a auth atende só ONG e Admin.
-6. **Marca:** a identidade do **perto** já foi aplicada (ver §11): metadata, navbar, login, cadastro e 404. Só o título da home ainda diz "BuscaONG", porque o Hello World combinado para a Etapa 5 é "Hello World — BuscaONG".
+6. **Marca:** o nome público passou a ser **BuscaONG** (antes era "perto", nome do protótipo em `design/`). A identidade visual (cores, fontes e o símbolo do pin, ver §11) continua a do protótipo.
 
 ## 11. Identidade visual
 
@@ -312,8 +311,8 @@ As fontes são carregadas via `next/font/google` em `web/src/app/layout.tsx`. To
 
 ### Logo
 
-- **Componente:** `web/src/components/base/brand/PertoLogo.tsx`.
-- **Marca (`PertoMark`):** quadrado arredondado com um pin.
-- **Logo completo (`PertoLogo`):** a marca + a palavra "perto" em Bricolage.
+- **Componente:** `web/src/components/base/brand/BuscaOngLogo.tsx`.
+- **Marca (`BuscaOngMark`):** quadrado arredondado com um pin.
+- **Logo completo (`BuscaOngLogo`):** a marca + o nome "BuscaONG" em Bricolage.
 - **Variantes:** `light` (marca musgo e pin sálvia, para fundo claro) e `dark` (marca sálvia e pin musgo-escuro, para fundo escuro).
 - **Favicon:** `web/src/app/icon.svg`, o mesmo desenho em SVG.

@@ -4,7 +4,7 @@ Instruções para agentes de IA (Codex/GPT, Claude Code, Cursor, Copilot...) e p
 
 ## Projeto
 
-**BuscaONG** é o nome interno do repositório; o nome público, visível no site, é **perto**. É um site que conecta doadores a ONGs próximas, com mapa (Mapbox) e lista sincronizada, filtros por causa, item e voluntariado, e destaque visual de urgência.
+**BuscaONG** é o nome do projeto e do site. É um site que conecta doadores a ONGs próximas, com mapa (Mapbox) e lista sincronizada, filtros por causa, item e voluntariado, e destaque visual de urgência.
 
 - Não há conta de doador: só **ONG** (`/ong`) e **Admin** (`/admin`) têm login.
 - O site **não envia notificações**; a urgência é só visual.
@@ -29,7 +29,7 @@ Idioma: documentação, commits, branches e textos da interface em **português*
 - **Prisma fica na linha 6** (`^6.19`), porque o Prisma 7 não suporta MongoDB. **Nunca instale `prisma` ou `@prisma/client` sem versão**: a tag `latest` do npm aponta para um release candidate do Prisma 8.
 - **Autenticação é com better-auth** (não Auth.js/NextAuth). Operações de conta passam pelo better-auth, nunca pelo Prisma direto ([docs/autenticacao.md](docs/autenticacao.md)).
 - **Rotas da API não importam o Prisma**: rota → schema (Zod) → service ([docs/padroes-api.md](docs/padroes-api.md)).
-- **Cores só pelos tokens do perto** (`bg-musgo`, `text-tinta`...). **Terracota é exclusiva de urgência** ([docs/buscaong.md §11](docs/buscaong.md)).
+- **Cores só pelos tokens do projeto** (`bg-musgo`, `text-tinta`...). **Terracota é exclusiva de urgência** ([docs/buscaong.md §11](docs/buscaong.md)).
 - **Código herdado do template:** ao reescrever, **não copie** o código antigo; parta do requisito e da documentação oficial ([docs/codigo-herdado.md](docs/codigo-herdado.md)).
 - **Antes de mexer em `/api/users`, auth ou validação de IDs**, leia [docs/erros-a-consertar.md](docs/erros-a-consertar.md): há bugs de segurança conhecidos que dependem uns dos outros.
 

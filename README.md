@@ -1,6 +1,6 @@
 # BuscaONG
 
-**perto**: site que conecta doadores a ONGs próximas, com mapa e lista de ONGs, filtros por causa, item e voluntariado, e destaque visual para pedidos urgentes.
+Site que conecta doadores a ONGs próximas, com mapa e lista de ONGs, filtros por causa, item e voluntariado, e destaque visual para pedidos urgentes.
 
 ## Estrutura do repositório
 
@@ -10,7 +10,7 @@ Monorepo com pnpm workspaces:
 - `/bruno`: coleção do [Bruno](https://www.usebruno.com/) para testar e documentar a API
 - `/.husky`: hooks do git (regras de branch e commit, testes, lint)
 - `/.github`: workflow que confere as convenções de git nos PRs
-- `/design`: design e protótipo do perto
+- `/design`: design e protótipo
 - `/.vscode`: configurações compartilhadas do editor
 
 ## Setup
