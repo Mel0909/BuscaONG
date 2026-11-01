@@ -14,4 +14,3 @@ export const TIPOS_IMAGEM = {
 export type TipoImagem = keyof typeof TIPOS_IMAGEM;
 
 export const TAMANHO_MAXIMO_IMAGEM = { logo: 2 * 1024 * 1024, capa: 5 * 1024 * 1024 } as const;
-export const LADO_MINIMO_LOGO = 400; // px

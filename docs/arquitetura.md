@@ -145,7 +145,7 @@ src/
 │   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
 │   │   ├── admin/                /admin (login do admin), /admin/dashboard
-│   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG)
+│   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG, mais continuar e retomar)
 │   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx)
 │   │   │   ├── _actions/         chamadas à API dos passos 3 a 8
 │   │   │   └── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)

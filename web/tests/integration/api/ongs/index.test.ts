@@ -116,13 +116,69 @@ describe("POST /api/ongs", () => {
   });
 
   it("devolve 409 quando o CNPJ já tem conta, sem consultar a Receita", async () => {
-    db.ong.findUnique.mockResolvedValue({ id: "ong-1" } as never);
+    db.ong.findUnique.mockResolvedValue({ id: "ong-1", status: "PUBLICADA", userId: "antigo" } as never);
 
     const response = await post();
 
     expect(response.status).toBe(409);
     expect((await response.json()).error.details).toEqual({ campo: "cnpj" });
     expect(lookupMock).not.toHaveBeenCalled();
+  });
+
+  it("ONG publicada não pode ser recomeçada", async () => {
+    db.ong.findUnique.mockResolvedValue({ id: "ong-1", status: "PUBLICADA", userId: "antigo" } as never);
+
+    const response = await post({ ...corpo, recomecar: true });
+
+    expect(response.status).toBe(409);
+    expect(db.user.delete).not.toHaveBeenCalled();
+  });
+
+  describe("cadastro em andamento (rascunho) para o CNPJ", () => {
+    const rascunho = { id: "ong-antiga", status: "RASCUNHO", userId: "usuario-antigo" };
+
+    beforeEach(() => {
+      // a busca por CNPJ acha o rascunho; a criação da ONG nova não passa por findUnique
+      db.ong.findUnique.mockResolvedValue(rascunho as never);
+    });
+
+    it("sem escolher recomeçar, responde 409 EM_ANDAMENTO e não apaga nada", async () => {
+      const response = await post();
+
+      expect(response.status).toBe(409);
+      expect((await response.json()).error.details).toEqual({ campo: "cnpj", motivo: "EM_ANDAMENTO" });
+      expect(db.user.delete).not.toHaveBeenCalled();
+      expect(signUpEmail).not.toHaveBeenCalled();
+    });
+
+    it("recomeçando, apaga o rascunho (com o usuário) antes de criar a conta nova", async () => {
+      const response = await post({ ...corpo, recomecar: true });
+
+      expect(response.status).toBe(201);
+      expect(db.user.delete).toHaveBeenCalledWith({ where: { id: "usuario-antigo" } });
+      expect(db.user.delete.mock.invocationCallOrder[0]).toBeLessThan(signUpEmail.mock.invocationCallOrder[0]);
+    });
+
+    it("recomeçando, aceita o mesmo e-mail do rascunho apagado", async () => {
+      db.user.findUnique.mockImplementation((async (args: { where: { id?: string; email?: string } }) => {
+        if (args.where.email) return { id: "usuario-antigo" }; // e-mail é do rascunho
+        return args.where.id === USER_ID ? { id: USER_ID } : null;
+      }) as never);
+
+      const response = await post({ ...corpo, recomecar: true });
+
+      expect(response.status).toBe(201);
+    });
+
+    it("recomeçando, ainda recusa e-mail de outra conta", async () => {
+      db.user.findUnique.mockResolvedValue({ id: "outra-conta" } as never);
+
+      const response = await post({ ...corpo, recomecar: true });
+
+      expect(response.status).toBe(409);
+      expect((await response.json()).error.details).toEqual({ campo: "email" });
+      expect(db.user.delete).not.toHaveBeenCalled();
+    });
   });
 
   it("devolve 422 quando o CNPJ não é elegível", async () => {

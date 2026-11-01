@@ -12,10 +12,10 @@ function enderecoInicial(ong: Ong): EnderecoForm {
       logradouro: e.logradouro,
       numero: e.numero ?? "",
       complemento: e.complemento ?? "",
-      bairro: e.bairro ?? "",
+      bairro: e.bairro,
       municipio: e.municipio,
       uf: e.uf,
-      cep: e.cep ? formatarCep(e.cep) : "",
+      cep: formatarCep(e.cep),
     };
   }
 

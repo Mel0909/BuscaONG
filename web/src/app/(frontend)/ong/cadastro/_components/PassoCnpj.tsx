@@ -10,12 +10,14 @@ import { CNPJ_LENGTH, formatCnpj, isValidCnpj, normalizeCnpj } from "@/utils/val
 import { useCadastro } from "./CadastroContext";
 import { CartaoReceita } from "./CartaoReceita";
 
-// estados do campo (protótipo O1): digitando, validando, válido, inválido, já cadastrado, não elegível
+// estados do campo (protótipo O1): digitando, validando, válido, inválido, já cadastrado, não elegível,
+// e cadastro em andamento (começado e não publicado)
 type Estado =
   | { tipo: "digitando" }
   | { tipo: "invalido" }
   | { tipo: "validando" }
-  | { tipo: "elegivel"; cnpj: string; receita: CnpjData }
+  | { tipo: "elegivel"; cnpj: string; receita: CnpjData; recomecar?: boolean }
+  | { tipo: "em-andamento"; cnpj: string; receita: CnpjData }
   | { tipo: "nao-elegivel"; motivo: string; receita: CnpjData }
   | { tipo: "ja-cadastrado" }
   | { tipo: "nao-encontrado" }
@@ -35,6 +37,9 @@ async function consultar(cnpj: string, signal: AbortSignal): Promise<Estado> {
   if (response.ok) {
     const consulta = body as ConsultaCnpj;
     if (consulta.status === "JA_CADASTRADO") return { tipo: "ja-cadastrado" };
+    if (consulta.status === "EM_ANDAMENTO") {
+      return { tipo: "em-andamento", cnpj: consulta.cnpj, receita: consulta.receita };
+    }
     if (consulta.status === "NAO_ELEGIVEL") {
       return { tipo: "nao-elegivel", motivo: consulta.motivo, receita: consulta.receita };
     }
@@ -69,7 +74,7 @@ export function PassoCnpj() {
   const salvo = !editado && dados && !dados.emailPendente ? dados : null;
   const valor = salvo ? formatCnpj(salvo.cnpj) : valorDigitado;
   const estado: Estado = salvo
-    ? { tipo: "elegivel", cnpj: salvo.cnpj, receita: salvo.receita }
+    ? { tipo: "elegivel", cnpj: salvo.cnpj, receita: salvo.receita, recomecar: salvo.recomecar }
     : estadoDigitado;
   const setEstado = setEstadoDigitado;
 
@@ -96,7 +101,7 @@ export function PassoCnpj() {
 
   function continuar(usarEnderecoReceita: boolean) {
     if (estado.tipo !== "elegivel") return;
-    salvar({ cnpj: estado.cnpj, receita: estado.receita, usarEnderecoReceita });
+    salvar({ cnpj: estado.cnpj, receita: estado.receita, usarEnderecoReceita, recomecar: estado.recomecar });
     router.push("/ong/cadastro/acesso");
   }
 
@@ -159,6 +164,28 @@ export function PassoCnpj() {
           </Link>
         </Aviso>
       )}
+      {estado.tipo === "em-andamento" && (
+        <div className="flex flex-col gap-4">
+          <Aviso>
+            Este CNPJ tem um cadastro em andamento, ainda não publicado. Continue de onde parou ou comece de novo.
+          </Aviso>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/ong/cadastro/continuar"
+              className="flex h-[52px] items-center rounded-[15px] bg-musgo px-[26px] text-base font-semibold text-papel transition-colors hover:bg-musgo-escuro"
+            >
+              Continuar de onde parei
+            </Link>
+            <button
+              type="button"
+              onClick={() => setEstado({ tipo: "elegivel", cnpj: estado.cnpj, receita: estado.receita, recomecar: true })}
+              className="h-[52px] cursor-pointer rounded-[15px] bg-salvia-clara px-[22px] text-base font-semibold text-musgo transition-colors hover:bg-salvia"
+            >
+              Começar de novo
+            </button>
+          </div>
+        </div>
+      )}
       {estado.tipo === "nao-encontrado" && (
         <Aviso>Não encontramos este CNPJ na Receita Federal. Confira os números.</Aviso>
       )}
@@ -172,6 +199,11 @@ export function PassoCnpj() {
 
       {estado.tipo === "elegivel" && (
         <>
+          {estado.recomecar && (
+            <Aviso>
+              Ao criar o acesso no próximo passo, o cadastro anterior deste CNPJ é apagado e tudo começa do zero.
+            </Aviso>
+          )}
           <CartaoReceita receita={estado.receita} elegivel />
           <div className="flex flex-wrap gap-3">
             <button

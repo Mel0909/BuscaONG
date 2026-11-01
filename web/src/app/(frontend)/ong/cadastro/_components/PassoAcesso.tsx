@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useCadastro } from "./CadastroContext";
 import { CampoCodigo } from "./CampoCodigo";
+import { CampoSenha } from "./CampoSenha";
 
 // mesma regra que o servidor aplica (passwordSchema)
 const REGRAS_SENHA = [
@@ -43,6 +44,7 @@ export function PassoAcesso() {
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const [codigo, setCodigo] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<Erro | null>(null);
@@ -83,6 +85,7 @@ export function PassoAcesso() {
           email,
           password: senha,
           usarEnderecoReceita: dados.usarEnderecoReceita,
+          recomecar: dados.recomecar ?? false,
         }),
       });
       const body = await response.json().catch(() => null);
@@ -96,7 +99,18 @@ export function PassoAcesso() {
 
       const mensagem: string = body?.error?.message ?? "Não foi possível criar o acesso. Tente de novo.";
       const campo = body?.error?.details?.campo;
-      if (response.status === 409 && campo === "cnpj") {
+      if (response.status === 409 && body?.error?.details?.motivo === "EM_ANDAMENTO") {
+        setErro({
+          mensagem: (
+            <>
+              {mensagem}{" "}
+              <Link href="/ong/cadastro/continuar" className="font-semibold text-musgo underline underline-offset-2">
+                Continuar de onde parei
+              </Link>
+            </>
+          ),
+        });
+      } else if (response.status === 409 && campo === "cnpj") {
         setErro({
           mensagem: (
             <>
@@ -152,6 +166,8 @@ export function PassoAcesso() {
   }
 
   const senhaValida = REGRAS_SENHA.every((r) => r.ok(senha));
+  // só avisa depois que a pessoa começou a digitar a confirmação
+  const senhasDiferentes = confirmacao.length > 0 && confirmacao !== senha;
 
   return (
     <form
@@ -193,15 +209,13 @@ export function PassoAcesso() {
             <label htmlFor="senha" className="text-sm font-semibold">
               Senha
             </label>
-            <input
+            <CampoSenha
               id="senha"
-              type="password"
               autoComplete="new-password"
               required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               aria-describedby="regras-senha"
-              className={estiloCampo}
             />
             <ul id="regras-senha" className="flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
               {REGRAS_SENHA.map((regra) => {
@@ -213,6 +227,28 @@ export function PassoAcesso() {
                 );
               })}
             </ul>
+          </div>
+        )}
+
+        {!emailPendente && (
+          <div className="flex flex-col gap-[7px]">
+            <label htmlFor="confirmacao-senha" className="text-sm font-semibold">
+              Confirme a senha
+            </label>
+            <CampoSenha
+              id="confirmacao-senha"
+              autoComplete="new-password"
+              required
+              value={confirmacao}
+              onChange={(e) => setConfirmacao(e.target.value)}
+              invalido={senhasDiferentes}
+              aria-describedby={senhasDiferentes ? "erro-confirmacao" : undefined}
+            />
+            {senhasDiferentes && (
+              <span id="erro-confirmacao" className="text-[13px] font-semibold text-tinta">
+                As senhas não são iguais.
+              </span>
+            )}
           </div>
         )}
 
@@ -253,7 +289,7 @@ export function PassoAcesso() {
         )}
         <button
           type="submit"
-          disabled={enviando || (emailPendente ? codigo.length < TAMANHO_CODIGO : !senhaValida || !email)}
+          disabled={enviando || (emailPendente ? codigo.length < TAMANHO_CODIGO : !senhaValida || !email || confirmacao !== senha)}
           className={estiloBotaoPrimario}
         >
           {enviando ? "Aguarde…" : emailPendente ? "Confirmar e continuar" : "Criar acesso"}

@@ -3,6 +3,7 @@ import { isAPIError } from "better-auth/api";
 
 import { novaContaOngSchema } from "@/backend/schemas";
 import {
+  CadastroEmAndamentoError,
   criarContaOng,
   EmailEmUsoError,
   OngJaCadastradaError,
@@ -47,6 +48,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(conta, { status: 201 });
   } catch (error) {
     if (error instanceof OngJaCadastradaError) return erro(error.message, 409, { campo: "cnpj" });
+    if (error instanceof CadastroEmAndamentoError) {
+      return erro(error.message, 409, { campo: "cnpj", motivo: "EM_ANDAMENTO" });
+    }
     if (error instanceof EmailEmUsoError) return erro(error.message, 409, { campo: "email" });
     if (error instanceof OngNaoElegivelError) return erro(error.message, 422, { motivo: error.motivo });
     if (error instanceof CnpjNotFoundError) return erro("CNPJ não encontrado na Receita Federal", 404);

@@ -75,7 +75,11 @@ describe("rotas /api/ongs/minha/*", () => {
   });
 
   describe("acesso", () => {
-    const corpo = { endereco: { logradouro: "Rua A", municipio: "São Paulo", uf: "SP" }, latitude: -23.5, longitude: -46.6 };
+    const corpo = {
+      endereco: { logradouro: "Rua A", bairro: "Centro", municipio: "São Paulo", uf: "SP", cep: "01001-000" },
+      latitude: -23.5,
+      longitude: -46.6,
+    };
 
     it("401 sem login", async () => {
       setCurrentRole(null);
@@ -105,7 +109,14 @@ describe("rotas /api/ongs/minha/*", () => {
   it("passo 3 grava o ponto GeoJSON [lng, lat] e libera o passo 4", async () => {
     const response = await putLocalizacao(
       requisicao("PUT", "localizacao", {
-        endereco: { logradouro: "Rua Domingos de Morais", numero: "1200", municipio: "São Paulo", uf: "SP", cep: "04010-100" },
+        endereco: {
+          logradouro: "Rua Domingos de Morais",
+          numero: "1200",
+          bairro: "Vila Mariana",
+          municipio: "São Paulo",
+          uf: "SP",
+          cep: "04010-100",
+        },
         latitude: -23.5893,
         longitude: -46.6345,
         mostrarSoBairro: true,
@@ -219,10 +230,18 @@ describe("rotas /api/ongs/minha/*", () => {
     });
 
     it("pedir URL de envio sem o R2 configurado responde 503", async () => {
-      const response = await postImagens(
-        requisicao("POST", "imagens", { tipo: "logo", contentType: "image/png", tamanho: 1000 })
-      );
-      expect(response.status).toBe(503);
+      // o cliente do Prisma carrega o web/.env; o teste não pode depender das chaves de quem roda
+      for (const nome of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"]) {
+        vi.stubEnv(nome, "");
+      }
+      try {
+        const response = await postImagens(
+          requisicao("POST", "imagens", { tipo: "logo", contentType: "image/png", tamanho: 1000 })
+        );
+        expect(response.status).toBe(503);
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
   });
 

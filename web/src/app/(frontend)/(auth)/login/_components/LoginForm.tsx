@@ -92,6 +92,7 @@ function LoginForm() {
       <GoogleAuthButton disabled={loading} text="Entrar com Google" />
 
       <Link href='/ong/cadastro' className="block w-fit mt-8 text-sm group">Sua ONG ainda não tem conta? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Cadastre a ONG</span></Link>
+      <Link href='/ong/cadastro/continuar' className="block w-fit mt-2 text-sm group">Começou o cadastro e não terminou? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Continue de onde parou</span></Link>
     </div>
    );
 }
