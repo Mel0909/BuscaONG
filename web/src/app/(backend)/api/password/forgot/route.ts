@@ -1,31 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth"; // your betterAuth export
-import { blockForbiddenRequests, validBody } from "@/utils/api/server";
-import { AllowedRoutes } from "@/types";
+import { solicitarRecuperacaoSchema } from "@/backend/schemas/recuperacao.schema";
+import { solicitarRecuperacao } from "@/backend/services/auth/recuperacao";
+import { clientIp, rateLimit, returnInvalidDataErrors, tooManyRequests } from "@/utils/api/server";
+import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
-const allowedRoles: AllowedRoutes = {
-  POST: ['ADMIN', 'ONG'],
-}
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
+  const limite = rateLimit(`recuperacao:solicitar:${clientIp(request)}`, { limit: 5, windowMs: 60_000 });
+  if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
+  let corpo: unknown;
   try {
-    const forbidden = await blockForbiddenRequests(req, allowedRoles.POST);
-    if (forbidden) {
-      return forbidden;
-    }
-
-    const { email } = await validBody(req);
-
-    const redirectTo = `${process.env.BETTER_AUTH_URL}/api/password/reset`;
-
-    // Triggers sendResetPassword() above if the user exists
-    await auth.api.requestPasswordReset({
-      body: { email, redirectTo },
-    });
-
-    // Don't reveal if email is registered
-    return NextResponse.json({ ok: true });
+    corpo = await request.json();
   } catch {
-    // Still hide existence of the email
-    return NextResponse.json({ ok: true });
+    return NextResponse.json(toErrorMessage("JSON malformado"), { status: 400 });
   }
+  const resultado = solicitarRecuperacaoSchema.safeParse(corpo);
+  if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+  try {
+    await solicitarRecuperacao(resultado.data.email, request.headers);
+  } catch {
+    // Não registrar e-mail, código ou detalhes do provedor; resposta não revela contas.
+    console.error("Não foi possível solicitar a recuperação de acesso.");
+  }
+  return NextResponse.json({ ok: true });
 }

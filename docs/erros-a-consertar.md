@@ -25,11 +25,11 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
 | 5 | ✅ | ~~Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos~~ | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
-| 7 | 🟠 | "Esqueci a senha" nunca funciona e não avisa | `api/password/forgot/route.ts`, `auth.ts` |
+| 7 | ✅ | ~~"Esqueci a senha" nunca funciona e não avisa~~ | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | 🟠 | Botão "Entrar/Cadastro com Google" quebra (provedor desativado) | `GoogleLoginButton.tsx`, `auth.ts` |
 | 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
-| 11 | 🟡 | Reset de senha sem validação da política | `api/password/reset/route.ts` |
+| 11 | ✅ | ~~Reset de senha sem validação da política~~ | `api/password/reset/route.ts` |
 | 12 | 🟡 | Admin pode apagar ou editar outros admins | `api/users/[id]/route.ts` |
 | 13 | 🟡 | Regras de senha inconsistentes entre telas e rotas | vários |
 | 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
@@ -105,7 +105,9 @@ Caminhos relativos a `web/src/`.
   - Remover o `[id]` da rota (ex.: `/api/me/email`) ou exigir que ele seja o da sessão.
   - Validar `currentPassword` só com `z.string().min(1)`.
 
-### 7. 🟠 "Esqueci a senha" nunca funciona e não avisa
+### 7. ✅ "Esqueci a senha" nunca funciona e não avisa
+
+> **Corrigido:** recuperação pública por código de seis dígitos em `/recuperar-acesso`, com as rotas `password/forgot` e `password/reset` reescritas sobre o better-auth. Resposta de solicitação neutra, limites por IP/e-mail, validação de senha, revogação de sessões e testes com os endpoints reais do better-auth usando banco em memória. Não depende de `sendResetPassword` nem de tokens em URL. Os itens abaixo registram o fluxo antigo.
 
 - **Onde:** [api/password/forgot/route.ts](../web/src/app/(backend)/api/password/forgot/route.ts) e [auth.ts](../web/src/auth.ts) (`sendResetPassword` comentado)
 - **Problemas, em ordem:**
@@ -139,7 +141,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** com JSON malformado, a função **retorna** um `NextResponse` em vez de lançar. Quem chama trata o retorno como corpo; por exemplo, `const { newEmail } = await validBody(...)` resulta em `undefined`. A mensagem "JSON malformado" nunca chega ao cliente; ele recebe um erro de validação genérico. Os `catch` das rotas já esperam um `NextResponse` lançado (`error instanceof NextResponse`).
 - **Correção:** trocar `return` por `throw` no `catch` do `validBody`.
 
-### 11. 🟡 Reset de senha sem validação
+### 11. ✅ Reset de senha sem validação
+
+> **Corrigido:** `recuperarSenhaSchema` valida e-mail, código e `passwordSchema` antes do service; o hook também exige a política nos endpoints nativos. Testes cobrem senhas fracas, código expirado/reutilizado, preservação do cadastro e revogação das sessões.
 
 - **Onde:** [api/password/reset/route.ts](../web/src/app/(backend)/api/password/reset/route.ts)
 - **Problema:** `newPassword` vai direto para o better-auth, sem `passwordSchema` e sem `validBody`.

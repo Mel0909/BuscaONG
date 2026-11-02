@@ -9,6 +9,7 @@ import { getUserRole } from "@/backend/services/auth";
 import { sendEmail } from "./lib/email";
 import { codigoVerificacaoEmail } from "./lib/email/templates/codigoVerificacao";
 import { validarRequisicaoAuth } from "./lib/auth-hooks";
+import { protegerConsumoOtp } from "./lib/auth-consumo-otp";
 
 // código de 6 dígitos por e-mail, válido por 10 minutos (protótipo, cadastro passo 2)
 export const OTP_VALIDADE_SEGUNDOS = 10 * 60;
@@ -20,7 +21,10 @@ export const auth = betterAuth({
     }),
     hooks: {
         // bloqueia o cadastro direto pelo HTTP e aplica a regra de senha no servidor
-        before: createAuthMiddleware(async (ctx) => validarRequisicaoAuth(ctx)),
+        before: createAuthMiddleware(async (ctx) => {
+          validarRequisicaoAuth(ctx);
+          await protegerConsumoOtp(ctx);
+        }),
     },
     emailVerification: {
         sendOnSignUp: true,
@@ -30,6 +34,7 @@ export const auth = betterAuth({
       enabled: true,
       requireEmailVerification: true,
       minPasswordLength: 8,
+      revokeSessionsOnPasswordReset: true,
       // sendResetPassword: async ({ user, url /*, token*/ }, ) => {
         // // url already includes the reset token; just email it.
         // await sendEmail({
@@ -68,6 +73,8 @@ export const auth = betterAuth({
     plugins: [
         // a verificação de e-mail usa código (OTP) em vez de link
         emailOTP({
+            disableSignUp: true,
+            allowedAttempts: 3,
             overrideDefaultEmailVerification: true,
             otpLength: 6,
             expiresIn: OTP_VALIDADE_SEGUNDOS,

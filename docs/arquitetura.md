@@ -141,6 +141,7 @@ Tudo **fora** de `app/` é código comum, que as páginas importam; o Next não 
 src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
+│   │   ├── recuperar-acesso/     recuperação de senha por código de e-mail
 │   │   ├── (landing-pages)/      /            (home)
 │   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
@@ -169,6 +170,8 @@ src/
 ├── lib/                          integração com libs e serviços
 │   ├── auth-client.ts            cliente better-auth para o navegador
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
+│   ├── auth-consumo-otp.ts       consumo condicional de códigos, inclusive sob concorrência
+│   ├── auth-limites.ts           limite por e-mail compartilhado entre aliases de códigos
 │   ├── armazenamento/            URLs assinadas para enviar imagens ao Cloudflare R2
 │   ├── cadastro/                 limites e regras do cadastro usados no servidor e na tela (turnos, tipos de imagem)
 │   ├── cnpj/                     consulta de CNPJ (BrasilAPI → Minha Receita → OpenCNPJ)
