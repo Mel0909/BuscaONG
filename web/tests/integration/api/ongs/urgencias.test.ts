@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
+import { Prisma } from "@/generated/prisma";
 import { limparCacheNomes } from "@/backend/services/ongs";
 import { setCurrentRole } from "../../mocks/auth";
 
@@ -27,6 +28,7 @@ const urgencia = (item: string, diasRestantes = 3) => ({
 const ong = (extra: Record<string, unknown> = {}) => ({
   id: "6ae649983bbad49560772d32",
   status: "PUBLICADA",
+  updatedAt: new Date("2026-11-01T12:00:00Z"),
   itens: ["fraldas", "leite-em-po"],
   itensLivres: [{ nome: "Ventilador de teto", chave: "ventilador de teto" }],
   urgencias: [],
@@ -125,6 +127,19 @@ describe("/api/ongs/minha/urgencias", () => {
     expect((await marcar({ item: "fraldas", dias: 7 })).status).toBe(401);
     setCurrentRole("ADMIN");
     expect((await marcar({ item: "fraldas", dias: 7 })).status).toBe(403);
+  });
+
+  it("grava só se a ONG não mudou desde a leitura; se mudou, 409", async () => {
+    await marcar({ item: "fraldas", dias: 7 });
+    expect(db.ong.update.mock.calls[0][0].where).toEqual({
+      id: "6ae649983bbad49560772d32",
+      status: "PUBLICADA",
+      updatedAt: new Date("2026-11-01T12:00:00Z"),
+    });
+
+    db.ong.update.mockRejectedValue(new Prisma.PrismaClientKnownRequestError("conflito", { code: "P2025", clientVersion: "6.19.1" }));
+    expect((await marcar({ item: "fraldas", dias: 7 })).status).toBe(409);
+    expect((await encerrar("fraldas")).status).toBe(409);
   });
 
   it("encerrar tira só a urgência do item", async () => {

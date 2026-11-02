@@ -379,7 +379,6 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **E-mails da equipe:** suspensão e reativação avisam a ONG; arquivar, suspender ou excluir avisam quem denunciou e deixou e-mail. O texto é provisório.
 - **Limite de denúncias:** por aparelho (navegador) e por IP, em memória (cada instância da Vercel conta separado). Para algo global, usar um store compartilhado.
 - **Grupo dos itens (A4):** campo novo, vazio nas listas do seed; o admin preenche.
-- **Escritas concorrentes na mesma ONG:** os formulários do cadastro e do painel só gravam se a ONG não mudou desde a leitura (409 se mudou). As urgências ainda regravam a lista inteira sem essa condição: duas abas marcando ao mesmo tempo podem perder uma das mudanças.
 - **Login com Google:** o botão (quebrado, erro #8) saiu da tela de login. Decidir se ONG e admin vão entrar com Google.
 - **Raio e tamanho da lista:** 50 km e 30 ONGs foram escolhas iniciais. Revisar com dados reais (em cidade pequena, 50 km pode ser pouco; em SP, 30 pode ser pouco sem filtro).
 - **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.

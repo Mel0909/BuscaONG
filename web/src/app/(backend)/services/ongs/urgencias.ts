@@ -1,7 +1,9 @@
 import prisma from "@/backend/services/db";
+import { Prisma, type Ong, type Urgencia } from "@/generated/prisma";
 import type { UrgenciaData } from "@/backend/schemas";
 import { MAX_URGENCIAS, urgenciaAtiva } from "@/lib/ong/urgencia";
 import {
+  CadastroAlteradoError,
   LimiteUrgenciasError,
   OngNaoEncontradaError,
   OngSuspensaError,
@@ -21,6 +23,16 @@ async function ongParaUrgencia(userId: string) {
   if (!ong) throw new OngNaoEncontradaError();
   if (ong.status === "SUSPENSA") throw new OngSuspensaError();
   return ong;
+}
+
+/** Regrava a lista só se a ONG não mudou desde a leitura (outra aba, suspensão): senão, 409. */
+async function gravarUrgencias(ong: Ong, urgencias: Urgencia[]) {
+  try {
+    await prisma.ong.update({ where: { id: ong.id, status: ong.status, updatedAt: ong.updatedAt }, data: { urgencias } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") throw new CadastroAlteradoError();
+    throw error;
+  }
 }
 
 /**
@@ -47,7 +59,7 @@ export async function marcarUrgencia(userId: string, { item, detalhe, dias }: Ur
     criadaEm: atual?.criadaEm ?? agora,
     ate: dias === undefined ? atual!.ate : new Date(agora.getTime() + dias * DIA_MS),
   };
-  await prisma.ong.update({ where: { id: ong.id }, data: { urgencias: [...outras, urgencia] } });
+  await gravarUrgencias(ong, [...outras, urgencia]);
   return urgencia;
 }
 
@@ -56,6 +68,6 @@ export async function encerrarUrgencia(userId: string, item: string) {
   const ong = await ongParaUrgencia(userId);
   const agora = new Date();
   const urgencias = ong.urgencias.filter((u) => u.item !== item && urgenciaAtiva(u, agora));
-  await prisma.ong.update({ where: { id: ong.id }, data: { urgencias } });
+  await gravarUrgencias(ong, urgencias);
   return { urgencias: urgencias.length };
 }
