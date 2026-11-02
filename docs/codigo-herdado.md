@@ -17,8 +17,9 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 
 ### Back-end (~500 linhas)
 
-- [ ] `app/(backend)/api/users/**` (CRUD de users, troca de e-mail e senha)
-- [ ] `app/(backend)/api/password/forgot`, `reset`
+- [x] `app/(backend)/api/users/route.ts` e `api/users/[id]/route.ts`: reescritas com sessão, perfil e regra de dono explícitos; testes de acesso adicionados
+- [ ] `app/(backend)/api/users/[id]/email` e `password` (troca de e-mail e senha)
+- [x] `app/(backend)/api/password/forgot`, `reset`: reescritas para recuperação por código via better-auth, com validação, limites e testes
 - [ ] `app/(backend)/schemas/*` (`auth.schema.ts`, `base.schema.ts`)
 - [ ] `app/(backend)/services/auth/*`, `services/users/*`
 - [ ] `app/(backend)/README.md`

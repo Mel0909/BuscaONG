@@ -141,6 +141,7 @@ Tudo **fora** de `app/` é código comum, que as páginas importam; o Next não 
 src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
+│   │   ├── recuperar-acesso/     recuperação de senha por código de e-mail
 │   │   ├── (landing-pages)/      /            (home)
 │   │   ├── (auth)/               /login, /logout
 │   │   │   └── login/_components/   componentes usados só no /login
@@ -148,7 +149,8 @@ src/
 │   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG, mais continuar e retomar)
 │   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx)
 │   │   │   ├── _actions/         chamadas à API dos passos 3 a 8
-│   │   │   └── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   │   ├── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   │   └── reiniciar/        confirmação por e-mail para limpar rascunho, mantendo a conta
 │   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
 │   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = passos 3 a 8 do cadastro
@@ -169,6 +171,8 @@ src/
 ├── lib/                          integração com libs e serviços
 │   ├── auth-client.ts            cliente better-auth para o navegador
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
+│   ├── auth-consumo-otp.ts       consumo condicional de códigos, inclusive sob concorrência
+│   ├── auth-limites.ts           limite por e-mail compartilhado entre aliases de códigos
 │   ├── armazenamento/            URLs assinadas para enviar imagens ao Cloudflare R2
 │   ├── cadastro/                 limites e regras do cadastro usados no servidor e na tela (turnos, tipos de imagem)
 │   ├── cnpj/                     consulta de CNPJ (BrasilAPI → Minha Receita → OpenCNPJ)

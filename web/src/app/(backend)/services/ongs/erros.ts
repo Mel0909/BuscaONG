@@ -10,8 +10,15 @@ export class OngJaCadastradaError extends Error {
 /** Já existe um cadastro não publicado para o CNPJ e a pessoa não escolheu recomeçar. */
 export class CadastroEmAndamentoError extends Error {
   constructor() {
-    super("Este CNPJ tem um cadastro em andamento. Continue de onde parou ou escolha começar de novo.");
+    super("Este CNPJ tem um cadastro em andamento. Entre na conta para continuar ou reiniciar com segurança.");
     this.name = "CadastroEmAndamentoError";
+  }
+}
+
+export class CadastroAlteradoError extends Error {
+  constructor() {
+    super("O cadastro mudou ou já foi publicado. Recarregue a página antes de continuar.");
+    this.name = "CadastroAlteradoError";
   }
 }
 

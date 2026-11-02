@@ -15,8 +15,7 @@ body:json {
     "cnpj": "12.345.678/0001-95",
     "email": "contato@exemplo.org.br",
     "password": "Senha123",
-    "usarEnderecoReceita": true,
-    "recomecar": false
+    "usarEnderecoReceita": true
   }
 }
 
@@ -24,8 +23,9 @@ docs {
   Passo 2 do cadastro da ONG (pública, 5 tentativas por minuto por IP).
   Revalida o CNPJ, cria o usuário (perfil ONG, e-mail não verificado) e a ONG em RASCUNHO.
   O better-auth envia o código de 6 dígitos; confirme em /api/auth/email-otp/verify-email.
-  recomecar: true apaga o cadastro em andamento (não publicado) do CNPJ antes de criar a conta.
+  Nunca substitui cadastro existente. recomecar: true é recusado com 400.
+  Para limpar rascunho, entre na própria conta e confirme o código em /minha/reinicio.
   Erros: 400 dados inválidos, 404 CNPJ não encontrado, 409 CNPJ ou e-mail já com conta
-  (ou cadastro em andamento sem recomecar: details.motivo EM_ANDAMENTO),
+  (ou cadastro em andamento: details.motivo EM_ANDAMENTO),
   422 CNPJ não elegível, 503 Receita indisponível.
 }

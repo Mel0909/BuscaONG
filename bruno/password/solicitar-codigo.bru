@@ -1,0 +1,17 @@
+meta {
+  name: solicitar recuperação por código
+  type: http
+  seq: 1
+}
+post {
+  url: {{baseUrl}}/password/forgot
+  body: json
+  auth: none
+}
+body:json {
+  { "email": "contato@exemplo.org.br" }
+}
+docs {
+  Público. Resposta neutra independentemente da existência da conta.
+  Receba o código no e-mail ou no terminal em dev sem Resend.
+}

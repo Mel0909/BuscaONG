@@ -1,0 +1,17 @@
+meta {
+  name: redefinir senha com código
+  type: http
+  seq: 2
+}
+post {
+  url: {{baseUrl}}/password/reset
+  body: json
+  auth: none
+}
+body:json {
+  { "email": "contato@exemplo.org.br", "codigo": "123456", "newPassword": "NovaSenha123" }
+}
+docs {
+  Código do e-mail, válido por dez minutos e três tentativas.
+  Redefinir revoga as sessões anteriores; entre novamente. O rascunho é preservado.
+}

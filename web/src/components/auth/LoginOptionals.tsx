@@ -9,7 +9,7 @@ function LoginOptionals() {
         <label htmlFor="remember" className="leading-4">Lembrar de mim</label>
       </div>
 
-      <Link href='/login/reset-password' className="colorTransition border-transparent border-b hover:border-gray-400">Esqueceu sua senha?</Link>
+      <Link href='/recuperar-acesso' className="colorTransition border-transparent border-b hover:border-gray-400">Esqueceu sua senha?</Link>
     </div>
    );
 }

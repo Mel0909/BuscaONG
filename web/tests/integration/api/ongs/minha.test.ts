@@ -28,6 +28,7 @@ const ongRascunho = (extra: Record<string, unknown> = {}) => ({
   userId: "test-user-id",
   status: "RASCUNHO",
   passoAtual: 3,
+  updatedAt: new Date("2026-11-01T12:00:00Z"),
   localizacao: null,
   contatos: null,
   causas: [],

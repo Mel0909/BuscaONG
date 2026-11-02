@@ -9,3 +9,9 @@ get {
   body: none
   auth: inherit
 }
+
+docs {
+  userId: ID da conta do better-auth, com 32 caracteres alfanuméricos.
+  Exige cookie de sessão. ONG só lê a própria conta; ADMIN pode ler outras.
+  Sem sessão: 401. Sem permissão: 403. ID inválido: 400. Conta inexistente: 404.
+}

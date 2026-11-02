@@ -1,5 +1,6 @@
 import { APIError } from "better-auth/api";
 import { passwordSchema } from "@/backend/schemas";
+import { limitarCodigoEmail } from "./auth-limites";
 
 // rotas do better-auth que recebem uma senha nova, e o campo do corpo onde ela vem
 const CAMPOS_SENHA: Record<string, string> = {
@@ -23,6 +24,7 @@ type ContextoAuth = {
  * - Aplica a regra de senha (8+ caracteres, maiúscula, minúscula e número) no servidor.
  */
 export function validarRequisicaoAuth(ctx: ContextoAuth): void {
+  limitarCodigoEmail(ctx.path, ctx.body?.email);
   if (ctx.path === "/sign-up/email" && ctx.request) {
     throw new APIError("FORBIDDEN", {
       message: "Cadastro direto desativado. Use o cadastro da ONG.",

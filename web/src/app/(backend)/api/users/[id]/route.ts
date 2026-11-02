@@ -1,125 +1,76 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { blockForbiddenRequests, getUserFromRequest, returnInvalidDataErrors, validBody, zodErrorHandler } from "@/utils/api/server";
-import { AllowedRoutes } from "@/types";
+import { auth } from "@/auth";
 import { idSchema, patchSchema } from "@/backend/schemas";
 import { deleteUser, findUserById, updateUser } from "@/backend/services/users";
+import { returnInvalidDataErrors, zodErrorHandler } from "@/utils/api/server";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
-const allowedRoles: AllowedRoutes = {
-  PATCH: ['ADMIN', 'ONG'],
-  DELETE: ['ADMIN', 'ONG']
-}
+type Contexto = { params: Promise<{ id: string }> };
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-
-    const validationResult = idSchema.safeParse(id);
-    
-    if (!validationResult.success) {
-      return NextResponse.json(
-        toErrorMessage('ID Inválido'),
-        { status: 400 }
-      )
-    }
-
-    const user = await findUserById(id);
-    return NextResponse.json(user);
-  } catch (error) {
-    if (error instanceof NextResponse) {
-      return error;
-    }
-
-    return zodErrorHandler(error);    
+/** Autoriza antes de consultar ou alterar a conta indicada pela URL. */
+async function autorizarConta(request: NextRequest, { params }: Contexto) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session?.user) {
+    return NextResponse.json(toErrorMessage("Faça login para continuar"), { status: 401 });
   }
+  if (session.role !== "ADMIN" && session.role !== "ONG") {
+    return NextResponse.json(toErrorMessage("Acesso negado"), { status: 403 });
+  }
+
+  const resultado = idSchema.safeParse((await params).id);
+  if (!resultado.success) {
+    return NextResponse.json(toErrorMessage("ID inválido"), { status: 400 });
+  }
+  if (session.role !== "ADMIN" && session.user.id !== resultado.data) {
+    return NextResponse.json(toErrorMessage("Acesso negado"), { status: 403 });
+  }
+  return resultado.data;
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, contexto: Contexto) {
   try {
-    const forbidden = await blockForbiddenRequests(request, allowedRoles.DELETE);
-    if (forbidden) {
-      return forbidden;
+    const id = await autorizarConta(request, contexto);
+    if (id instanceof NextResponse) return id;
+
+    const usuario = await findUserById(id);
+    if (!usuario) {
+      return NextResponse.json(toErrorMessage("Usuário não encontrado"), { status: 404 });
     }
-
-    const userFromRequest = await getUserFromRequest(request);
-
-    // se for um erro
-    if (userFromRequest instanceof NextResponse) {
-      return userFromRequest;
-    }
-
-    const { id } = await params;
-
-    const validationResult = idSchema.safeParse(id);
-
-    if (!validationResult.success) {
-      return NextResponse.json(
-        toErrorMessage('ID Inválido'),
-        { status: 400 }
-      )
-    }
-
-    // só permite um usuário de role ONG se auto deletar
-    if (userFromRequest.role === 'ONG' && id !== userFromRequest.id) {
-      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
-    }
-
-    const user = await deleteUser(id);
-    return NextResponse.json(user);
+    return NextResponse.json(usuario);
   } catch (error) {
-    if (error instanceof NextResponse) {
-      return error;
-    }
-
     return zodErrorHandler(error);
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, contexto: Contexto) {
   try {
-    const forbidden = await blockForbiddenRequests(request, allowedRoles.PATCH);
-    if (forbidden) {
-      return forbidden;
+    const id = await autorizarConta(request, contexto);
+    if (id instanceof NextResponse) return id;
+
+    let corpo: unknown;
+    try {
+      corpo = await request.json();
+    } catch {
+      return NextResponse.json(toErrorMessage("JSON malformado"), { status: 400 });
     }
+    const resultado = patchSchema.safeParse(corpo);
+    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
 
-    const userFromRequest = await getUserFromRequest(request);
-
-    // se for um erro
-    if (userFromRequest instanceof NextResponse) {
-      return userFromRequest;
-    }
-
-    const { id } = await params;
-
-    const idValidationResult = idSchema.safeParse(id);
-
-    if (!idValidationResult.success) {
-      return NextResponse.json(
-        toErrorMessage('ID Inválido'),
-        { status: 400 }
-      )
-    }
-
-    // só permite um usuário de role ONG se auto atualizar
-    if (userFromRequest.role === 'ONG' && id !== userFromRequest.id) {
-      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
-    }
-
-    const body = await validBody(request);
-    const validationResult = patchSchema.safeParse(body);
-
-    if (!validationResult.success) {
-      return returnInvalidDataErrors(validationResult.error);
-    }
-    
-    const user = await updateUser(id, validationResult.data);
-    return NextResponse.json(user);
+    const usuario = await updateUser(id, resultado.data);
+    return NextResponse.json(usuario);
   } catch (error) {
-    if (error instanceof NextResponse) {
-      return error;
-    }
+    return zodErrorHandler(error);
+  }
+}
 
+export async function DELETE(request: NextRequest, contexto: Contexto) {
+  try {
+    const id = await autorizarConta(request, contexto);
+    if (id instanceof NextResponse) return id;
+
+    const usuario = await deleteUser(id);
+    return NextResponse.json(usuario);
+  } catch (error) {
     return zodErrorHandler(error);
   }
 }

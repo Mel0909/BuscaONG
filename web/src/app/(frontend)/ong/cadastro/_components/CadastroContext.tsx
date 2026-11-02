@@ -8,8 +8,6 @@ export type DadosCadastro = {
   cnpj: string;
   receita: CnpjData;
   usarEnderecoReceita: boolean;
-  /** a pessoa escolheu "Começar de novo" sobre um cadastro em andamento */
-  recomecar?: boolean;
   /** preenchido quando a conta já foi criada e falta confirmar o código do e-mail */
   emailPendente?: string;
 };

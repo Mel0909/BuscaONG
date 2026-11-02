@@ -16,7 +16,7 @@ export const novaContaOngSchema = z
     password: passwordSchema,
     // false quando a ONG clicou em "O endereço mudou" no passo 1
     usarEnderecoReceita: z.boolean().default(true),
-    // true quando a pessoa escolheu "Começar de novo" sobre um cadastro em andamento
-    recomecar: z.boolean().default(false),
+    // Compatibilidade com clientes antigos: a API pública nunca reinicia cadastros.
+    recomecar: z.literal(false).optional(),
   })
   .strict(); // rejeita campos extras (ex.: tentar mandar role)
