@@ -19,11 +19,11 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 
 | # | Sev. | Problema | Arquivo |
 |---|---|---|---|
-| 1 | 🔴 | Qualquer pessoa, sem login, lê qualquer usuário pelo ID | `api/users/[id]/route.ts` |
-| 2 | 🔴 | Qualquer usuário logado lista todos os usuários | `api/users/route.ts` |
+| 1 | ✅ | ~~Qualquer pessoa, sem login, lê qualquer usuário pelo ID~~ | `api/users/[id]/route.ts` |
+| 2 | ✅ | ~~Qualquer usuário logado lista todos os usuários~~ | `api/users/route.ts` |
 | 3 | ✅ | ~~Política de senha só existe no front; a API do better-auth aceita senhas fracas~~ | `auth.ts`, `CadastroForm.tsx` |
 | 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
-| 5 | 🟠 | Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos: todas as rotas `/api/users/[id]` respondem 400 | `schemas/base.schema.ts` |
+| 5 | ✅ | ~~Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos~~ | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
 | 7 | 🟠 | "Esqueci a senha" nunca funciona e não avisa | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | 🟠 | Botão "Entrar/Cadastro com Google" quebra (provedor desativado) | `GoogleLoginButton.tsx`, `auth.ts` |
@@ -42,14 +42,18 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 
 Caminhos relativos a `web/src/`.
 
-### 1. 🔴 Leitura de qualquer usuário sem login
+### 1. ✅ Leitura de qualquer usuário sem login
+
+> **Corrigido:** `GET`, `PATCH` e `DELETE /api/users/[id]` usam a mesma autorização: exigem sessão com perfil `ONG` ou `ADMIN`; ONG só acessa a própria conta e admin pode acessar outras. A sessão é lida dos headers da requisição, antes de qualquer acesso ao banco. O GET devolve 404 quando a conta não existe. Testes em `web/tests/integration/api/users/acesso.test.ts`. Corrigido junto com o #5; os tópicos abaixo descrevem o problema original.
 
 - **Onde:** [api/users/[id]/route.ts:14](../web/src/app/(backend)/api/users/[id]/route.ts#L14)
 - **Problema:** o `GET` não chama `blockForbiddenRequests`; não há nenhuma verificação de sessão.
 - **Cenário:** `GET /api/users/<id>` sem cookie retorna nome, e-mail, role e datas do usuário. Hoje o erro #5 bloqueia isso por acidente (todo ID real é rejeitado), mas corrigir o #5 sozinho **abre o vazamento**.
 - **Correção:** exigir sessão e permitir só o próprio usuário ou admins, como já é feito no `PATCH` e no `DELETE` do mesmo arquivo. **Corrigir junto com o #5.**
 
-### 2. 🔴 Qualquer usuário logado lista todos os usuários
+### 2. ✅ Qualquer usuário logado lista todos os usuários
+
+> **Corrigido:** a listagem consulta a sessão diretamente e exige explicitamente `ADMIN`. Sem sessão responde 401; ONG ou sessão sem perfil responde 403, sem consultar usuários no banco.
 
 - **Onde:** [api/users/route.ts:16](../web/src/app/(backend)/api/users/route.ts#L16)
 - **Problema:** o `GET` passa `allowedRoles.POST` para a verificação, mas `allowedRoles` só define `GET`. Com `undefined`, o `blockForbiddenRequests` só confere se existe sessão e ignora o perfil.
@@ -73,7 +77,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** o `env` do `next.config` **embute o valor no JavaScript em tempo de build**, onde quer que `process.env.RESEND_API_KEY` apareça. Hoje só o servidor referencia essa variável (em código comentado), mas basta um componente client usar a variável para a chave vazar para o navegador.
 - **Correção:** remover o bloco `env`. O código de servidor já lê `process.env` em runtime, e variáveis públicas devem usar o prefixo `NEXT_PUBLIC_`.
 
-### 5. 🟠 Validação de ID incompatível com os IDs do better-auth
+### 5. ✅ Validação de ID incompatível com os IDs do better-auth
+
+> **Corrigido:** `idSchema` aceita exatamente 32 caracteres alfanuméricos, mantendo o formato já gerado pelo better-auth e as contas existentes. Não foi alterado o gerador de IDs nem feita migração. O schema é exclusivo das contas; não deve ser reutilizado para os ObjectIds de ONG. A validação foi corrigida junto com a autorização do #1. As rotas de e-mail e senha continuam com os problemas do #6.
 
 - **Onde:** [schemas/base.schema.ts:3](../web/src/app/(backend)/schemas/base.schema.ts#L3)
 - **Problema:** `idSchema = z.string().uuid()`. O better-auth gera IDs de **32 caracteres alfanuméricos**, não UUIDs, a menos que `advanced.database.generateId: "uuid"` esteja configurado, e o [auth.ts](../web/src/auth.ts) não configura.
@@ -82,7 +88,7 @@ Caminhos relativos a `web/src/`.
   - (a) Configurar `generateId: "uuid"` no better-auth. Só vale para usuários novos.
   - (b) Trocar o `idSchema` por um formato compatível (ex.: `z.string().regex(/^[A-Za-z0-9]{32}$/)` ou só `.min(1)`).
 
-  **Decidir antes de criar os modelos de ONG**, porque o `idSchema` será reutilizado. Lembrar do #1.
+  A opção (b) foi adotada junto com o #1. Os modelos de ONG usam ObjectId, com validação separada quando necessária.
 
 ### 6. 🟠 Trocar e-mail e senha pela API sempre falha
 

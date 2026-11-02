@@ -100,3 +100,9 @@ const allowedRoles: AllowedRoutes = {
 ```
 
 Use sempre a chave do **mesmo método** da função (`allowedRoles.GET` dentro de `GET`). Errar isso já causou uma falha de segurança no código herdado (bug #2).
+
+### Rotas de usuários
+
+As rotas reescritas `/api/users` e `/api/users/[id]` consultam a sessão com `auth.api.getSession({ headers: request.headers })` e verificam o perfil explicitamente. A listagem exige `ADMIN`; leitura, atualização e exclusão individuais permitem `ADMIN` ou a própria conta `ONG`. Sessão e permissão são verificadas antes do acesso ao banco. As respostas de erro dessas rotas seguem `{ error: { message } }`.
+
+O `idSchema` valida **IDs de conta** do better-auth: exatamente 32 caracteres alfanuméricos, sem conversão nem mudança das contas existentes. IDs de ONG são ObjectIds do MongoDB e não usam esse schema. As subrotas de e-mail e senha ainda são herdadas e têm pendências no bug #6.
