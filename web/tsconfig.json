@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "allowUmdGlobalAccess": true,
     "lib": [
       "dom",
       "dom.iterable",
