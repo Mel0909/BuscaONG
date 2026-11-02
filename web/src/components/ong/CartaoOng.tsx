@@ -9,10 +9,12 @@ export type DadosCartaoOng = {
   subtitulo: string;
   /** até 3 itens que a ONG costuma precisar */
   itens: string[];
+  /** itens com urgência ativa: selo "URGENTE" */
+  urgentes?: string[];
 };
 
 /** Card da ONG no mapa e na lista (protótipo: "Card no mapa e na lista"). */
-export function CartaoOng({ nome, logoUrl, subtitulo, itens }: DadosCartaoOng) {
+export function CartaoOng({ nome, logoUrl, subtitulo, itens, urgentes = [] }: DadosCartaoOng) {
   return (
     <article className="flex gap-3 rounded-[20px] border border-borda-suave bg-papel p-[14px]">
       <div className="relative flex size-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-salvia font-display text-[17px] font-bold text-musgo">
@@ -21,6 +23,11 @@ export function CartaoOng({ nome, logoUrl, subtitulo, itens }: DadosCartaoOng) {
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <h3 className="text-base font-semibold">{nome}</h3>
         {subtitulo && <p className="text-[13px] font-medium text-tinta-suave">{subtitulo}</p>}
+        {urgentes.length > 0 && (
+          <p className="self-start rounded-md bg-terracota px-2 py-[3px] text-[11px] font-bold uppercase tracking-[0.04em] text-papel">
+            Urgente · {urgentes.join(", ")}
+          </p>
+        )}
         {itens.length > 0 && (
           <ul className="flex flex-wrap gap-1.5">
             {itens.map((item) => (
