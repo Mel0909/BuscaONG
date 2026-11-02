@@ -107,7 +107,7 @@ Caminhos relativos a `web/src/`.
 
 ### 7. ✅ "Esqueci a senha" nunca funciona e não avisa
 
-> **Corrigido:** recuperação pública por código de seis dígitos em `/recuperar-acesso`, com as rotas `password/forgot` e `password/reset` reescritas sobre o better-auth. Resposta de solicitação neutra, limites por IP/e-mail, validação de senha, revogação de sessões e testes com os endpoints reais do better-auth usando banco em memória. Não depende de `sendResetPassword` nem de tokens em URL. Os itens abaixo registram o fluxo antigo.
+> **Corrigido:** recuperação pública por código de seis dígitos em `/login/recuperar`, com as rotas `password/forgot` e `password/reset` reescritas sobre o better-auth. Resposta de solicitação neutra, limites por IP/e-mail, validação de senha, revogação de sessões e testes com os endpoints reais do better-auth usando banco em memória. Não depende de `sendResetPassword` nem de tokens em URL. Os itens abaixo registram o fluxo antigo.
 
 - **Onde:** [api/password/forgot/route.ts](../web/src/app/(backend)/api/password/forgot/route.ts) e [auth.ts](../web/src/auth.ts) (`sendResetPassword` comentado)
 - **Problemas, em ordem:**

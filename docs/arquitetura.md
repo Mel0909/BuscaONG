@@ -143,7 +143,6 @@ Tudo **fora** de `app/` é código comum, que as páginas importam; o Next não 
 src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
-│   │   ├── recuperar-acesso/     recuperação de senha por código de e-mail
 │   │   ├── (landing-pages)/      /            (tela principal: mapa, lista, busca e filtros)
 │   │   │   ├── _components/      TelaMapa (estado e layout), MapaOngs, ListaOngs, PainelFiltros...
 │   │   │   └── _actions/         chamadas à API pública e à busca de lugares do Mapbox

@@ -133,7 +133,7 @@ ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até
 **Continuar o cadastro** (`/ong/cadastro/continuar`):
 - E-mail e senha do passo 2. Com login certo, `/ong/cadastro/retomar` leva ao passo em que a pessoa parou (`passoAtual`).
 - Se a pessoa saiu antes de confirmar o e-mail, o better-auth responde `EMAIL_NOT_VERIFIED` (só depois de conferir a senha). A tela manda um código novo e confirma ali mesmo; com o código, a sessão abre e o cadastro continua.
-- Quem não lembra a senha segue para `/recuperar-acesso`: código por e-mail e nova senha, preservando o cadastro. Depois de redefinir, é preciso entrar novamente; sessões anteriores são revogadas.
+- Quem não lembra a senha segue para `/login/recuperar`: código por e-mail e nova senha, preservando o cadastro. Ao redefinir, as sessões anteriores são encerradas e a tela entra com a senha nova.
 - Sem login, as páginas dos passos 3 a 8 levam para cá. O `/login` também tem o link "Continue de onde parou".
 
 **Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`), ou cadastro em andamento (`details.motivo: EM_ANDAMENTO`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.

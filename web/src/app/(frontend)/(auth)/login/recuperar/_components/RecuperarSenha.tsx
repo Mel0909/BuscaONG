@@ -23,9 +23,23 @@ const REQUISITOS = [
   { texto: "Um número", ok: hasNumber },
 ];
 
+/** POST /api/password/forgot ou /reset; não lança em erro de rede (vira status 0). */
+async function enviar(rota: "forgot" | "reset", corpo: Record<string, string>) {
+  try {
+    const resposta = await fetch(`/api/password/${rota}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(corpo),
+    });
+    return { ok: resposta.ok, status: resposta.status };
+  } catch {
+    return { ok: false, status: 0 };
+  }
+}
+
 /**
- * "Esqueci a senha": o better-auth manda um código de 6 dígitos por e-mail (plugin emailOTP);
- * com o código, a pessoa escolhe a senha nova e já entra.
+ * "Esqueci a senha": o servidor pede ao better-auth um código de 6 dígitos por e-mail (plugin
+ * emailOTP); com o código, a pessoa escolhe a senha nova e já entra.
  * Por segurança, a tela não diz se o e-mail tem conta: o código só chega se tiver.
  */
 export function RecuperarSenha() {
@@ -50,10 +64,10 @@ export function RecuperarSenha() {
   async function pedirCodigo() {
     setEnviando(true);
     setErro(null);
-    const { error } = await authClient.emailOtp.requestPasswordReset({ email: email.trim().toLowerCase() });
+    const resposta = await enviar("forgot", { email: email.trim().toLowerCase() });
     setEnviando(false);
-    if (error) {
-      setErro(error.status === 429 ? "Muitas tentativas. Espere um pouco." : "Não foi possível enviar o código agora. Tente de novo.");
+    if (!resposta.ok) {
+      setErro(resposta.status === 429 ? "Muitas tentativas. Espere um pouco." : "Não foi possível enviar o código agora. Tente de novo.");
       return;
     }
     setReenviarEm(Date.now() + ESPERA_REENVIO_MS);
@@ -72,15 +86,21 @@ export function RecuperarSenha() {
     setEnviando(true);
     setErro(null);
     const emailNormalizado = email.trim().toLowerCase();
-    const { error } = await authClient.emailOtp.resetPassword({ email: emailNormalizado, otp: codigo, password: senha });
-    if (error) {
+    const resposta = await enviar("reset", { email: emailNormalizado, codigo, newPassword: senha });
+    if (!resposta.ok) {
       setEnviando(false);
       setCodigo("");
-      setErro("Código incorreto ou expirado. Confira o e-mail ou peça um novo código.");
+      setErro(
+        resposta.status === 429
+          ? "Muitas tentativas. Espere um pouco."
+          : resposta.status === 400
+            ? "Código incorreto, expirado ou já usado. Confira o e-mail ou peça um novo código."
+            : "Não foi possível trocar a senha agora. Tente de novo."
+      );
       return;
     }
 
-    // senha trocada: entra direto
+    // senha trocada (as sessões antigas foram encerradas): entra direto com a nova
     const login = await authClient.signIn.email({ email: emailNormalizado, password: senha });
     if (!login.error) {
       router.push("/ong/painel");

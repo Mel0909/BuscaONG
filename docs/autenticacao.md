@@ -76,12 +76,10 @@ await authClient.signOut();
 ## 5. Esqueci a senha
 
 O fluxo usa **código por e-mail**, reutilizando o plugin `emailOTP`:
-Há duas telas por enquanto: `/recuperar-acesso` e `/login/recuperar` (ligada ao login), que chama os endpoints do better-auth direto.
-
-1. `/recuperar-acesso` envia o e-mail a `POST /api/password/forgot`, sem exigir sessão.
+1. A tela `/login/recuperar` (link "Esqueci a senha" do login e do "continuar cadastro") envia o e-mail a `POST /api/password/forgot`, sem exigir sessão.
 2. Rota → schema → `services/auth/recuperacao.ts` → `auth.api.requestPasswordResetEmailOTP`. O e-mail é normalizado; a resposta `{ ok: true }` é igual para conta existente, inexistente e falha do provedor. Falhas são registradas sem código, e-mail ou detalhes sensíveis.
 3. A pessoa digita código, nova senha e confirmação. `POST /api/password/reset` valida e-mail, seis dígitos e política de senha; o service chama `auth.api.resetPasswordEmailOTP`.
-4. O better-auth valida o código, troca a credencial, confirma o e-mail caso ainda não estivesse confirmado e revoga sessões. A pessoa faz login com a nova senha; o rascunho permanece intacto.
+4. O better-auth valida o código, troca a credencial, confirma o e-mail caso ainda não estivesse confirmado e revoga sessões. Com a senha trocada, a tela já entra com a senha nova e leva ao painel (ou ao passo do cadastro em que a ONG parou); o rascunho permanece intacto.
 
 Não são usados tokens em URL nem o fluxo por link (`sendResetPassword` permanece desativado). Códigos inválidos, expirados e já utilizados têm mensagem neutra. Os endpoints HTTP nativos continuam sob a mesma política de senha e limite por e-mail do hook; `disableSignUp` impede criar conta pelo login com OTP.
 

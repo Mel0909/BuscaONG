@@ -150,7 +150,7 @@ export function PassoContinuar({ reiniciar = false }: { reiniciar?: boolean }) {
 
         <p className="text-sm leading-normal text-tinta-suave">
           Não lembra a senha?{" "}
-          <Link href="/recuperar-acesso" className="font-semibold text-musgo underline underline-offset-2">
+          <Link href="/login/recuperar" className="font-semibold text-musgo underline underline-offset-2">
             Recupere o acesso pelo e-mail
           </Link>
           . Seus dados do cadastro serão mantidos.
