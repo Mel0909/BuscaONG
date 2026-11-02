@@ -54,6 +54,7 @@ export default async function CadastroPublicarPage() {
   return (
     <PassoPublicar
       status={ong.status}
+      endereco={ong.status === "PUBLICADA" ? (ong.slug ?? ong.id) : null}
       verificacao={verificacao(ong)}
       cartao={{
         nome: ong.nomePublico ?? ong.razaoSocial,

@@ -5,7 +5,15 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { enviarPasso } from "../_actions/enviarPasso";
 import { CartaoOng, type DadosCartaoOng } from "@/components/ong/CartaoOng";
-import { CabecalhoPasso, estiloBotaoPrimario, estiloTituloSecao, FormularioPasso, MensagemErro, RodapePasso } from "./ui";
+import {
+  CabecalhoPasso,
+  estiloBotaoPrimario,
+  estiloBotaoSecundario,
+  estiloTituloSecao,
+  FormularioPasso,
+  MensagemErro,
+  RodapePasso,
+} from "./ui";
 
 export type ItemVerificacao = {
   texto: string;
@@ -20,6 +28,8 @@ type Props = {
   cartao: DadosCartaoOng;
   verificacao: ItemVerificacao[];
   status: "RASCUNHO" | "PUBLICADA" | "SUSPENSA";
+  /** endereço da página pública (slug), quando já publicada */
+  endereco: string | null;
 };
 
 function Marca({ ok, opcional }: { ok: boolean; opcional?: boolean }) {
@@ -36,25 +46,36 @@ function Marca({ ok, opcional }: { ok: boolean; opcional?: boolean }) {
   );
 }
 
-function Publicado({ cartao }: { cartao: DadosCartaoOng }) {
+function Publicado({ cartao, endereco }: { cartao: DadosCartaoOng; endereco: string | null }) {
   return (
     <div className="flex max-w-[560px] flex-col gap-6">
       <CabecalhoPasso titulo="Perfil publicado!">
         A ONG já está no BuscaONG. Quem procura ONGs por perto vai encontrar vocês com o card abaixo.
       </CabecalhoPasso>
       <CartaoOng {...cartao} />
-      <Link href="/" className={cn(estiloBotaoPrimario, "flex items-center self-start")}>
-        Ir para o início
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/ong/painel" className={cn(estiloBotaoPrimario, "flex items-center")}>
+          Ir para o painel
+        </Link>
+        {endereco && (
+          <Link href={`/ong/${endereco}`} className={estiloBotaoSecundario}>
+            Ver a página da ONG
+          </Link>
+        )}
+      </div>
+      <p className="text-sm leading-normal text-tinta-suave">
+        No painel vocês marcam itens urgentes e mantêm o perfil em dia.
+      </p>
     </div>
   );
 }
 
-export function PassoPublicar({ cartao, verificacao, status }: Props) {
+export function PassoPublicar({ cartao, verificacao, status, endereco: enderecoInicial }: Props) {
   const [aceita, setAceita] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [publicada, setPublicada] = useState(status === "PUBLICADA");
+  const [endereco, setEndereco] = useState(enderecoInicial);
 
   if (status === "SUSPENSA") {
     return (
@@ -63,7 +84,7 @@ export function PassoPublicar({ cartao, verificacao, status }: Props) {
       </CabecalhoPasso>
     );
   }
-  if (publicada) return <Publicado cartao={cartao} />;
+  if (publicada) return <Publicado cartao={cartao} endereco={endereco} />;
 
   const pendente = verificacao.some((v) => !v.ok && !v.opcional);
 
@@ -71,9 +92,12 @@ export function PassoPublicar({ cartao, verificacao, status }: Props) {
     if (!aceita || pendente || enviando) return;
     setEnviando(true);
     setErro(null);
-    const resposta = await enviarPasso("publicacao", { aceitaTermos: true }, "POST");
+    const resposta = await enviarPasso<{ slug: string | null }>("publicacao", { aceitaTermos: true }, "POST");
     setEnviando(false);
-    if (resposta.ok) setPublicada(true);
+    if (resposta.ok) {
+      setEndereco(resposta.dados.slug);
+      setPublicada(true);
+    }
     else setErro(resposta.mensagem);
   }
 

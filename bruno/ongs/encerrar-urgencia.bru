@@ -1,0 +1,15 @@
+meta {
+  name: painel - encerrar urgência
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/{{folder}}/minha/urgencias?item=fraldas
+  body: none
+  auth: inherit
+}
+
+docs {
+  Exige login de uma conta ONG. Encerra a urgência do item antes do prazo.
+}
