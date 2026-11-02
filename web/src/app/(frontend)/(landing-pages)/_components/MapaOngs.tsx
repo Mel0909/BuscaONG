@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { ExpressionSpecification, GeoJSONSource, Map as MapaMapbox, Marker } from "mapbox-gl";
 
-import type { Bbox, Ponto } from "@/lib/mapa/geo";
+import { limitarBbox, type Bbox, type Ponto } from "@/lib/mapa/geo";
 import type { PinNoMapa } from "./tipos";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -114,7 +114,7 @@ export function MapaOngs({ centroInicial, pins, pessoa, selecionada, margemInfer
 
       const avisarArea = () => {
         const b = m.getBounds();
-        if (b) ultimo.current.aoMover([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
+        if (b) ultimo.current.aoMover(limitarBbox([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]));
       };
 
       m.on("load", async () => {

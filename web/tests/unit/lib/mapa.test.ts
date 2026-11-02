@@ -1,12 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { montarFiltro } from "@/backend/services/ongs/publico";
+import { fatiasDoBbox, montarFiltro } from "@/backend/services/ongs/publico";
 import { contarFiltros, FILTROS_VAZIOS, filtrosParaParams, paramsParaFiltrosCrus } from "@/lib/mapa/filtros";
-import { dentroDoBbox, distanciaKm, formatarDistancia, posicaoAproximada } from "@/lib/mapa/geo";
+import { dentroDoBbox, distanciaKm, formatarDistancia, limitarBbox, posicaoAproximada } from "@/lib/mapa/geo";
 
 const SE = { latitude: -23.5505, longitude: -46.6333 };
 const CAMPINAS = { latitude: -22.9056, longitude: -47.0608 };
 
 describe("geo", () => {
+  it("área do mapa: dentro de ±180, ou o mundo inteiro quando o Mapbox repete o mapa", () => {
+    expect(limitarBbox([-47, -24, -46, -23])).toEqual([-47, -24, -46, -23]);
+    expect(limitarBbox([-250, -85, 250, 85])).toEqual([-180, -85, 180, 85]);
+    expect(limitarBbox([150, -30, 210, 10])).toEqual([-180, -30, 180, 10]);
+  });
+
+  it("fatias de até 90° cobrindo a área toda", () => {
+    expect(fatiasDoBbox([-47, -24, -46, -23])).toEqual([[-47, -24, -46, -23]]);
+    expect(fatiasDoBbox([-180, -85, 180, 85])).toEqual([
+      [-180, -85, -90, 85],
+      [-90, -85, 0, 85],
+      [0, -85, 90, 85],
+      [90, -85, 180, 85],
+    ]);
+  });
+
   it("calcula a distância em linha reta", () => {
     expect(distanciaKm(SE, CAMPINAS)).toBeGreaterThan(80);
     expect(distanciaKm(SE, CAMPINAS)).toBeLessThan(90);

@@ -153,6 +153,23 @@ describe("área pública", () => {
       expect(body.map((p: { urgente: boolean }) => p.urgente)).toEqual([true, false]);
     });
 
+    it("mapa bem afastado: a área vira fatias de até 90°, sem perder os filtros de item", async () => {
+      db.ong.findRaw.mockResolvedValue([] as never);
+      await getMapa(get("ongs/mapa?bbox=-180,-85,180,85&item=fraldas"));
+
+      const { filter } = db.ong.findRaw.mock.calls[0][0] as {
+        filter: { $or?: unknown; $and: [{ $or: { localizacaoPublica: { $geoWithin: { $geometry: { coordinates: number[][][] } } } }[] }] };
+      };
+      const fatias = filter.$and[0].$or.map((f) => f.localizacaoPublica.$geoWithin.$geometry.coordinates[0]);
+      expect(fatias).toHaveLength(4);
+      for (const anel of fatias) {
+        const lngs = anel.map(([lng]) => lng);
+        expect(Math.max(...lngs) - Math.min(...lngs)).toBeLessThanOrEqual(90);
+      }
+      expect(filter).not.toHaveProperty("localizacaoPublica");
+      expect(filter.$or).toBeDefined(); // o $or dos itens continua lá
+    });
+
     it.each(["", "bbox=1,2,3", "bbox=10,0,5,5", "bbox=a,b,c,d"])("400 para bbox inválido (%s)", async (q) => {
       expect((await getMapa(get(`ongs/mapa?${q}`))).status).toBe(400);
     });

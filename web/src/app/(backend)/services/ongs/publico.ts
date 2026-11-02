@@ -255,7 +255,9 @@ const PONTOS_POR_LADO = 16;
 /**
  * Retângulo da tela como polígono GeoJSON. No MongoDB os lados de um polígono são arcos de
  * círculo máximo, que em zoom de estado "entortam" vários km em relação à linha reta da tela;
- * pontos intermediários nos lados mantêm o polígono colado ao retângulo.
+ * pontos intermediários nos lados norte e sul (paralelos) mantêm o polígono colado ao retângulo.
+ * Os lados leste e oeste já são meridianos (círculo máximo) e ficam com um trecho só: pontos
+ * colineares neles fazem o MongoDB recusar o polígono ("Loop is not valid") com a área alta.
  */
 export function poligonoDoBbox([oeste, sul, leste, norte]: Bbox) {
   const lado = (de: [number, number], para: [number, number]) =>
@@ -263,19 +265,26 @@ export function poligonoDoBbox([oeste, sul, leste, norte]: Bbox) {
       de[0] + ((para[0] - de[0]) * i) / PONTOS_POR_LADO,
       de[1] + ((para[1] - de[1]) * i) / PONTOS_POR_LADO,
     ]);
-  const anel = [
-    ...lado([oeste, sul], [leste, sul]),
-    ...lado([leste, sul], [leste, norte]),
-    ...lado([leste, norte], [oeste, norte]),
-    ...lado([oeste, norte], [oeste, sul]),
-  ];
+  const anel = [...lado([oeste, sul], [leste, sul]), [leste, sul], ...lado([leste, norte], [oeste, norte]), [oeste, norte]];
   return { type: "Polygon", coordinates: [[...anel, anel[0]]] };
+}
+
+/** Largura máxima de cada polígono: o MongoDB entende um polígono maior que um hemisfério como o lado de fora dele. */
+const LARGURA_MAXIMA_GRAUS = 90;
+
+/** Divide uma área larga (mapa bem afastado) em fatias de até 90° de longitude. */
+export function fatiasDoBbox([oeste, sul, leste, norte]: Bbox): Bbox[] {
+  const n = Math.max(1, Math.ceil((leste - oeste) / LARGURA_MAXIMA_GRAUS));
+  const largura = (leste - oeste) / n;
+  return Array.from({ length: n }, (_, i): Bbox => [oeste + i * largura, sul, i === n - 1 ? leste : oeste + (i + 1) * largura, norte]);
 }
 
 /** Pins (P1): ONGs publicadas que batem com os filtros dentro da área visível do mapa. */
 export async function pinsNoMapa(bbox: Bbox, filtros: FiltrosData): Promise<PinNoMapa[]> {
+  const area = fatiasDoBbox(bbox).map((fatia) => ({ localizacaoPublica: { $geoWithin: { $geometry: poligonoDoBbox(fatia) } } }));
   const ongs = (await prisma.ong.findRaw({
-    filter: { ...montarFiltro(filtros), localizacaoPublica: { $geoWithin: { $geometry: poligonoDoBbox(bbox) } } },
+    // montarFiltro já pode ter um $or (itens): as fatias entram num $and para não brigar com ele
+    filter: { ...montarFiltro(filtros), ...(area.length === 1 ? area[0] : { $and: [{ $or: area }] }) },
     options: { projection: { nomePublico: 1, localizacaoPublica: 1, mostrarSoBairro: 1, "urgencias.ate": 1 }, limit: MAX_PINS },
   })) as unknown as OngCrua[];
 

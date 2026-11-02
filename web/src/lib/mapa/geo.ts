@@ -26,6 +26,15 @@ export function dentroDoBbox({ latitude, longitude }: Ponto, [oeste, sul, leste,
   return latitude >= sul && latitude <= norte && longitude >= oeste && longitude <= leste;
 }
 
+/**
+ * Área visível dentro do que a API aceita. Com o mapa bem afastado, o Mapbox mostra o mundo
+ * repetido e devolve longitudes além de ±180: aí vale o mundo inteiro.
+ */
+export function limitarBbox([oeste, sul, leste, norte]: Bbox): Bbox {
+  const mundoTodo = leste - oeste >= 360 || oeste < -180 || leste > 180;
+  return [mundoTodo ? -180 : oeste, Math.max(-90, sul), mundoTodo ? 180 : leste, Math.min(90, norte)];
+}
+
 /** Número entre 0 e 1 de um gerador criptográfico (imprevisível, ao contrário do Math.random). */
 const aleatorio = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
 
