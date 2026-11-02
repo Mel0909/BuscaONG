@@ -1,0 +1,23 @@
+meta {
+  name: arquivar denúncias
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/{{folder}}/denuncias
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "ongId": "6ae67eea8cf900bcea8cfe24",
+    "motivo": "FECHOU",
+    "justificativa": "Sem procedência"
+  }
+}
+
+docs {
+  Arquiva as denúncias abertas da ONG com esse motivo, sem mexer na ONG. Devolve { arquivadas }.
+}

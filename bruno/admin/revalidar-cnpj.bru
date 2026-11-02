@@ -1,0 +1,16 @@
+meta {
+  name: revalidar CNPJ
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/ongs/6ae67eea8cf900bcea8cfe24/revalidacao
+  body: none
+  auth: inherit
+}
+
+docs {
+  Consulta o CNPJ de novo na Receita e guarda situação, natureza e endereço. Devolve a ficha da ONG.
+  503 se a Receita estiver indisponível.
+}

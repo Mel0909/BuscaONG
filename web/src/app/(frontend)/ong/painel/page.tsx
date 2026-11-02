@@ -31,6 +31,7 @@ export default async function PainelInicioPage() {
       {suspensa ? (
         <div role="status" className="flex flex-col gap-2 rounded-[18px] border-2 border-tinta bg-papel px-5 py-4">
           <span className="font-display text-lg font-semibold">Perfil suspenso pela equipe do BuscaONG</span>
+          {ong.suspensao?.motivo && <span className="text-[15px]">Motivo: {ong.suspensao.motivo}</span>}
           <span className="text-sm leading-normal text-tinta-suave">
             Enquanto estiver suspenso, o perfil não aparece no mapa e não dá para marcar urgências. Se acha que foi um
             engano ou já resolveu o problema, responda o e-mail que enviamos.

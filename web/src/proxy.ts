@@ -59,8 +59,8 @@ export async function proxy(request: NextRequest) {
     }
     
     if (hasRequiredRole(userRole, ["ADMIN"])) {
-      // Redirect admin users to dashboard
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+      // admin logado vai direto para a gestão de ONGs (A1)
+      return NextResponse.redirect(new URL("/admin/ongs", request.url));
     } else {
       // Redirect non-admin authenticated users to home
       return NextResponse.redirect(new URL("/", request.url));
@@ -71,7 +71,7 @@ export async function proxy(request: NextRequest) {
   if (matchesAnyPattern(pathname, ROUTE_CONFIG.redirectIfAuth)) {
     if (isAuthenticated) {
       // quem já entrou vai para a própria área (o painel leva o cadastro não terminado ao passo em que parou)
-      const destino = hasRequiredRole(userRole, ["ADMIN"]) ? "/admin/dashboard" : "/ong/painel";
+      const destino = hasRequiredRole(userRole, ["ADMIN"]) ? "/admin/ongs" : "/ong/painel";
       return NextResponse.redirect(new URL(destino, request.url));
     }
     return NextResponse.next();

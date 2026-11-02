@@ -1,0 +1,22 @@
+meta {
+  name: listas - reordenar
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/{{folder}}/listas/ordem
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "tipo": "ITEM",
+    "ids": ["6ae67eea8cf900bcea8cfe25", "6ae67eea8cf900bcea8cfe24"]
+  }
+}
+
+docs {
+  ids precisa ter exatamente as opções da lista, na ordem nova (409 se a lista mudou).
+}

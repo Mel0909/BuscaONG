@@ -1,0 +1,21 @@
+meta {
+  name: excluir ONG
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/{{folder}}/ongs/6ae67eea8cf900bcea8cfe24
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "motivo": "Cadastro fraudulento"
+  }
+}
+
+docs {
+  Apaga a conta de acesso, a ONG e as denúncias dela. Não dá para desfazer.
+}

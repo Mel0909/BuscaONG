@@ -1,0 +1,15 @@
+meta {
+  name: registro de ações (CSV)
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}/acoes?categoria=suspensoes&q=
+  body: none
+  auth: inherit
+}
+
+docs {
+  CSV do registro de ações (A3). categoria: todas, suspensoes, exclusoes, denuncias, listas ou sistema.
+}

@@ -15,7 +15,8 @@
     "test": "pnpm --filter web test",
     "test:e2e": "pnpm --filter web test:e2e",
     "db:push": "pnpm --filter web db:push",
-    "db:seed": "pnpm --filter web db:seed"
+    "db:seed": "pnpm --filter web db:seed",
+    "admin:criar": "pnpm --filter web admin:criar"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",

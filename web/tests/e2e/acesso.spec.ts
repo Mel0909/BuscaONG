@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-// Login da ONG, "esqueci a senha" e páginas que exigem sessão.
+// Login da ONG, "esqueci a senha", login do admin e páginas que exigem sessão.
 // Não dependem de dados no banco: usam e-mails que não existem e conferem os redirecionamentos.
 
 const BASE = 'http://localhost:3000'
@@ -61,6 +61,22 @@ test.describe('páginas que exigem sessão', () => {
     await page.goto(`${BASE}/ong/painel/itens`)
     await expect(page).toHaveURL(`${BASE}/login`)
   })
+
+  for (const secao of ['ongs', 'denuncias', 'registro', 'listas']) {
+    test(`/admin/${secao} sem login leva ao login do admin`, async ({ page }) => {
+      await page.goto(`${BASE}/admin/${secao}`)
+      await expect(page).toHaveURL(`${BASE}/admin`)
+    })
+  }
+})
+
+test('login do admin recusa credenciais erradas', async ({ page }) => {
+  await page.goto(`${BASE}/admin`)
+  await page.waitForLoadState('networkidle')
+  const entrar = page.getByRole('button', { name: 'Entrar' })
+  await preencher(page, [[page.getByLabel('E-mail'), EMAIL_INEXISTENTE], [page.locator('#senha-admin'), 'SenhaErrada1']], entrar)
+  await entrar.click()
+  await expect(page.getByText('E-mail ou senha incorretos.')).toBeVisible()
 })
 
 test('ONG que não existe mostra a página não encontrada', async ({ page }) => {

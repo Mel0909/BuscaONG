@@ -5,3 +5,4 @@ export * from './cadastro-ong.schema';
 export * from './mapa.schema';
 export * from './denuncia.schema';
 export * from './painel.schema';
+export * from './admin.schema';

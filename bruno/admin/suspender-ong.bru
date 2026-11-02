@@ -1,0 +1,23 @@
+meta {
+  name: suspender ou reativar ONG
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/{{folder}}/ongs/6ae67eea8cf900bcea8cfe24
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": "SUSPENSA",
+    "motivo": "CNPJ inativo na Receita"
+  }
+}
+
+docs {
+  status: SUSPENSA (sai do mapa; a ONG recebe e-mail; denúncias abertas viram COM_ACAO) ou
+  PUBLICADA (reativa uma suspensa). 409 se a ação não vale no estado atual.
+}

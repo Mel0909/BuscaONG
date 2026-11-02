@@ -170,6 +170,9 @@ model Ong {
   // painel: itens marcados como urgentes (O3)
   urgencias Urgencia[]
 
+  // admin: preenchido quando a ONG é suspensa
+  suspensao Suspensao?
+
   denuncias Denuncia[]
 
   userId    String   @unique
@@ -190,19 +193,26 @@ type Urgencia {
   ate      DateTime
 }
 
+type Suspensao {
+  motivo     String
+  em         DateTime
+  adminEmail String
+}
+
 enum TipoLista {
   CAUSA
   ITEM
   ATIVIDADE // atividades de voluntariado
 }
 
-// opções das listas fixas usadas no cadastro e nos filtros; o admin vai gerenciá-las
+// opções das listas fixas usadas no cadastro e nos filtros; o admin as gerencia (A4)
 // (preenchidas por prisma/seed.ts)
 model OpcaoLista {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   tipo      TipoLista
   slug      String // chave estável, gravada na Ong; não muda quando o nome muda
   nome      String
+  grupo     String? // agrupa os itens no admin (ex.: Alimentação, Higiene e cuidado)
   ordem     Int       @default(0)
   ativa     Boolean   @default(true) // inativa some do cadastro, mas continua valendo para quem já usa
   createdAt DateTime  @default(now())
@@ -210,6 +220,15 @@ model OpcaoLista {
 
   @@unique([tipo, slug])
   @@map("opcao_lista")
+}
+
+// item livre que o admin decidiu manter como texto livre: sai das sugestões do A4
+model ItemLivreMantido {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chave     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("item_livre_mantido")
 }
 
 // motivos da denúncia de perfil (P5.1); os mesmos da fila do admin (A2)
@@ -243,6 +262,37 @@ model Denuncia {
 
   @@index([status, ongId])
   @@map("denuncia")
+}
+
+enum TipoAcao {
+  SUSPENDEU_ONG
+  REATIVOU_ONG
+  EXCLUIU_ONG
+  REVALIDOU_CNPJ
+  ARQUIVOU_DENUNCIA
+  ADICIONOU_OPCAO
+  EDITOU_OPCAO
+  REORDENOU_LISTA
+  UNIFICOU_OPCOES
+  EXCLUIU_OPCAO
+  ADICIONOU_ITEM_LIVRE // texto livre virou item da lista
+  UNIFICOU_ITEM_LIVRE // texto livre passou para um item da lista
+  MANTEVE_ITEM_LIVRE
+}
+
+// registro de ações (A3): só se cria, nunca se edita nem apaga
+model AcaoAdmin {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tipo       TipoAcao
+  adminId    String? // vazio = ação automática do sistema
+  adminEmail String?
+  alvo       String // nome da ONG ou do item, como era no momento da ação
+  alvoId     String?
+  motivo     String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("acao_admin")
 }
 
 // evitar mexer daqui pra baixo
