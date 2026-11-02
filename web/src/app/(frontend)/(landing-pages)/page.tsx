@@ -1,22 +1,17 @@
-import LandingPagesNav from "@/components/base/nav/InitialNav";
-import { headers } from "next/headers";
-import { auth } from "@/auth";
+import { listarOpcoes } from "@/backend/services/listas";
+import { itensLivresPopulares, RAIO_LISTA_KM } from "@/backend/services/ongs";
+import { TelaMapa } from "./_components/TelaMapa";
+
+// tela principal (P1): mapa e lista de ONGs; as listas dos filtros vêm do banco a cada visita
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
+  const [causas, itens, atividades, livres] = await Promise.all([
+    listarOpcoes("CAUSA"),
+    listarOpcoes("ITEM"),
+    listarOpcoes("ATIVIDADE"),
+    itensLivresPopulares(),
+  ]);
 
-  const isLogged = !!session?.user;
-
-  return (
-    <div className="min-h-screen">
-      <LandingPagesNav isLogged={isLogged} />
-
-      <main className="h-[70vh] w-full pt-20 pb-16 flex flex-col items-center justify-center text-center">
-        <h1 className="font-bold text-5xl font-display text-musgo-escuro">BuscaONG</h1>
-        <p className="pt-4 text-xl">Em construção</p>
-      </main>
-    </div>
-  );
+  return <TelaMapa opcoes={{ causas, itens, atividades, livres }} raioKm={RAIO_LISTA_KM} />;
 }

@@ -6,6 +6,9 @@ Como a autenticação funciona no BuscaONG e as regras para mexer nela. Document
 
 Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site sem login (ver [buscaong.md §2](buscaong.md)).
 
+- **ONG:** a conta nasce no cadastro (`POST /api/ongs`). Entra em `/login` e vai para o painel (`/ong/painel`); com o cadastro não terminado, vai para o passo em que parou.
+- **Admin:** a conta é criada pelo terminal, com `pnpm admin:criar` (`web/prisma/criar-admin.mts`). O script pede e-mail, nome e senha, cria o usuário pelo better-auth (que grava a senha com hash) e marca `role: ADMIN` e o e-mail como verificado. Não promove contas de ONG. Entra em `/admin`; o login do admin recusa (e encerra) a sessão de quem não é admin.
+
 > Perfis no enum `Role` do `schema.prisma`: `ONG` (padrão) e `ADMIN`.
 
 ## 2. Onde está cada peça
@@ -18,8 +21,10 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 | Criação de conta (ONG) | `POST /api/ongs` → `services/ongs` (`criarContaOng`) |
 | Endpoints do better-auth (`/api/auth/*`) | `web/src/app/(backend)/api/auth/[...all]/route.ts` |
 | Cliente para o navegador | `web/src/lib/auth-client.ts` |
-| Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) |
-| Proteção de rotas da API | `blockForbiddenRequests` ([padroes-api.md §5](padroes-api.md)) |
+| Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) e, nas páginas da ONG, `carregarPainel`/`carregarPasso` |
+| Telas de acesso | `/login` (ONG), `/login/recuperar` (esqueci a senha), `/admin` (equipe) |
+| Criação de admin | `web/prisma/criar-admin.mts` (`pnpm admin:criar`) |
+| Proteção de rotas da API | `exigirSessaoOng`, `exigirSessaoAdmin` e `blockForbiddenRequests` ([padroes-api.md §5](padroes-api.md)) |
 | Tabelas | modelos `User`, `Session`, `Account`, `Verification` no `schema.prisma` |
 
 Configuração atual do `auth.ts`:
@@ -41,7 +46,7 @@ Configuração atual do `auth.ts`:
 1. **Operações de conta passam pelo better-auth**, nunca pelo Prisma direto: cadastro, login, logout, troca de senha, troca de e-mail, reset de senha. Ele cuida de hash, verificação de e-mail e invalidação de sessão.
 2. **Nunca alterar senha ou e-mail via `update` comum.** O schema de atualização de usuário (`patchSchema`) bloqueia esses campos de propósito; use as funções dedicadas (`auth.api.changePassword`, `auth.api.changeEmail`).
 3. **Ninguém troca a senha ou o e-mail de outra pessoa**, nem admin. Se o admin precisar agir sobre contas (bloquear, remover), avaliar o [plugin admin do better-auth](https://www.better-auth.com/docs/plugins/admin) em vez de escrever no banco.
-4. **Exceção conhecida:** a exclusão de usuário pelo admin hoje apaga `Session`, `Account` e `User` direto via Prisma (`services/users`). Ao reescrever, preferir o fluxo do better-auth ou do plugin admin.
+4. **Exceção conhecida:** a exclusão de conta hoje apaga `User` (e, em cascata, sessões, contas, ONG e denúncias) direto via Prisma: no `DELETE /api/users/[id]` (`services/users`) e no "Excluir" da ficha da ONG (`services/admin/ongs.ts`, A1). Não pede senha nem sessão recente, e as imagens da ONG ficam no R2. Ao reescrever, preferir o fluxo do better-auth ou do plugin admin. A rota `/delete-user` do better-auth fica fechada (ver §5).
 5. **Funções de servidor precisam da sessão:** chamadas como `auth.api.getSession`, `changePassword` e `changeEmail` exigem `headers: await headers()`. Sem isso, falham (bug #6 em [erros-a-consertar.md](erros-a-consertar.md)).
 6. **Não editar os modelos do better-auth no `schema.prisma`** sem conferir a documentação; campos novos de usuário entram como `additionalFields` na configuração.
 7. **Contas só nascem pelo `POST /api/ongs`.** Não reabra o cadastro direto do better-auth: uma conta de perfil ONG sem `Ong` ligada fica num estado inválido.
@@ -68,15 +73,15 @@ await authClient.signIn.email({ email, password, callbackURL: "/" });
 await authClient.signOut();
 ```
 
-## 5. Reset de senha
+## 5. Esqueci a senha
 
 O fluxo usa **código por e-mail**, reutilizando o plugin `emailOTP`:
-1. `/recuperar-acesso` envia o e-mail a `POST /api/password/forgot`, sem exigir sessão.
+1. A tela `/login/recuperar` (link "Esqueci a senha" do login e do "continuar cadastro") envia o e-mail a `POST /api/password/forgot`, sem exigir sessão.
 2. Rota → schema → `services/auth/recuperacao.ts` → `auth.api.requestPasswordResetEmailOTP`. O e-mail é normalizado; a resposta `{ ok: true }` é igual para conta existente, inexistente e falha do provedor. Falhas são registradas sem código, e-mail ou detalhes sensíveis.
 3. A pessoa digita código, nova senha e confirmação. `POST /api/password/reset` valida e-mail, seis dígitos e política de senha; o service chama `auth.api.resetPasswordEmailOTP`.
-4. O better-auth valida o código, troca a credencial, confirma o e-mail caso ainda não estivesse confirmado e revoga sessões. A pessoa faz login com a nova senha; o rascunho permanece intacto.
+4. O better-auth valida o código, troca a credencial, confirma o e-mail caso ainda não estivesse confirmado e revoga sessões. Com a senha trocada, a tela já entra com a senha nova e leva ao painel (ou ao passo do cadastro em que a ONG parou); o rascunho permanece intacto.
 
-Não são usados tokens em URL nem o fluxo por link (`sendResetPassword` permanece desativado). Códigos inválidos, expirados e já utilizados têm mensagem neutra. Os endpoints HTTP nativos continuam sob a mesma política de senha e limite por e-mail do hook; `disableSignUp` impede criar conta pelo login com OTP.
+Não são usados tokens em URL nem o fluxo por link (`sendResetPassword` permanece desativado). Códigos inválidos, expirados e já utilizados têm mensagem neutra. Os endpoints HTTP nativos de recuperação ficam fechados (`disabledPaths` em `auth.ts`), então o único caminho é `/api/password/*`, com limite por IP; o servidor continua chamando `auth.api.*`. Também ficam fechados, por não terem uso no site: `/email-otp/check-verification-otp` (contaria as tentativas sem atomicidade e revelaria se a conta existe), `/sign-in/email-otp` (entraria só com o código, sem trocar a senha nem encerrar sessões) e `/delete-user` (uma ONG suspensa poderia apagar a conta e cadastrar o CNPJ de novo). `disableSignUp` impede criar conta pelo login com OTP.
 
 ## 5.1 Reinício do rascunho
 

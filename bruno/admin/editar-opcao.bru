@@ -1,0 +1,23 @@
+meta {
+  name: listas - editar opção
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/{{folder}}/listas/6ae67eea8cf900bcea8cfe24
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nome": "Fraldas descartáveis",
+    "ativa": true
+  }
+}
+
+docs {
+  Campos opcionais: nome, grupo (vazio tira o grupo) e ativa. O slug guardado nas ONGs não muda.
+  DELETE na mesma URL exclui a opção, se nenhuma ONG usar (409 se estiver em uso).
+}

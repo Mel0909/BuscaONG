@@ -77,6 +77,7 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 |---|---|
 | `blockForbiddenRequests(request, roles)` | exige sessão e, se `roles` for passado, um dos perfis |
 | `exigirSessaoOng(request)` | exige a sessão de uma conta `ONG` e devolve `{ userId, email }` (ou a resposta 401/403, no formato novo) |
+| `exigirSessaoAdmin(request)` | o mesmo para o perfil `ADMIN`; devolve `{ id, email }` |
 | `rateLimit(chave, { limit, windowMs })` + `tooManyRequests(s)` | limite simples em memória por chave (IP ou usuário) |
 | `getUserFromRequest(request)` | usuário da sessão com `role` (ou resposta 401) |
 | `validBody(request)` | lê o JSON do corpo ⚠️ ver bug #10 em [erros-a-consertar.md](erros-a-consertar.md) |
@@ -86,6 +87,10 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 E `toErrorMessage(message, details?)` em `@/utils/api/toErrorMessage`.
 
 **Rotas do cadastro da ONG** (`api/ongs/minha/*`): todas seguem o mesmo roteiro (sessão de ONG → corpo validado → service), montado por `rotaDoCadastro(schema, service)` em `api/ongs/minha/_utils/rotaDoCadastro.ts`, que também traduz os erros dos services em respostas HTTP. Agem sempre sobre a ONG do usuário da sessão, nunca sobre um ID vindo da requisição.
+
+**Rotas do admin** (`api/admin/*`): montadas por `rotaAdmin(schema, acao)` em `api/admin/_utils/rotaAdmin.ts` (sessão de admin → ID da URL, se houver, validado como ObjectId → corpo validado → service), que também traduz os erros dos services do admin. Toda ação que muda algo exige motivo e é registrada (`registrarAcao`).
+
+**IDs do MongoDB:** documentos criados pelo Prisma (ONG, denúncia, opção de lista) têm ID ObjectId (24 caracteres hexadecimais) e são validados com `objectIdSchema`. O `idSchema` (UUID) não serve para eles (erro #5).
 
 ## 6. Autenticação nas rotas
 
@@ -113,4 +118,4 @@ O `idSchema` valida **IDs de conta** do better-auth: exatamente 32 caracteres al
 
 `POST /api/ongs/minha/reinicio/codigo` aceita `{}` e `/reinicio` aceita `{ codigo, confirmar: true }`. Exigem sessão ONG e header `Origin` igual à origem da requisição. Não aceitam IDs, CNPJ ou e-mail como alvo. O service resolve a ONG pela sessão e só limpa rascunho após confirmar posse do e-mail.
 
-Os salvamentos e a publicação do cadastro usam comparação com o `updatedAt` lido, além de dono e status `RASCUNHO`. Conflitos com outra gravação/reinício/publicação devolvem 409; nunca reaplicar automaticamente uma operação destrutiva sobre a versão nova.
+Os salvamentos e a publicação do cadastro usam comparação com o `updatedAt` lido, além do dono e da situação lida (rascunho, publicada ou suspensa: o painel edita a ONG publicada pelos mesmos passos). Conflitos com outra gravação/reinício/publicação devolvem 409; nunca reaplicar automaticamente uma operação destrutiva sobre a versão nova.

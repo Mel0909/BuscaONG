@@ -1,0 +1,21 @@
+meta {
+  name: listas - unificar
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/listas/6ae67eea8cf900bcea8cfe24/unificacao
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "destinoId": "6ae67eea8cf900bcea8cfe25"
+  }
+}
+
+docs {
+  As ONGs da opção da URL passam para a de destino (mesma lista) e a opção da URL é apagada.
+}

@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth-client";
-import { CampoCodigo } from "./CampoCodigo";
-import { CampoSenha } from "./CampoSenha";
+import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
+import { CampoSenha } from "@/components/base/campos/CampoSenha";
 import { CabecalhoPasso, estiloBotaoPrimario, estiloCampo, estiloRotulo, FormularioPasso, MensagemErro } from "./ui";
 
 const ESPERA_REENVIO_MS = 60_000;
@@ -150,7 +150,7 @@ export function PassoContinuar({ reiniciar = false }: { reiniciar?: boolean }) {
 
         <p className="text-sm leading-normal text-tinta-suave">
           Não lembra a senha?{" "}
-          <Link href="/recuperar-acesso" className="font-semibold text-musgo underline underline-offset-2">
+          <Link href="/login/recuperar" className="font-semibold text-musgo underline underline-offset-2">
             Recupere o acesso pelo e-mail
           </Link>
           . Seus dados do cadastro serão mantidos.

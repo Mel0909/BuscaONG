@@ -1,0 +1,16 @@
+meta {
+  name: pins do mapa
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}/mapa?bbox=-46.70,-23.60,-46.58,-23.52
+  body: none
+  auth: none
+}
+
+docs {
+  Área pública (pública, 120 por minuto por IP). Pins das ONGs publicadas dentro da área visível:
+  bbox = oeste,sul,leste,norte. Aceita os mesmos filtros da lista. Até 1.000 pins.
+}

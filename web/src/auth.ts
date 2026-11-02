@@ -19,6 +19,21 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "mongodb",
     }),
+    // rotas HTTP que o site não usa (o servidor ainda chama auth.api.* quando precisa):
+    // - check-verification-otp conta as tentativas sem atomicidade e diz se a conta existe;
+    // - login só por código daria acesso sem trocar a senha nem encerrar as sessões;
+    // - recuperar a senha passa só por /api/password/*, com limite por IP;
+    // - apagar a conta tiraria do ar uma ONG suspensa e liberaria o CNPJ para um cadastro novo.
+    disabledPaths: [
+        "/email-otp/check-verification-otp",
+        "/sign-in/email-otp",
+        "/email-otp/request-password-reset",
+        "/forget-password/email-otp",
+        "/email-otp/reset-password",
+        "/request-password-reset",
+        "/reset-password",
+        "/delete-user",
+    ],
     hooks: {
         // bloqueia o cadastro direto pelo HTTP e aplica a regra de senha no servidor
         before: createAuthMiddleware(async (ctx) => {
@@ -35,22 +50,13 @@ export const auth = betterAuth({
       requireEmailVerification: true,
       minPasswordLength: 8,
       revokeSessionsOnPasswordReset: true,
-      // sendResetPassword: async ({ user, url /*, token*/ }, ) => {
-        // // url already includes the reset token; just email it.
-        // await sendEmail({
-          // to: user.email,
-          // subject: "Reset your password",
-          // react: ResetPasswordEmail({ name: user.name, resetUrl: url }),
-        // });
-      // },
-      // // optional: runs after a successful reset
-      // onPasswordReset: async ({ user }) => {
-        // console.log("Password reset for:", user.email);
-      // },
+      // "esqueci a senha" usa código por e-mail (emailOTP), não link: tela /login/recuperar,
+      // rotas /api/password/forgot e /api/password/reset
     },
     user: {
-        deleteUser: { 
-            enabled: true
+        // nenhuma tela apaga a própria conta; a exclusão é do admin (ver disabledPaths acima)
+        deleteUser: {
+            enabled: false
         },
         changeEmail: {
             enabled: true,

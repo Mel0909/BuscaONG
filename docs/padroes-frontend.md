@@ -16,10 +16,14 @@ Como organizar páginas e componentes no BuscaONG (`web/src/`). A estrutura de p
 | Usado só por uma página ou layout | `app/(frontend)/<rota>/_components/` |
 | Componente do shadcn/ui | `components/ui/` (gerado com `pnpm dlx shadcn@latest add <nome>`) |
 | Logo e marca | `components/base/brand/` |
+| Janela por cima da página (formulário curto, confirmação) | `components/base/Dialogo.tsx`: folha que sobe no celular, caixa centralizada no computador; Esc e o fundo fecham |
+| Campo de senha (com o olho) e de código de 6 dígitos | `components/base/campos/` |
 
 O `_` no nome da pasta (`_components`, `_utils`, `_actions`) a torna **privada**: o Next nunca a transforma em rota. Use o mesmo prefixo para utilitários e ações que só servem àquela página.
 
 "Domínio" é o assunto do código: `ong`, `causa`, `denuncia`, `mapa`.
+
+**Formulários da ONG reaproveitados:** os passos 3 a 7 do cadastro (`ong/cadastro/_components/Passo*.tsx`) também são as telas de edição do painel (`ong/painel`). Dentro de `<ModoPainel>` (`ong/cadastro/_components/modo.tsx`) eles escondem o título do passo e o "Voltar", e salvar fica na página em vez de seguir para o próximo passo. Os dados iniciais de cada formulário saem de `ong/cadastro/_utils/dadosDosPassos.ts`.
 
 ## 3. Chamadas à API
 

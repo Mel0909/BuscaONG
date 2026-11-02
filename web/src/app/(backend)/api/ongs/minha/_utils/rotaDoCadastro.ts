@@ -5,7 +5,9 @@ import {
   CadastroIncompletoError,
   CadastroAlteradoError,
   ImagemInvalidaError,
+  LimiteUrgenciasError,
   OngNaoEncontradaError,
+  PrazoObrigatorioError,
   OngSuspensaError,
   OpcaoInvalidaError,
 } from "@/backend/services/ongs";
@@ -24,6 +26,8 @@ export function respostaDeErro(error: unknown) {
   if (error instanceof ImagemInvalidaError) return erro(error.message, 400, [{ campo: error.campo, message: error.message }]);
   if (error instanceof CadastroIncompletoError) return erro(error.message, 422, { pendencias: error.pendencias });
   if (error instanceof OngSuspensaError) return erro(error.message, 403);
+  if (error instanceof LimiteUrgenciasError) return erro(error.message, 422);
+  if (error instanceof PrazoObrigatorioError) return erro(error.message, 400, [{ campo: "dias", message: error.message }]);
   if (error instanceof ArmazenamentoIndisponivelError) return erro(error.message, 503);
   return zodErrorHandler(error);
 }

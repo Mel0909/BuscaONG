@@ -42,6 +42,7 @@ test.describe('cadastro da ONG', () => {
   test.beforeEach(async ({ page }) => {
     await simularApi(page)
     await page.goto(`${BASE}/ong/cadastro`)
+    await page.waitForLoadState('networkidle')
   })
 
   test('mostra CNPJ inválido sem consultar a API', async ({ page }) => {
@@ -133,8 +134,12 @@ test.describe('continuar o cadastro', () => {
     // espera o React assumir a página (no WebKit, preencher antes disso perde o valor)
     await page.waitForLoadState("networkidle")
 
-    await page.locator('#email').fill('contato@casalar.org.br')
-    await page.locator('#senha').fill('Senha999')
+    // sob carga, o React pode assumir a página depois do preenchimento e zerar os campos: repete até valer
+    await expect(async () => {
+      await page.locator('#email').fill('contato@casalar.org.br')
+      await page.locator('#senha').fill('Senha999')
+      await expect(page.getByRole('button', { name: 'Continuar cadastro' })).toBeEnabled({ timeout: 1000 })
+    }).toPass()
     await page.getByRole('button', { name: 'Continuar cadastro' }).click()
 
     await expect(page.getByText('E-mail ou senha incorretos.')).toBeVisible()
@@ -153,8 +158,11 @@ test.describe('continuar o cadastro', () => {
     // espera o React assumir a página (no WebKit, preencher antes disso perde o valor)
     await page.waitForLoadState("networkidle")
 
-    await page.locator('#email').fill('contato@casalar.org.br')
-    await page.locator('#senha').fill('Senha123')
+    await expect(async () => {
+      await page.locator('#email').fill('contato@casalar.org.br')
+      await page.locator('#senha').fill('Senha123')
+      await expect(page.getByRole('button', { name: 'Continuar cadastro' })).toBeEnabled({ timeout: 1000 })
+    }).toPass()
     const novoCodigo = page.waitForRequest('**/api/auth/email-otp/send-verification-otp')
     await page.getByRole('button', { name: 'Continuar cadastro' }).click()
     expect((await novoCodigo).postDataJSON()).toEqual({ email: 'contato@casalar.org.br', type: 'email-verification' })

@@ -26,12 +26,12 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 5 | ✅ | ~~Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos~~ | `schemas/base.schema.ts` |
 | 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
 | 7 | ✅ | ~~"Esqueci a senha" nunca funciona e não avisa~~ | `api/password/forgot/route.ts`, `auth.ts` |
-| 8 | 🟠 | Botão "Entrar/Cadastro com Google" quebra (provedor desativado) | `GoogleLoginButton.tsx`, `auth.ts` |
+| 8 | ✅ | ~~Botão "Entrar/Cadastro com Google" quebra (provedor desativado)~~ | `GoogleLoginButton.tsx`, `auth.ts` |
 | 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
 | 11 | ✅ | ~~Reset de senha sem validação da política~~ | `api/password/reset/route.ts` |
 | 12 | 🟡 | Admin pode apagar ou editar outros admins | `api/users/[id]/route.ts` |
-| 13 | 🟡 | Regras de senha inconsistentes entre telas e rotas | vários |
+| 13 | ✅ | ~~Regras de senha inconsistentes entre telas e rotas~~ | vários |
 | 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
 | 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
@@ -107,7 +107,7 @@ Caminhos relativos a `web/src/`.
 
 ### 7. ✅ "Esqueci a senha" nunca funciona e não avisa
 
-> **Corrigido:** recuperação pública por código de seis dígitos em `/recuperar-acesso`, com as rotas `password/forgot` e `password/reset` reescritas sobre o better-auth. Resposta de solicitação neutra, limites por IP/e-mail, validação de senha, revogação de sessões e testes com os endpoints reais do better-auth usando banco em memória. Não depende de `sendResetPassword` nem de tokens em URL. Os itens abaixo registram o fluxo antigo.
+> **Corrigido:** recuperação pública por código de seis dígitos em `/login/recuperar`, com as rotas `password/forgot` e `password/reset` reescritas sobre o better-auth. Resposta de solicitação neutra, limites por IP/e-mail, validação de senha, revogação de sessões e testes com os endpoints reais do better-auth usando banco em memória. Não depende de `sendResetPassword` nem de tokens em URL. Os itens abaixo registram o fluxo antigo.
 
 - **Onde:** [api/password/forgot/route.ts](../web/src/app/(backend)/api/password/forgot/route.ts) e [auth.ts](../web/src/auth.ts) (`sendResetPassword` comentado)
 - **Problemas, em ordem:**
@@ -121,7 +121,9 @@ Caminhos relativos a `web/src/`.
   - Criar a página de redefinição e apontar o `redirectTo` para ela.
   - Registrar o erro em log no `catch`, mantendo a resposta neutra.
 
-### 8. 🟠 Botão do Google quebrado
+### 8. ✅ Botão do Google quebrado
+
+> **Corrigido:** o botão saiu da tela de login, que foi refeita (e os componentes `components/auth/*` foram removidos). Login com Google segue em aberto como decisão de produto ([buscaong.md §9](buscaong.md)).
 
 - **Onde:** [GoogleLoginButton.tsx](../web/src/components/auth/GoogleLoginButton.tsx), usado em `/login`
 - **Problema:** `socialProviders.google` está comentado no [auth.ts](../web/src/auth.ts), então clicar no botão retorna erro do provedor.
@@ -155,7 +157,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** `ADMIN` pode apagar ou editar outros admins.
 - **Correção:** é decisão de produto; definir junto com a feature de Admin.
 
-### 13. 🟡 Regras de senha inconsistentes
+### 13. ✅ Regras de senha inconsistentes
+
+> **Corrigido:** as telas de login não validam mais o tamanho da senha (só conferem com o better-auth), e toda senha nova (cadastro, esqueci a senha, admin) segue o `passwordSchema`, que o hook `before` aplica no servidor.
 
 | Lugar | Regra |
 |---|---|

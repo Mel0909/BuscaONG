@@ -136,10 +136,40 @@ describe("códigos reais do better-auth", () => {
     expect(storage.user ?? []).toHaveLength(0);
   });
 
-  it("limita envios entre aliases, mesmo variando maiúsculas e espaços", async () => {
+  it("limita envios entre aliases, mesmo variando maiúsculas", async () => {
     await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123" } });
     for (let i = 0; i < 3; i++) await real.api.requestPasswordResetEmailOTP({ body: { email } });
-    await expect(real.api.sendVerificationOTP({ body: { email: ` ${email.toUpperCase()} `, type: "sign-in" } })).rejects.toThrow();
+    const codigosAntes = storage.verification.length;
+    // e-mail válido para o better-auth: só o limitador (que normaliza) pode recusar
+    await expect(real.api.sendVerificationOTP({ body: { email: "ONG@Example.com", type: "sign-in" } })).rejects.toMatchObject({
+      statusCode: 429,
+    });
     expect(vi.mocked(sendEmail).mock.calls).toHaveLength(4);
+    expect(storage.verification).toHaveLength(codigosAntes);
+  });
+
+  it.each([
+    "/email-otp/check-verification-otp",
+    "/sign-in/email-otp",
+    "/email-otp/request-password-reset",
+    "/forget-password/email-otp",
+    "/email-otp/reset-password",
+    "/request-password-reset",
+    "/delete-user",
+  ])("POST /api/auth%s fica fechado pelo HTTP", async (rota) => {
+    const resposta = await real.handler(
+      new Request(`http://localhost:3000/api/auth${rota}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email, type: "forget-password", otp: "000000" }),
+      })
+    );
+    expect(resposta.status).toBe(404);
+  });
+
+  it("o servidor continua pedindo o código de recuperação pela API interna", async () => {
+    await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123" } });
+    await real.api.requestPasswordResetEmailOTP({ body: { email } });
+    expect(vi.mocked(sendEmail).mock.calls).toHaveLength(2);
   });
 });

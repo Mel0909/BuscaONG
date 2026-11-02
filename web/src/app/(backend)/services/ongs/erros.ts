@@ -1,3 +1,4 @@
+import { MAX_URGENCIAS } from "@/lib/ong/urgencia";
 import type { MotivoNaoElegivel } from "./elegibilidade";
 
 export class OngJaCadastradaError extends Error {
@@ -74,5 +75,20 @@ export class OngNaoElegivelError extends Error {
         : "O CNPJ não é de uma entidade sem fins lucrativos."
     );
     this.name = "OngNaoElegivelError";
+  }
+}
+
+export class LimiteUrgenciasError extends Error {
+  constructor() {
+    super(`Vocês já têm ${MAX_URGENCIAS} itens urgentes. Encerre um antes de marcar outro.`);
+    this.name = "LimiteUrgenciasError";
+  }
+}
+
+/** Item que ainda não está urgente precisa de um prazo. */
+export class PrazoObrigatorioError extends Error {
+  constructor() {
+    super("Escolha por quantos dias o item fica urgente.");
+    this.name = "PrazoObrigatorioError";
   }
 }

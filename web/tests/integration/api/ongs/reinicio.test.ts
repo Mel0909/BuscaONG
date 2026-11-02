@@ -12,7 +12,7 @@ import { CadastroAlteradoError } from "@/backend/services/ongs/erros";
 import { Prisma } from "@/generated/prisma";
 
 vi.mock("@/backend/services/db", () => ({ default: {
-  ong: { findUnique: vi.fn(), updateMany: vi.fn(), update: vi.fn() },
+  ong: { findUnique: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), update: vi.fn() },
   user: { delete: vi.fn() },
 } }));
 const db = vi.mocked(prisma, { deep: true });

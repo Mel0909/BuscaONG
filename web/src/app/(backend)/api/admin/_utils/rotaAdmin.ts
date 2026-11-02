@@ -1,0 +1,61 @@
+import { NextRequest, NextResponse } from "next/server";
+import type { ZodType } from "zod";
+
+import { objectIdSchema } from "@/backend/schemas";
+import { AcaoInvalidaError, NaoEncontradoError, OpcaoDuplicadaError, OpcaoEmUsoError } from "@/backend/services/admin";
+import { CnpjLookupUnavailableError, CnpjNotFoundError } from "@/lib/cnpj";
+import { exigirSessaoAdmin, returnInvalidDataErrors, zodErrorHandler, type SessaoAdmin } from "@/utils/api/server";
+import { toErrorMessage } from "@/utils/api/toErrorMessage";
+
+const erro = (message: string, status: number) => NextResponse.json(toErrorMessage(message), { status });
+
+/** Erros dos services do admin → resposta HTTP. */
+export function respostaAdmin(error: unknown) {
+  if (error instanceof NaoEncontradoError) return erro(error.message, 404);
+  if (error instanceof AcaoInvalidaError || error instanceof OpcaoDuplicadaError || error instanceof OpcaoEmUsoError) {
+    return erro(error.message, 409);
+  }
+  if (error instanceof CnpjNotFoundError) return erro("CNPJ não encontrado na Receita Federal", 404);
+  if (error instanceof CnpjLookupUnavailableError) return erro(error.message, 503);
+  return zodErrorHandler(error);
+}
+
+type Contexto = { params: Promise<Record<string, string>> };
+
+/**
+ * Rota do admin: sessão de admin → ID da URL (se houver) → corpo validado pelo schema → service.
+ * Corpo vazio vale como {} (ex.: POST de revalidação).
+ */
+export function rotaAdmin<T>(
+  schema: ZodType<T>,
+  acao: (admin: SessaoAdmin, dados: T, params: Record<string, string>) => Promise<unknown>,
+  status = 200
+) {
+  return async function (request: NextRequest, { params }: Contexto) {
+    try {
+      const admin = await exigirSessaoAdmin(request);
+      if (admin instanceof NextResponse) return admin;
+
+      const segmentos = (await params) ?? {};
+      if (segmentos.id !== undefined) {
+        const id = objectIdSchema.safeParse(segmentos.id);
+        if (!id.success) return returnInvalidDataErrors(id.error);
+      }
+
+      const texto = await request.text();
+      let body: unknown = {};
+      try {
+        if (texto) body = JSON.parse(texto);
+      } catch {
+        return erro("Formato de dados inválido - JSON malformado", 400);
+      }
+
+      const resultado = schema.safeParse(body);
+      if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+
+      return NextResponse.json(await acao(admin, resultado.data, segmentos), { status });
+    } catch (error) {
+      return respostaAdmin(error);
+    }
+  };
+}

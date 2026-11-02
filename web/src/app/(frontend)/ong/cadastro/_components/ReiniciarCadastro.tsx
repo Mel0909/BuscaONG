@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CampoCodigo } from "./CampoCodigo";
+import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
 import { useCadastro } from "./CadastroContext";
 import { CabecalhoPasso, estiloBotaoPrimario, FormularioPasso, MensagemErro } from "./ui";
 

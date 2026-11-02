@@ -1,22 +1,30 @@
-import LandingPagesNav from "@/components/base/nav/InitialNav";
-import { BuscaOngMark } from "@/components/base/brand/BuscaOngLogo";
 import Link from "next/link";
 
-function NotFound() {
+import BuscaOngLogo, { BuscaOngMark } from "@/components/base/brand/BuscaOngLogo";
+
+// página não encontrada (inclui ONG que saiu do ar ou endereço digitado errado)
+export default function NaoEncontrada() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <LandingPagesNav isLogged={false} />
+    <div className="flex min-h-dvh flex-col bg-creme">
+      <header className="px-5 py-5 md:px-10">
+        <Link href="/" aria-label="BuscaONG: ir para o mapa" className="inline-flex">
+          <BuscaOngLogo size={30} />
+        </Link>
+      </header>
 
-      <main className="flex-1 flex flex-col gap-2 items-center justify-start text-tinta pt-12">
-        <BuscaOngMark size={120} />
-        <h1 className="text-musgo font-display font-bold text-8xl mt-2">404</h1>
-        <p className="font-semibold text-4xl">Página não encontrada</p>
-        <p className="text-xl leading-7 max-w-[445px] text-center text-tinta-suave">Ainda estamos trabalhando para adicionar novas páginas e serviços</p>
-
-        <Link href='/' className="button-md bg-musgo text-papel text-xl mt-2">Voltar ao início</Link>
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 px-5 pb-20 text-center">
+        <BuscaOngMark size={72} />
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.02em] md:text-[40px]">Página não encontrada</h1>
+        <p className="max-w-[440px] text-base leading-normal text-tinta-suave">
+          O endereço pode ter mudado, ou a ONG não está mais no BuscaONG. Procure ONGs perto de você no mapa.
+        </p>
+        <Link
+          href="/"
+          className="mt-2 flex h-[50px] items-center rounded-[15px] bg-musgo px-7 text-base font-semibold text-papel hover:bg-musgo-escuro"
+        >
+          Ir para o mapa
+        </Link>
       </main>
     </div>
-   );
+  );
 }
-
-export default NotFound;

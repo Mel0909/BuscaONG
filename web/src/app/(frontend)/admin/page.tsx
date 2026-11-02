@@ -1,21 +1,25 @@
-import AdminForm from './AdminForm';
+import type { Metadata } from "next";
 
-function AdminLogin() {
-  return ( 
-    <>
-      <main className="lg:h-screen flex">
-        <div className="w-[55%] h-full flex flex-col gap-8 items-center justify-center">
-          <AdminForm />
-        </div>
+import { LoginAdmin } from "./_components/LoginAdmin";
 
-        <div className="bg-tinta h-full w-[45%] flex flex-col items-center justify-center">
-          <div className="text-salvia-apagada flex flex-col gap-4 w-fit">
-            <h1 className='font-bold text-2xl text-center'>Painel de Administrador de Conteúdo<br/> (apenas funcionários!!!)</h1>
-          </div>
+export const metadata: Metadata = {
+  title: "Admin · BuscaONG",
+};
+
+// login da equipe (o proxy leva quem já é admin para /admin/ongs). Contas de admin são criadas
+// pelo terminal: pnpm admin:criar
+export default function AdminLoginPage() {
+  return (
+    <main className="flex min-h-dvh items-center justify-center bg-cinza-fundo px-4">
+      <div className="flex w-full max-w-[380px] flex-col gap-6 rounded-2xl border border-cinza-borda bg-branco p-7">
+        <div className="flex flex-col gap-1">
+          <span className="font-display text-lg font-bold">
+            BuscaONG <span className="font-mono text-xs font-medium text-cinza-texto">/admin</span>
+          </span>
+          <span className="text-sm text-cinza-texto">Acesso da equipe.</span>
         </div>
-      </main>
-    </>
-   );
+        <LoginAdmin />
+      </div>
+    </main>
+  );
 }
-
-export default AdminLogin;

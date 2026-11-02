@@ -1,0 +1,23 @@
+meta {
+  name: itens livres - decidir
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/itens-livres
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "acao": "ADICIONAR",
+    "chave": "cadeira de rodas"
+  }
+}
+
+docs {
+  acao: ADICIONAR (vira item da lista), UNIFICAR (com destinoId, um item da lista) ou MANTER (sai das
+  sugestões). Nos dois primeiros, as ONGs que escreveram o texto passam a usar o item da lista.
+}

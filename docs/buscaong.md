@@ -30,6 +30,63 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - **Barra de contato fixa.**
 - **Denúncia de perfil:** o visitante pode denunciar o perfil de uma ONG.
 
+### 3.1 Tela principal: como está implementado
+
+Protótipo P1 a P4 (a página da ONG e a denúncia estão na §3.2). Fica em `app/(frontend)/(landing-pages)/`; a página carrega as listas dos filtros no servidor e o resto acontece no navegador (`TelaMapa`).
+
+**Layout:**
+- **Celular (como o protótipo):** mapa em tela cheia; busca, engrenagem e chips por cima; a lista num painel que desliza (metade da tela ou aberto, pela alça).
+- **Computador:** lista numa coluna de 400 px à esquerda (com a busca e os filtros) e o mapa ocupando o resto.
+
+**Onde o mapa abre:** o navegador pede a localização. Aceitando, o mapa abre perto da pessoa e as distâncias são a partir dela ("perto de você"); negando, abre em São Paulo ("nesta região"). O botão de mira pede de novo.
+
+**Mapa e lista são independentes** (como no protótipo):
+- **Mapa** (`GET /api/ongs/mapa?bbox=`): pins das ONGs publicadas dentro da área visível, até 1.000. Pins próximos viram um círculo com a quantidade; tocar aproxima.
+- **Lista** (`GET /api/ongs?lat=&lng=`): as 30 ONGs mais próximas do ponto de referência (a pessoa, o lugar buscado ou o centro de SP), até **50 km**, com o total. Separa as que estão fora da área do mapa ("toque para centralizar"). Mover o mapa não muda a lista; buscar um lugar muda.
+- As duas consultas usam o índice `2dsphere` de `localizacaoPublica` (`$geoWithin` e `$geoNear`), criado pelo `pnpm db:seed`. O retângulo da tela vira um polígono com pontos intermediários nos lados norte e sul (no MongoDB os lados são arcos de círculo máximo, que em zoom de estado entortam vários km; os lados leste e oeste já são meridianos). Com o mapa bem afastado, a tela limita a área a ±180° e o servidor a divide em fatias de até 90° de longitude: um polígono maior que um hemisfério seria lido como o lado de fora dele.
+
+**Busca "ONG ou bairro":** nomes de ONGs vêm do banco (`GET /api/ongs/busca?q=`, em todo o país); bairros, cidades e CEPs vêm da geocodificação do Mapbox (v6, no navegador, com o token público). Escolher uma ONG leva o mapa até ela; escolher um lugar enquadra o lugar e o torna o ponto de referência da lista. O resultado do Mapbox não é guardado, então a geocodificação comum ("temporária") é permitida; cada busca conta no limite gratuito do Mapbox.
+
+**Filtros (P2):** causa, "tenho para doar" (itens da lista e, com borda tracejada, os itens livres mais usados pelas ONGs) e "quero ser voluntário" (dias D S T Q Q S S, turno e atividade). O painel mostra a contagem ao vivo ("Mostrar N ONGs") e só aplica no botão.
+- Dentro de um grupo vale qualquer opção (OU); entre grupos, todas (E).
+- Voluntariado: o **mesmo horário** precisa bater dia, turno e atividade. Sábado também encontra horários de "fim de semana" e "todo dia"; segunda a sexta, os de "dias úteis".
+- Os filtros vão na URL das rotas como parâmetros repetidos (`?causa=animais&causa=idosos&item=fraldas&dia=SABADO`), definidos em `lib/mapa/filtros.ts`.
+
+**Card contextual:** sem filtro, mostra os itens; com filtro de item ou de voluntariado, mostra em mel o item ("✓ Precisa de Fraldas") e o horário que bateram, mais "+ N outros itens". Tocar no card seleciona a ONG e mostra "Ver página da ONG" (§3.2).
+
+**Urgência no mapa (§6):** ONG com item urgente tem o selo terracota "Urgente · Fraldas G" no card e o pin terracota; um grupo de pins com alguma ONG urgente ganha contorno terracota. A lista continua por distância.
+
+**Estados vazios (P4):**
+- Há resultados, mas nenhum na área do mapa: aviso sobre o mapa, com "Ver na lista" e "Ir para a mais próxima".
+- Nenhum resultado com os filtros: a busca **não** é ampliada sozinha; a lista sugere qual filtro remover, com quantas ONGs apareceriam.
+
+**Privacidade:** a área pública só vê e só consulta a **posição pública** (`localizacaoPublica`): a real, ou, para ONG com "mostrar só o bairro", um ponto **sorteado** a 150-400 m do endereço quando a localização é salva (gerador criptográfico, guardado no banco). Assim:
+- a coordenada exata nunca sai da API e não dá para recalculá-la a partir de dados públicos (o desvio não depende do ID nem de nada visível);
+- filtrar ou ordenar pela posição real deixaria descobrir o endereço encolhendo a área do mapa ou movendo o ponto de referência, então nenhuma consulta pública usa `localizacao`;
+- ajustar o pin (até 1 km) mantém o desvio sorteado, e a posição pública só anda junto; sorteia de novo só quando a ONG liga "só o bairro" ou muda para longe (vários sorteios em volta do mesmo endereço permitiriam tirar a média).
+
+ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até lá, não aparecem no mapa.
+
+**Rotas públicas** (limite por IP): `GET /api/ongs` 60/min · `GET /api/ongs/mapa` 120/min · `GET /api/ongs/busca` 60/min. Só ONGs `PUBLICADA` aparecem.
+
+### 3.2 Página da ONG (P5) e denúncia (P5.1): como está implementado
+
+**Endereço:** `/ong/<slug>` (ex.: `/ong/casa-lar-esperanca`). O slug nasce ao publicar, a partir do nome público, e **não muda** se a ONG trocar de nome (links já divulgados continuam valendo). Repetido ganha `-2`, `-3`; nomes de rotas fixas (`cadastro`, `painel`...) são pulados. O ID também abre a página (`/ong/<id>`), para ONGs publicadas antes de existir slug; o `pnpm db:seed` cria o slug que faltar. Só ONG `PUBLICADA` abre; as outras dão 404.
+
+**O que mostra**, de cima para baixo (Server Component, `app/(frontend)/ong/[slug]/`):
+- Capa (ou o padrão listrado do protótipo), "←" (volta ao mapa como estava) e "Denunciar" discreto sobre a foto; logo ou iniciais.
+- Nome, "causa · distância · bairro" e a descrição curta. A distância aparece quando a pessoa veio do mapa: o card manda `?de=lat,lng`, o mesmo ponto de onde a lista mede.
+- **Urgente agora** (fundo terracota claro): cada item urgente com "há 2 h" e o detalhe.
+- **Sempre precisa**: os outros itens (lista fixa primeiro, depois os livres).
+- **Voluntariado** (horários e requisitos), **Sobre a ONG** e as outras causas.
+- **Onde fica**: imagem do mapa (Static Images API do Mapbox, sem carregar o mapa interativo), o endereço e "Como chegar" (Google Maps). Quem mostra só o bairro aparece como uma área, sem pin e sem rua.
+- **Barra de contato fixa** com até 2 botões, por prioridade: WhatsApp, e-mail, site, Instagram. O principal é o WhatsApp (sem ele, o e-mail). O que não cabe vira botão no fim da página (`lib/ong/contatos.ts`). Contato marcado como não visível não sai do servidor.
+
+**Denúncia (P5.1):** "Denunciar" abre um formulário curto: motivo (obrigatório, lista fixa: fechou ou mudou, pediu dinheiro ou dados, não parece ONG, violência, conteúdo inadequado, outro), relato e e-mail opcionais. `POST /api/denuncias` (pública).
+- Limite de **1 denúncia por perfil a cada 24 h por aparelho** (guardado no navegador) e por IP (no servidor, mais 10 por hora por IP no geral). Os dois são freios contra abuso, não garantias.
+- "Violência verbal ou física" mostra 190 e Disque 100 na confirmação e vai para o topo da fila do admin.
+- A denúncia não tira a ONG do ar: só entra na fila (A2). A ONG não vê quem denunciou; o e-mail de quem denunciou também não aparece para o admin (é usado só para avisar da decisão).
+
 ## 4. Cadastro da ONG (8 passos)
 
 1. **CNPJ**, validado em três camadas, em ordem:
@@ -70,13 +127,13 @@ O BuscaONG conecta doadores a ONGs próximas. Tem um **mapa** (Mapbox) e uma **l
 - `POST /api/ongs/minha/reinicio/codigo` envia um código de seis dígitos para o e-mail da sessão, nunca para um endereço recebido no corpo. O better-auth armazena o hash; validade de dez minutos e três tentativas por código.
 - `POST /api/ongs/minha/reinicio` exige `{ codigo, confirmar: true }`, sessão de ONG e origem igual à do site. O código é validado e consumido pelo better-auth; a identidade resultante precisa ser a mesma da sessão.
 - Só os dados dos passos 3 a 7 são limpos. Conta, senha, e-mail, CNPJ e dados consultados na Receita são mantidos. A ONG volta ao passo 3, com opção de usar o endereço da Receita.
-- A limpeza é condicional ao dono, status `RASCUNHO` e versão `updatedAt`. Publicação e salvamentos usam a mesma proteção contra dados antigos. Se outra ação alterar o cadastro, responde 409 e pede recarregamento. Publicadas e suspensas não podem recomeçar.
+- A limpeza é condicional ao dono, status `RASCUNHO` e versão `updatedAt`. Publicação e salvamentos (do cadastro e do painel) usam a mesma proteção contra dados antigos, condicionada à situação lida. Se outra ação alterar o cadastro, responde 409 e pede recarregamento. Publicadas e suspensas não podem recomeçar.
 - A troca de logo/capa continua sem apagar arquivos antigos do R2 (limpeza do bucket é pendência separada).
 
 **Continuar o cadastro** (`/ong/cadastro/continuar`):
 - E-mail e senha do passo 2. Com login certo, `/ong/cadastro/retomar` leva ao passo em que a pessoa parou (`passoAtual`).
 - Se a pessoa saiu antes de confirmar o e-mail, o better-auth responde `EMAIL_NOT_VERIFIED` (só depois de conferir a senha). A tela manda um código novo e confirma ali mesmo; com o código, a sessão abre e o cadastro continua.
-- Quem não lembra a senha segue para `/recuperar-acesso`: código por e-mail e nova senha, preservando o cadastro. Depois de redefinir, é preciso entrar novamente; sessões anteriores são revogadas.
+- Quem não lembra a senha segue para `/login/recuperar`: código por e-mail e nova senha, preservando o cadastro. Ao redefinir, as sessões anteriores são encerradas e a tela entra com a senha nova.
 - Sem login, as páginas dos passos 3 a 8 levam para cá. O `/login` também tem o link "Continue de onde parou".
 
 **Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`), ou cadastro em andamento (`details.motivo: EM_ANDAMENTO`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
@@ -137,7 +194,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 - Mostra o card como vai aparecer no mapa e na lista (`components/ong/CartaoOng.tsx`) e a verificação do que está completo, com link para completar o que falta.
 - Publicar exige aceitar os termos de uso (`/termos`, texto provisório). A publicação é imediata, sem aprovação manual. Se faltar algo, a API responde 422 com `details.pendencias`.
 - ONG suspensa não publica (403). Publicar de novo não muda nada.
-- Depois de publicar, a tela mostra "Perfil publicado!" e o card. A tela de boas-vindas e o e-mail com o link do perfil, previstos no protótipo, ficaram fora desta entrega.
+- Depois de publicar, a tela mostra "Perfil publicado!", o card e os botões "Ir para o painel" e "Ver a página da ONG". O e-mail com o link do perfil, previsto no protótipo, ficou fora.
 
 **Erros das rotas `/api/ongs/minha/*`:** 400 dados inválidos ou opção/imagem que não existe (`details[].campo`) · 401 sem login · 403 outro perfil ou ONG suspensa · 404 conta sem ONG · 422 cadastro incompleto · 503 R2 não configurado (imagens).
 
@@ -146,6 +203,21 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 - Gerenciar itens e marcar urgência.
 - **Sem métricas** de alertas ou seguidores.
 
+### 5.1 Como está implementado (O2)
+
+`/ong/painel`, para a conta de perfil `ONG` com o perfil publicado ou suspenso. Sem login, vai para `/login`; cadastro não terminado, para o passo em que parou; admin, para `/admin`. O login (`/login`) leva direto ao painel.
+
+| Seção | Rota | O que tem |
+|---|---|---|
+| Início | `/ong/painel` | link da página (copiar e abrir), urgências ativas, "Como aparece no mapa" e atalhos. Suspensa: o motivo da suspensão |
+| Itens e urgência | `/ong/painel/itens` | tabela dos itens com "Marcar urgente", "Editar" e "Encerrar" (O3) e, abaixo, o formulário de causas e itens |
+| Perfil público | `/ong/painel/perfil`, `/contatos`, `/localizacao` | apresentação (nome, descrição, logo e capa), contatos e endereço com o pin |
+| Voluntariado | `/ong/painel/voluntariado` | horários e requisitos |
+
+- **Os formulários são os mesmos do cadastro** (passos 3 a 7), em "modo painel" (`ModoPainel`, em `ong/cadastro/_components/modo.tsx`): sem título de passo nem "Voltar", o botão vira "Salvar alterações" e, ao salvar, a página fica onde está e avisa. As rotas são as mesmas `PUT /api/ongs/minha/<seção>`.
+- Tirar um item da lista encerra a urgência dele.
+- Moldura (`PainelShell`): barra lateral musgo-escuro no computador (como no protótipo O2), abas no topo no celular, e "Sair".
+
 ## 6. Urgência (apenas visual)
 
 - **Selo** de urgência.
@@ -153,12 +225,41 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 - **Bloco de urgência** na página da ONG.
 - **Nenhum envio de mensagens.**
 
+### 6.1 Como está implementado (O3)
+
+- A ONG marca um item dela (da lista ou livre) como urgente, com **detalhe** opcional (até 120 caracteres) e **prazo** de 3, 7 ou 14 dias (padrão 7). Depois do prazo o selo sai sozinho: quem lê compara `ate` com a hora atual, sem tarefa agendada. Dá para editar ou encerrar antes.
+- **No máximo 5 itens urgentes ao mesmo tempo** (mais que isso e "urgente" deixa de dizer alguma coisa). ONG suspensa não marca.
+- Guardado na própria ONG (`urgencias`: item, nome, detalhe, `criadaEm`, `ate`). O item é o slug da lista fixa ou `livre:<chave>` para item livre.
+- `POST /api/ongs/minha/urgencias` (`{ item, detalhe, dias }`) marca ou remarca; `DELETE /api/ongs/minha/urgencias?item=` encerra. 422 com 5 ativas; 400 para item que a ONG não tem; 403 suspensa.
+- Aparece no card e no pin do mapa (§3.1), no bloco "Urgente agora" da página (§3.2) e na coluna "Urgências" do admin (A1).
+
 ## 7. Admin
 
 - **ONGs:** gestão das ONGs cadastradas.
 - **Denúncias:** fila das denúncias de perfil.
 - **Registro de ações:** log das ações administrativas.
 - **Listas fixas:** listas de causas e itens usadas nos filtros e no cadastro.
+
+### 7.1 Como está implementado (A1 a A4)
+
+`/admin` é o login da equipe; as seções ficam em `/admin/ongs`, `/admin/denuncias`, `/admin/registro` e `/admin/listas`, com a barra escura do protótipo (visual neutro, sem o creme do site). **Contas de admin são criadas pelo terminal**, com `pnpm admin:criar` (e-mail, nome e senha; a senha segue a mesma regra e é gravada pelo better-auth). Uma conta de ONG não vira admin.
+
+**A1, ONGs:** busca por nome, CNPJ ou cidade e filtros com contagem (todas, ativas, suspensas, CNPJ com problema, denunciadas, cadastro não terminado). "Revisar" marca a ONG com algum sinal. A ficha, à direita, tem:
+- "Ver página pública" e "Abrir no WhatsApp"; contatos com copiar ou abrir, marcando o que é **interno** (e-mail de acesso) e o que está **oculto** na página;
+- **Receita × declarado** (situação, natureza, cidade) e o botão **Revalidar**, que consulta o CNPJ de novo;
+- **Sinais:** situação diferente de ativa, denúncias abertas por motivo, cidade declarada diferente da Receita e "a ONG disse que o endereço da Receita mudou" (o protótipo pede que isso vire sinal, sem bloquear);
+- **Suspender** (sai do mapa na hora; a ONG recebe e-mail com o motivo; as denúncias abertas viram "com ação"), **Reativar** e **Excluir** (apaga a conta, o perfil e as denúncias; pede confirmação). Todas exigem motivo. O admin não edita perfis.
+
+**A2, Denúncias:** abas Abertas, Arquivadas e Com ação. Denúncias da mesma ONG e motivo viram uma linha; vão para o topo as de violência e as que têm 3 ou mais em 7 dias. A linha abre os relatos, a ficha resumida e duas ações com motivo: **Suspender ONG** ou **Arquivar denúncia** (sem mexer na ONG). Quem denunciou e deixou e-mail recebe um aviso da decisão.
+
+**A3, Registro de ações:** somente leitura (nenhuma linha se edita ou apaga). Busca, filtros (suspensões, exclusões, denúncias, listas, sistema) e **Exportar CSV** (`GET /api/admin/acoes`). Toda ação do admin vira uma linha com quem, o quê, o alvo (o nome como era na hora) e o motivo.
+
+**A4, Listas:** causas, itens e atividades, com quantas ONGs usam cada opção.
+- **Arrastar** (ou as setas, pelo teclado) muda a ordem dos filtros e do cadastro.
+- **Editar:** renomear (o slug guardado nas ONGs não muda), grupo (só itens), desativar (some do cadastro e dos filtros, mas vale para quem já usa) e **unificar** com outra opção (as ONGs passam para a outra, inclusive as urgências, e esta sai da lista). Opção em uso não se exclui.
+- **Sugestões do texto livre:** itens que as ONGs escreveram à mão, dos mais usados para os menos, com "Parecido com X" quando há um item próximo na lista. **Adicionar à lista** ou **Unificar** passam as ONGs para o item da lista (o filtro do mapa passa a encontrá-las); **Manter como texto livre** tira a sugestão.
+
+**Rotas** (todas exigem perfil `ADMIN`; ID no formato de ObjectId): `PATCH` e `DELETE /api/admin/ongs/[id]`, `POST /api/admin/ongs/[id]/revalidacao`, `PATCH /api/admin/denuncias`, `POST /api/admin/listas`, `PATCH` e `DELETE /api/admin/listas/[id]`, `POST /api/admin/listas/[id]/unificacao`, `PUT /api/admin/listas/ordem`, `POST /api/admin/itens-livres`, `GET /api/admin/acoes`. Erros: 400 dados inválidos · 401/403 sessão · 404 não existe · 409 ação que não vale no estado atual (reativar ONG ativa, excluir opção em uso, nome repetido) · 503 Receita indisponível.
 
 ## 8. Stack técnica
 
@@ -186,6 +287,7 @@ Atualizadas na Etapa 4 (revalidadas em 2026-10-30). Ficam no `package.json` da r
 | TypeScript | 6.0.3 | O TS 7 (latest) não expõe a API JS que o Next usa por padrão (só com `experimental.useTypeScriptCli`) | quando o Next suportar o TS 7 sem flag |
 | ESLint | 9.39.5 | **O ESLint 10 quebra o lint:** o `eslint-plugin-react` (usado pelo `eslint-config-next`, até a 16.4.3) trava, e `react`, `import` e `jsx-a11y` não declaram suporte ao 10. A linha 9 está marcada como sem suporte, então o install mostra um aviso de deprecated | quando o `eslint-config-next` e o `eslint-plugin-react` suportarem o 10 |
 | @types/node | 24.19.x | Alinhado ao Node 24 do `engines`, não ao 26 | ao subir o `engines` |
+| @types/geojson | 7946.0.x | Os tipos do `mapbox-gl` usam o namespace global `GeoJSON`. Com o TypeScript 6 (`types` vazio por padrão), ele é incluído em `web/src/types/geojson.d.ts`, e o `web/tsconfig.json` liga `allowUmdGlobalAccess` | junto com o `mapbox-gl` |
 | Vitest + @vitest/coverage-v8 | 5.0.5 | — | — |
 | Vite | 8.3.5 | Dependência explícita para fixar o Vite usado pelo Vitest e exigido pelo `@vitejs/plugin-react` 6 | — |
 | @vitejs/plugin-react | 6.1.2 | — | — |
@@ -223,6 +325,7 @@ Todos os pacotes da tabela §8.1 aceitam Node 24 (o mínimo mais alto é o do Ne
 | Serviço | Uso | Tier gratuito atual | Depois do gratuito |
 |---|---|---|---|
 | **Mapbox GL JS** | mapa | **50.000 map loads/mês** (sem mudança) | US$ 5,00 por 1.000 loads (50k–100k), com faixas decrescentes |
+| **Mapbox Static Images API** | imagem do endereço na página da ONG (P5) | ⚠️ não revalidado nesta sessão (conferir na página de preços do Mapbox) | — |
 | **Nominatim** (OpenStreetMap) | endereço → coordenadas no cadastro (passo 3) | gratuito, **1 consulta/s**, sem autocompletar, User-Agent identificado | — (para volume maior, hospedar um Nominatim próprio) |
 | **Resend** | e-mail transacional (login, reset de senha) | **3.000 e-mails/mês, limite de 100/dia**, 3 domínios | Pro: US$ 20/mês (50.000 e-mails) |
 | **Brevo** | alternativa ao Resend | **300 e-mails/dia** (~9.000/mês), contatos ilimitados — ⚠️ revalidado só parcialmente (ver abaixo) | a partir de ~US$ 9/mês (5.000 e-mails) |
@@ -263,16 +366,25 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 ## 9. Decisões em aberto
 
 - **Moderação automática de imagem:** ferramenta ainda não escolhida. O protótipo prevê moderar antes de publicar; hoje as imagens do passo 7 vão direto para o R2 e aparecem no perfil.
-- **Telas de login:** design pendente.
-- **Tela de confirmação de denúncia:** design pendente.
+- **Telas de login:** o protótipo não tem. `/login`, `/login/recuperar` e `/admin` seguem o visual do site e do admin; revisar com o design.
 - **Selo de CNPJ verificado:** exibir ou não.
 - **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).
-- **Endereço diferente do da Receita:** o protótipo prevê virar "sinal para a auditoria" do admin, sem bloquear. Não implementado (depende do admin).
 - **Representação da ONG:** reiniciar agora exige sessão e posse do e-mail já vinculado, mas o primeiro cadastro ainda não comprova que a pessoa representa a entidade. Ver junto com o selo de CNPJ verificado e o admin.
-- **Login comum (`/login`) de uma ONG em rascunho:** leva para `/`, não para o cadastro. Por enquanto há o link "Continue de onde parou" na própria tela de login.
+- **CNPJ preso por um rascunho sem e-mail confirmado:** sem o "Começar de novo" público, um rascunho cujo e-mail nunca foi confirmado (e-mail digitado errado, ou alguém que ocupou o CNPJ com um e-mail descartável) não tem saída: o código vai para um endereço que a ONG não controla, e reiniciar exige login. Falta decidir a saída (ex.: o `POST /api/ongs` substituir o rascunho quando a conta dele nunca confirmou o e-mail e já passou a validade do código; ou o admin liberar o CNPJ).
+- **Tempo de resposta do "esqueci a senha":** a resposta é a mesma com ou sem conta, mas quem tem conta espera o envio do e-mail (centenas de ms a mais). Baixa gravidade, porque o `POST /api/ongs` já diz quando um e-mail tem conta. Para fechar: enviar o e-mail em segundo plano (`advanced.backgroundTasks` do better-auth com o `after()` do Next).
+- **Nomes das listas em cache por instância:** depois que o admin renomeia ou unifica uma opção (A4), as outras instâncias da Vercel mostram o nome antigo por até 5 minutos.
+- **E-mail de quem denuncia não é confirmado:** dá para informar o e-mail de outra pessoa, que depois recebe o aviso da decisão (com o nome da ONG). Limitado a 10 denúncias por hora por IP, e o aviso só sai depois da decisão do admin.
 - **Rascunhos abandonados:** ficam no banco até alguém continuar ou recomeçar. Apagar sozinho depois de um tempo (ex.: 30 dias, com cron da Vercel) foi deixado para depois.
 - **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
 - **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
+- **Ordenação por urgência:** o protótipo diz que a urgência muda "o selo, o pin e a ordenação", mas a lista P3 do próprio protótipo segue por distância. A lista continua por distância.
+- **Revalidação automática do CNPJ:** o registro do protótipo (A3) mostra revalidações feitas pelo "sistema". Hoje só há o botão "Revalidar" na ficha (A1); revalidar todas periodicamente (cron da Vercel) fica para depois.
+- **Terracota no admin:** o protótipo do admin usa terracota para alertas ("Revisar", a contagem de denúncias, "Excluir"), fora da regra de "só urgência" do site público. Foi mantido como no protótipo.
+- **E-mails da equipe:** suspensão e reativação avisam a ONG; arquivar, suspender ou excluir avisam quem denunciou e deixou e-mail. O texto é provisório.
+- **Limite de denúncias:** por aparelho (navegador) e por IP, em memória (cada instância da Vercel conta separado). Para algo global, usar um store compartilhado.
+- **Grupo dos itens (A4):** campo novo, vazio nas listas do seed; o admin preenche.
+- **Login com Google:** o botão (quebrado, erro #8) saiu da tela de login. Decidir se ONG e admin vão entrar com Google.
+- **Raio e tamanho da lista:** 50 km e 30 ONGs foram escolhas iniciais. Revisar com dados reais (em cidade pequena, 50 km pode ser pouco; em SP, 30 pode ser pouco sem filtro).
 - **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.
 - **E-mail já cadastrado no passo 2:** hoje a resposta diz explicitamente que o e-mail já tem conta. Isso revela se um e-mail está cadastrado, mas só para quem tem um CNPJ elegível e ainda sem conta, e com limite de tentativas. A alternativa é uma mensagem genérica.
 - **Cor de erro:** a paleta não tem cor de erro (terracota é só para urgência). Os erros de formulário usam borda `tinta` e texto neutro.
@@ -312,10 +424,14 @@ Extraída do protótipo [design/Mapa de ONGs.dc.html](../design/Mapa%20de%20ONGs
 | `salvia-media` | `#D2E0D5` | texto de passo concluído (sobre musgo-escuro) |
 | `terracota` | `#B9472F` | **só para urgência** (selo, pin) |
 | `terracota-escura` | `#8A2F1C` | texto de urgência |
+| `terracota-clara` | `#F6DED5` | fundo do bloco "Urgente agora" (P5) |
+| `terracota-funda` | `#5C1E11` | texto sobre `terracota-clara` |
 | `mel` | `#FBE9B7` | **"por que apareceu"** (motivo do resultado) |
 | `mel-escuro` | `#4F3A00` | texto sobre mel |
 
 Regra do design: musgo e creme dão conforto; **terracota só para urgência**; mel marca o motivo de cada resultado aparecer.
+
+**Área admin** (visual neutro e denso, sem o creme do site; A1 a A4): `branco` `#FFFFFF` (cartões), `cinza-fundo` `#F4F5F3` (fundo), `cinza-cabecalho` `#F0F2EF` (cabeçalho de tabela), `cinza-linha` `#ECEEEB` (divisores), `cinza-borda` `#D9DDD9` (bordas e campos), `cinza-texto` `#5B655F` (texto secundário), `grafite` `#1C211E` (barra e botões escuros), `grafite-ativo` `#323A35` (aba ativa) e `grafite-texto` `#A5B0A9` (texto sobre grafite). O admin também usa terracota para alertas (ver §9).
 
 ### Tipografia
 

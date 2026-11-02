@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useModo } from "./modo";
 
 // Peças visuais comuns aos passos do cadastro (protótipo O1).
 
@@ -19,6 +20,8 @@ export const estiloTituloSecao = "text-xs font-bold uppercase tracking-[0.06em] 
 export const estiloAviso = "rounded-[14px] bg-salvia-clara px-4 py-3 text-sm leading-normal text-musgo-escuro";
 
 export function CabecalhoPasso({ titulo, children }: { titulo: string; children: ReactNode }) {
+  // no painel, a página tem o próprio título
+  if (useModo() === "painel") return null;
   return (
     <div className="flex max-w-[820px] flex-col gap-2">
       <h1 className="font-display text-[28px] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[34px]">
@@ -41,6 +44,16 @@ export function RodapePasso({
   desabilitado?: boolean;
   rotulo?: string;
 }) {
+  const painel = useModo() === "painel";
+  if (painel) {
+    return (
+      <div className="flex justify-end border-t border-borda-suave pt-[18px]">
+        <button type="submit" disabled={enviando || desabilitado} className={estiloBotaoPrimario}>
+          {enviando ? "Salvando…" : "Salvar alterações"}
+        </button>
+      </div>
+    );
+  }
   return (
     <div className="mt-auto flex items-center justify-between gap-3 border-t border-borda-suave pt-[18px]">
       {voltar ? (
@@ -59,6 +72,7 @@ export function RodapePasso({
 
 /** Formulário de um passo: ocupa a altura da tela para o rodapé ficar embaixo. */
 export function FormularioPasso({ aoEnviar, children }: { aoEnviar: () => void; children: ReactNode }) {
+  const painel = useModo() === "painel";
   return (
     <form
       noValidate
@@ -66,7 +80,7 @@ export function FormularioPasso({ aoEnviar, children }: { aoEnviar: () => void; 
         e.preventDefault();
         aoEnviar();
       }}
-      className="flex min-h-[calc(100vh-7rem)] flex-col gap-6"
+      className={cn("flex flex-col gap-6", !painel && "min-h-[calc(100vh-7rem)]")}
     >
       {children}
     </form>

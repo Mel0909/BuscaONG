@@ -13,6 +13,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  /* os testes rodam contra o pnpm dev, que compila cada página na primeira visita (lento em paralelo) */
+  expect: { timeout: 15_000 },
+  timeout: 60_000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

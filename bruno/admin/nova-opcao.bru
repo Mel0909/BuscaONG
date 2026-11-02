@@ -1,0 +1,23 @@
+meta {
+  name: listas - nova opção
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/listas
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "tipo": "ITEM",
+    "nome": "Cadeira de rodas",
+    "grupo": "Saúde"
+  }
+}
+
+docs {
+  tipo: CAUSA, ITEM ou ATIVIDADE. O slug sai do nome e entra no fim da lista. 409 para nome repetido.
+}

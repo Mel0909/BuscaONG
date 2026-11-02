@@ -1,0 +1,25 @@
+meta {
+  name: painel - marcar urgência
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}/minha/urgencias
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "item": "fraldas",
+    "detalhe": "200 unidades até sexta. Pode entregar na portaria, 8h–18h.",
+    "dias": 7
+  }
+}
+
+docs {
+  Exige login de uma conta ONG (rode auth/login antes).
+  item: slug do item da lista fixa ou "livre:<chave>" para item livre. dias: 3, 7 ou 14.
+  Remarcar o mesmo item troca o detalhe e o prazo. 422 com 5 urgências ativas; 403 se a ONG estiver suspensa.
+}

@@ -132,9 +132,13 @@ model Ong {
   passoAtual          Int              @default(3)
 
   // passo 3: localização
-  endereco        Endereco?
-  localizacao     Ponto?
-  mostrarSoBairro Boolean   @default(false) // o perfil mostra só o bairro e um pin aproximado
+  endereco           Endereco?
+  localizacao        Ponto?
+  mostrarSoBairro    Boolean   @default(false) // o perfil mostra só o bairro e um pin aproximado
+  // a posição que a área pública vê e consulta: a real, ou um ponto deslocado ao acaso
+  // (150 a 400 m) quando mostrarSoBairro. O desvio é sorteado ao salvar e guardado, para não
+  // dar para recalcular a posição real a partir de dados públicos.
+  localizacaoPublica Ponto?
 
   // passo 4: contatos e redes
   contatos Contatos?
@@ -159,13 +163,40 @@ model Ong {
   // passo 8: publicação
   termosAceitosEm DateTime?
   publicadaEm     DateTime?
+  // endereço da página pública (/ong/<slug>), criado ao publicar; não muda quando o nome muda.
+  // Sem @unique: o índice único do MongoDB não aceitaria vários rascunhos sem slug.
+  slug            String?
+
+  // painel: itens marcados como urgentes (O3)
+  urgencias Urgencia[]
+
+  // admin: preenchido quando a ONG é suspensa
+  suspensao Suspensao?
+
+  denuncias Denuncia[]
 
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([slug])
   @@map("ong")
+}
+
+// item marcado como urgente no painel; o selo sai sozinho depois de `ate`
+type Urgencia {
+  item     String // slug do item da lista fixa, ou "livre:<chave>" para item livre
+  nome     String // nome do item quando foi marcado
+  detalhe  String? // até 120 caracteres
+  criadaEm DateTime
+  ate      DateTime
+}
+
+type Suspensao {
+  motivo     String
+  em         DateTime
+  adminEmail String
 }
 
 enum TipoLista {
@@ -174,13 +205,14 @@ enum TipoLista {
   ATIVIDADE // atividades de voluntariado
 }
 
-// opções das listas fixas usadas no cadastro e nos filtros; o admin vai gerenciá-las
+// opções das listas fixas usadas no cadastro e nos filtros; o admin as gerencia (A4)
 // (preenchidas por prisma/seed.ts)
 model OpcaoLista {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   tipo      TipoLista
   slug      String // chave estável, gravada na Ong; não muda quando o nome muda
   nome      String
+  grupo     String? // agrupa os itens no admin (ex.: Alimentação, Higiene e cuidado)
   ordem     Int       @default(0)
   ativa     Boolean   @default(true) // inativa some do cadastro, mas continua valendo para quem já usa
   createdAt DateTime  @default(now())
@@ -188,6 +220,79 @@ model OpcaoLista {
 
   @@unique([tipo, slug])
   @@map("opcao_lista")
+}
+
+// item livre que o admin decidiu manter como texto livre: sai das sugestões do A4
+model ItemLivreMantido {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chave     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("item_livre_mantido")
+}
+
+// motivos da denúncia de perfil (P5.1); os mesmos da fila do admin (A2)
+enum MotivoDenuncia {
+  FECHOU // a ONG fechou ou mudou de endereço
+  PEDIU_DINHEIRO // pediu dinheiro ou dados pessoais
+  NAO_E_ONG
+  VIOLENCIA // vai direto para o topo da fila
+  CONTEUDO_INADEQUADO
+  OUTRO
+}
+
+enum StatusDenuncia {
+  ABERTA
+  ARQUIVADA // o admin analisou e não agiu
+  COM_ACAO // a ONG foi suspensa ou excluída
+}
+
+// denúncia feita por um visitante na página da ONG; a ONG não fica sabendo quem denunciou
+model Denuncia {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  ongId       String         @db.ObjectId
+  ong         Ong            @relation(fields: [ongId], references: [id], onDelete: Cascade)
+  motivo      MotivoDenuncia
+  relato      String?
+  email       String? // opcional, para a equipe dar retorno
+  status      StatusDenuncia @default(ABERTA)
+  resolucao   String? // motivo do admin ao arquivar ou agir
+  resolvidaEm DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@index([status, ongId])
+  @@map("denuncia")
+}
+
+enum TipoAcao {
+  SUSPENDEU_ONG
+  REATIVOU_ONG
+  EXCLUIU_ONG
+  REVALIDOU_CNPJ
+  ARQUIVOU_DENUNCIA
+  ADICIONOU_OPCAO
+  EDITOU_OPCAO
+  REORDENOU_LISTA
+  UNIFICOU_OPCOES
+  EXCLUIU_OPCAO
+  ADICIONOU_ITEM_LIVRE // texto livre virou item da lista
+  UNIFICOU_ITEM_LIVRE // texto livre passou para um item da lista
+  MANTEVE_ITEM_LIVRE
+}
+
+// registro de ações (A3): só se cria, nunca se edita nem apaga
+model AcaoAdmin {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tipo       TipoAcao
+  adminId    String? // vazio = ação automática do sistema
+  adminEmail String?
+  alvo       String // nome da ONG ou do item, como era no momento da ação
+  alvoId     String?
+  motivo     String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("acao_admin")
 }
 
 // evitar mexer daqui pra baixo

@@ -6,8 +6,8 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useCadastro } from "./CadastroContext";
-import { CampoCodigo } from "./CampoCodigo";
-import { CampoSenha } from "./CampoSenha";
+import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
+import { CampoSenha } from "@/components/base/campos/CampoSenha";
 
 // mesma regra que o servidor aplica (passwordSchema)
 const REGRAS_SENHA = [

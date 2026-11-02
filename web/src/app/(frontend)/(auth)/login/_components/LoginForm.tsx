@@ -1,100 +1,116 @@
 'use client'
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useState, type ReactNode } from "react";
 
-import LoginOptionals from "@/components/auth/LoginOptionals";
-
-import RequiredTag from "@/components/base/input/RequiredTag";
 import { authClient } from "@/lib/auth-client";
-import toast from "react-hot-toast";
+import { CampoSenha } from "@/components/base/campos/CampoSenha";
 
-import dynamic from 'next/dynamic';
+const estiloCampo =
+  "h-[52px] w-full rounded-[14px] border border-borda bg-papel px-4 text-base outline-none focus:border-2 focus:border-musgo";
+const estiloLink = "font-semibold text-musgo underline underline-offset-2";
 
-const GoogleAuthButton = dynamic(() => import('@/components/auth/GoogleLoginButton'));
-const CredentialsButton = dynamic(() => import('@/components/auth/CredentialsButton'));
-const ValidatedInput = dynamic(() => import('@/components/base/input/ValidatedInput'));
+/** Login da ONG: e-mail e senha. Quem entra vai para o painel (ou para o cadastro, se não terminou). */
+export function LoginForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<ReactNode>(null);
 
-function LoginForm() {
-  const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  async function entrar() {
+    if (!email || !senha || enviando) return;
+    setEnviando(true);
+    setErro(null);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-        callbackURL: "/",
-      });
-
-      if (result.error) {
-        toast.error((result.error?.message || 'Erro desconhecido'))
-      }
-    } catch (error) {
-      toast.error('Erro: ' + String(error))
-    } finally {
-      setLoading(false);
+    const { error } = await authClient.signIn.email({ email, password: senha });
+    if (!error) {
+      // o painel leva o admin ao /admin e o cadastro não terminado ao passo em que parou
+      router.push("/ong/painel");
+      return; // mantém "Entrando…" até a próxima tela abrir
     }
-  };
 
-  return ( 
-    <div className="lg:w-[90%] xl:w-[80%]">
-      <h2 className="font-bold text-[40px] text-center leading-12">Entre na sua conta</h2>
-      <form className="mt-6" onSubmit={handleSubmit}>
-        <ValidatedInput 
-          title="E-mail"
-          placeholder="exemplo@email.com"
-          name="email"
+    setEnviando(false);
+    if (error.code === "EMAIL_NOT_VERIFIED") {
+      setErro(
+        <>
+          Falta confirmar o e-mail desta conta.{" "}
+          <Link href="/ong/cadastro/continuar" className={estiloLink}>
+            Continue o cadastro
+          </Link>{" "}
+          para receber um código novo.
+        </>
+      );
+    } else if (error.status === 401) {
+      setErro("E-mail ou senha incorretos.");
+    } else if (error.status === 429) {
+      setErro("Muitas tentativas. Espere um pouco e tente de novo.");
+    } else {
+      setErro("Não foi possível entrar agora. Tente de novo em instantes.");
+    }
+  }
+
+  return (
+    <form
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        entrar();
+      }}
+      className="flex flex-col gap-5"
+    >
+      <label className="flex flex-col gap-[7px]">
+        <span className="text-sm font-semibold">E-mail de acesso</span>
+        <input
           type="email"
+          autoComplete="email"
+          required
           value={email}
-          setValue={setEmail}
-          labelClassName='auth-label'
-          inputClassName='auth-input'
-          iconContainerClassName="auth-icon"
-          required
-        ><RequiredTag/></ValidatedInput>
-        
-        <ValidatedInput 
-          title="Senha"
-          placeholder="Insira sua senha"
-          name="password"
-          type="password"
-          value={password}
-          setValue={setPassword}
+          onChange={(e) => setEmail(e.target.value)}
+          className={estiloCampo}
+        />
+      </label>
 
-          overrideValidate={(val) => val.length >= 6}
-
-          containerClassName="mt-4"
-          labelClassName="auth-label"
-          inputClassName="auth-input"
-          iconContainerClassName="auth-icon"
-          required
-        ><RequiredTag/></ValidatedInput>
-
-        <LoginOptionals />
-
-        <CredentialsButton className="mt-6" disabled={loading}>Entrar</CredentialsButton>
-      </form>
-      
-      <div className="flex items-center gap-4 py-5">
-        <div className="flex-grow h-0.5 bg-gray-400" />
-        <p className="text-gray-400 text-lg">ou</p>
-        <div className="flex-grow h-0.5 bg-gray-400" />
+      <div className="flex flex-col gap-[7px]">
+        <div className="flex items-baseline justify-between gap-3">
+          <label htmlFor="senha" className="text-sm font-semibold">
+            Senha
+          </label>
+          <Link href="/login/recuperar" className="text-[13px] font-semibold text-musgo underline underline-offset-2">
+            Esqueci a senha
+          </Link>
+        </div>
+        <CampoSenha id="senha" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} />
       </div>
 
-      <GoogleAuthButton disabled={loading} text="Entrar com Google" />
+      {erro && (
+        <p role="alert" className="rounded-[14px] border border-borda bg-papel px-4 py-3 text-[15px] leading-normal">
+          {erro}
+        </p>
+      )}
 
-      <Link href='/ong/cadastro' className="block w-fit mt-8 text-sm group">Sua ONG ainda não tem conta? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Cadastre a ONG</span></Link>
-      <Link href='/ong/cadastro/continuar' className="block w-fit mt-2 text-sm group">Começou o cadastro e não terminou? <span className="text-musgo colorTransition border-b border-transparent group-hover:border-musgo">Continue de onde parou</span></Link>
-    </div>
-   );
+      <button
+        type="submit"
+        disabled={enviando || !email || !senha}
+        className="h-[52px] cursor-pointer rounded-[15px] bg-musgo text-base font-semibold text-papel transition-colors hover:bg-musgo-escuro disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {enviando ? "Entrando…" : "Entrar"}
+      </button>
+
+      <div className="flex flex-col gap-2 border-t border-borda-suave pt-5 text-sm leading-normal text-tinta-suave">
+        <span>
+          Sua ONG ainda não tem conta?{" "}
+          <Link href="/ong/cadastro" className={estiloLink}>
+            Cadastre a ONG
+          </Link>
+        </span>
+        <span>
+          Começou o cadastro e não terminou?{" "}
+          <Link href="/ong/cadastro/continuar" className={estiloLink}>
+            Continue de onde parou
+          </Link>
+        </span>
+      </div>
+    </form>
+  );
 }
-
-export default LoginForm;

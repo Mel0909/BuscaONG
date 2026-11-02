@@ -11,6 +11,9 @@ import type {
 } from "@/backend/schemas";
 import { urlDeEnvio } from "@/lib/armazenamento";
 import { ATIVIDADE_OUTRA, calcularTurnos } from "@/lib/cadastro/voluntariado";
+import { distanciaKm, posicaoAproximada } from "@/lib/mapa/geo";
+import { slugLivre } from "@/lib/ong/slug";
+import { itemLivre } from "@/lib/ong/urgencia";
 import { normalizarChave } from "@/utils/formatters/texto";
 import {
   CadastroAlteradoError,
@@ -43,12 +46,39 @@ function proximoPasso(ong: Pick<Ong, "passoAtual">, passo: number) {
 
 const resumo = { id: true, status: true, passoAtual: true } as const;
 
-/** Não aplica uma gravação baseada em dados anteriores a um reinício ou publicação. */
+/** Até essa distância, mover o pin é ajuste do mesmo endereço: o desvio sorteado continua o mesmo. */
+const MESMO_LUGAR_KM = 1;
+
+/**
+ * Posição que a área pública vê: a real, ou um ponto sorteado perto dela para quem mostra só o
+ * bairro. Ajustar o pin mantém o desvio sorteado antes (só desloca junto): sortear de novo a cada
+ * ajuste daria várias amostras em volta do endereço, e a média delas o revelaria. Sorteia de novo
+ * só quando a ONG liga "só o bairro" ou muda para longe.
+ */
+export function posicaoPublica(
+  ong: Pick<Ong, "localizacao" | "localizacaoPublica" | "mostrarSoBairro">,
+  real: { latitude: number; longitude: number },
+  mostrarSoBairro: boolean
+) {
+  if (!mostrarSoBairro) return { type: "Point", coordinates: [real.longitude, real.latitude] };
+  const antes = ong.localizacao?.coordinates;
+  const publica = ong.localizacaoPublica?.coordinates;
+  if (ong.mostrarSoBairro && antes && publica && distanciaKm({ longitude: antes[0], latitude: antes[1] }, real) < MESMO_LUGAR_KM) {
+    return { type: "Point", coordinates: [real.longitude + (publica[0] - antes[0]), real.latitude + (publica[1] - antes[1])] };
+  }
+  const aproximada = posicaoAproximada(real);
+  return { type: "Point", coordinates: [aproximada.longitude, aproximada.latitude] };
+}
+
+/**
+ * Grava só se a ONG continua como foi lida (mesma situação e mesmo updatedAt): uma gravação
+ * baseada em dados anteriores a um reinício, à publicação ou a outra edição é recusada.
+ * Vale para o cadastro e para o painel, onde a ONG publicada edita o perfil pelos mesmos passos.
+ */
 async function atualizarCadastro(ong: Ong, data: Prisma.OngUpdateInput) {
-  if (ong.status !== "RASCUNHO") throw new CadastroAlteradoError();
   try {
     return await prisma.ong.update({
-      where: { id: ong.id, userId: ong.userId, status: "RASCUNHO", updatedAt: ong.updatedAt },
+      where: { id: ong.id, userId: ong.userId, status: ong.status, updatedAt: ong.updatedAt },
       data: { ...data, updatedAt: new Date(Math.max(Date.now(), ong.updatedAt.getTime() + 1)) },
       select: resumo,
     });
@@ -60,13 +90,13 @@ async function atualizarCadastro(ong: Ong, data: Prisma.OngUpdateInput) {
   }
 }
 
-
 /** Passo 3. */
 export async function salvarLocalizacao(userId: string, dados: LocalizacaoData) {
   const ong = await ongDoUsuario(userId);
   return atualizarCadastro(ong, {
     endereco: dados.endereco,
     localizacao: { type: "Point", coordinates: [dados.longitude, dados.latitude] },
+    localizacaoPublica: posicaoPublica(ong, dados, dados.mostrarSoBairro),
     mostrarSoBairro: dados.mostrarSoBairro,
     passoAtual: proximoPasso(ong, 3),
   });
@@ -106,10 +136,15 @@ export async function salvarCausasItens(userId: string, dados: CausasItensData) 
     else if (!itensLivres.has(chave)) itensLivres.set(chave, { nome: nome.replace(/\s+/g, " "), chave });
   }
 
+  // item que saiu da lista leva junto a urgência dele
+  const itensDaOng = new Set([...itens, ...[...itensLivres.keys()].map(itemLivre)]);
+  const urgencias = (ong.urgencias ?? []).filter((u) => itensDaOng.has(u.item));
+
   return atualizarCadastro(ong, {
     causas,
     itens: [...itens],
     itensLivres: [...itensLivres.values()],
+    urgencias,
     passoAtual: proximoPasso(ong, 5),
   });
 }
@@ -200,19 +235,31 @@ export function pendenciasParaPublicar(ong: Ong): string[] {
   return pendencias;
 }
 
+const slugOcupado = async (slug: string) => !!(await prisma.ong.findFirst({ where: { slug }, select: { id: true } }));
+
 /** Passo 8: publica na hora, sem aprovação manual. Publicar de novo não muda nada. */
 export async function publicarOng(userId: string) {
   const ong = await ongDoUsuario(userId);
 
   if (ong.status === "SUSPENSA") throw new OngSuspensaError();
   if (ong.status === "PUBLICADA") {
-    return { id: ong.id, status: ong.status, passoAtual: ong.passoAtual, publicadaEm: ong.publicadaEm };
+    return { id: ong.id, status: ong.status, passoAtual: ong.passoAtual, publicadaEm: ong.publicadaEm, slug: ong.slug };
   }
 
   const pendencias = pendenciasParaPublicar(ong);
   if (pendencias.length > 0) throw new CadastroIncompletoError(pendencias);
 
   const agora = new Date();
-  await atualizarCadastro(ong, { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO });
-  return { id: ong.id, status: "PUBLICADA", passoAtual: ULTIMO_PASSO, publicadaEm: agora };
+  // endereço da página pública; fica o mesmo se a ONG mudar de nome depois. O índice único do
+  // slug (pnpm db:seed) recusa o mesmo slug para duas ONGs publicando ao mesmo tempo: aí tenta o próximo.
+  for (let tentativa = 1; ; tentativa++) {
+    const slug = ong.slug ?? (await slugLivre(ong.nomePublico!, slugOcupado));
+    try {
+      await atualizarCadastro(ong, { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO, slug });
+      return { id: ong.id, status: "PUBLICADA" as const, passoAtual: ULTIMO_PASSO, publicadaEm: agora, slug };
+    } catch (error) {
+      const slugRepetido = error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+      if (!slugRepetido || ong.slug || tentativa >= 3) throw error;
+    }
+  }
 }
