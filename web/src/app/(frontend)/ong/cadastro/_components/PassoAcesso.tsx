@@ -85,7 +85,6 @@ export function PassoAcesso() {
           email,
           password: senha,
           usarEnderecoReceita: dados.usarEnderecoReceita,
-          recomecar: dados.recomecar ?? false,
         }),
       });
       const body = await response.json().catch(() => null);

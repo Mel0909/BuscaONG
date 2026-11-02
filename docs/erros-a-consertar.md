@@ -195,3 +195,7 @@ Caminhos relativos a `web/src/`.
 - **Onde:** `app/layout.tsx` (`next/font/google`), no `next dev` e no `next build` com Turbopack
 - **Problema:** de vez em quando o Turbopack falha ao baixar os arquivos da Bricolage Grotesque e mostra `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`. No dev, a página responde 500; no build, ele falha. Aconteceu 2 vezes em muitas execuções (2026-10-31), sempre só com a Bricolage; a Figtree e a IBM Plex Mono nunca falharam. Rodar de novo resolve.
 - **Correção:** hospedar as fontes no próprio projeto com `next/font/local` (arquivos `.woff2` versionados; as três fontes têm licença OFL). Isso tira a dependência de rede do build. Alternativa: pedir a Bricolage como fonte variável, sem listar pesos, para reduzir o número de arquivos baixados.
+
+## Correção adicional: reinício indevido de rascunho
+
+O POST público de ONG não aceita mais substituir cadastro existente. O reinício agora exige sessão da própria ONG, confirmação explícita e código enviado ao e-mail já vinculado. Somente dados do rascunho são limpos; a conta é mantida. Escritas condicionais a dono, status e `updatedAt` impedem limpar ONG publicada ou publicar/restaurar dados anteriores ao reinício. Foi habilitado `emailOTP.disableSignUp` para impedir contas sem ONG por um caminho alternativo. Detalhes em [autenticacao.md §5.1](autenticacao.md).

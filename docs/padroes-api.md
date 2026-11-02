@@ -107,6 +107,10 @@ As rotas reescritas `/api/users` e `/api/users/[id]` consultam a sessão com `au
 
 O `idSchema` valida **IDs de conta** do better-auth: exatamente 32 caracteres alfanuméricos, sem conversão nem mudança das contas existentes. IDs de ONG são ObjectIds do MongoDB e não usam esse schema. As subrotas de e-mail e senha ainda são herdadas e têm pendências no bug #6.
 
-### Recuperação de acesso
+### Recuperação e reinício
 
 `POST /api/password/forgot` é público e aceita `{ email }`; a resposta de solicitação é sempre neutra para não enumerar contas. `POST /api/password/reset` aceita `{ email, codigo, newPassword }` e valida a política antes do service better-auth. Nenhuma dessas rotas escreve credenciais pelo Prisma.
+
+`POST /api/ongs/minha/reinicio/codigo` aceita `{}` e `/reinicio` aceita `{ codigo, confirmar: true }`. Exigem sessão ONG e header `Origin` igual à origem da requisição. Não aceitam IDs, CNPJ ou e-mail como alvo. O service resolve a ONG pela sessão e só limpa rascunho após confirmar posse do e-mail.
+
+Os salvamentos e a publicação do cadastro usam comparação com o `updatedAt` lido, além de dono e status `RASCUNHO`. Conflitos com outra gravação/reinício/publicação devolvem 409; nunca reaplicar automaticamente uma operação destrutiva sobre a versão nova.

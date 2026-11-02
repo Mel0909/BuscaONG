@@ -78,6 +78,9 @@ O fluxo usa **código por e-mail**, reutilizando o plugin `emailOTP`:
 
 Não são usados tokens em URL nem o fluxo por link (`sendResetPassword` permanece desativado). Códigos inválidos, expirados e já utilizados têm mensagem neutra. Os endpoints HTTP nativos continuam sob a mesma política de senha e limite por e-mail do hook; `disableSignUp` impede criar conta pelo login com OTP.
 
+## 5.1 Reinício do rascunho
+
+As rotas `/api/ongs/minha/reinicio` e `/codigo` exigem sessão ONG, origem do site e agem exclusivamente sobre a conta da sessão. O envio usa o e-mail da sessão e tipo `sign-in`. A confirmação usa `auth.api.signInEmailOTP`, que valida/consome o código e renova a sessão; o token não é retornado no JSON. A identidade comprovada precisa coincidir com a original. A limpeza condicional só altera `Ong`, preservando `User`, credenciais e dados de CNPJ. Ver [buscaong.md §4.1](buscaong.md).
 
 ## 6. Variáveis de ambiente
 

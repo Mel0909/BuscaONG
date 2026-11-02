@@ -1,0 +1,21 @@
+meta {
+  name: confirmar reinício do rascunho
+  type: http
+  seq: 10
+}
+post {
+  url: {{baseUrl}}/{{folder}}/minha/reinicio
+  body: json
+  auth: inherit
+}
+headers {
+  Origin: http://localhost:3000
+}
+body:json {
+  { "codigo": "123456", "confirmar": true }
+}
+docs {
+  Exige sessão ONG e código enviado ao e-mail dela. Ajuste Origin para produção.
+  Limpa somente os dados do rascunho, mantendo conta, senha, CNPJ e dados da Receita.
+  409 se publicado, suspenso ou alterado por outra ação. Não repita sem recarregar.
+}

@@ -40,3 +40,9 @@ test("código inválido mantém o formulário e oferece novo envio", async ({ pa
   await page.getByRole("button", { name: "Solicitar outro código ou corrigir e-mail" }).click();
   await expect(page.getByRole("button", { name: "Enviar código", exact: true })).toBeVisible();
 });
+
+test("acesso a reinício sem sessão não mostra nem apaga dados", async ({ page }) => {
+  await page.goto(`${BASE}/ong/cadastro/reiniciar`);
+  await expect(page).toHaveURL(`${BASE}/ong/cadastro/continuar`);
+  await expect(page.getByRole("link", { name: "Recupere o acesso pelo e-mail" })).toHaveAttribute("href", "/recuperar-acesso");
+});

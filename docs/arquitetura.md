@@ -149,7 +149,8 @@ src/
 │   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG, mais continuar e retomar)
 │   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx)
 │   │   │   ├── _actions/         chamadas à API dos passos 3 a 8
-│   │   │   └── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   │   ├── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   │   └── reiniciar/        confirmação por e-mail para limpar rascunho, mantendo a conta
 │   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
 │   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = passos 3 a 8 do cadastro

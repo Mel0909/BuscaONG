@@ -16,7 +16,8 @@ const TAMANHO_CODIGO = 6;
  * segue para o passo em que parou. Se o e-mail ainda não foi confirmado (a pessoa saiu antes
  * de digitar o código), manda um código novo e confirma aqui mesmo.
  */
-export function PassoContinuar() {
+export function PassoContinuar({ reiniciar = false }: { reiniciar?: boolean }) {
+  const destino = reiniciar ? "/ong/cadastro/reiniciar" : "/ong/cadastro/retomar";
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -49,7 +50,7 @@ export function PassoContinuar() {
     const { error } = await authClient.signIn.email({ email, password: senha });
 
     if (!error) {
-      router.push("/ong/cadastro/retomar");
+      router.push(destino);
       return; // mantém "Aguarde…" até a próxima tela abrir
     }
     setEnviando(false);
@@ -71,7 +72,7 @@ export function PassoContinuar() {
     // com autoSignInAfterVerification, confirmar o código já abre a sessão
     const { error } = await authClient.emailOtp.verifyEmail({ email, otp: codigo });
     if (!error) {
-      router.push("/ong/cadastro/retomar");
+      router.push(destino);
       return;
     }
     setEnviando(false);
@@ -84,7 +85,7 @@ export function PassoContinuar() {
   return (
     <FormularioPasso aoEnviar={() => (podeEnviar && !enviando ? (confirmando ? confirmarCodigo() : entrar()) : undefined)}>
       <CabecalhoPasso titulo="Continue o cadastro da ONG">
-        Entre com o e-mail e a senha que vocês criaram no cadastro. Seguimos do passo em que pararam.
+        {reiniciar ? "Entre na conta da ONG. Depois, confirme o e-mail para recomeçar com segurança." : "Entre com o e-mail e a senha que vocês criaram no cadastro. Seguimos do passo em que pararam."}
       </CabecalhoPasso>
 
       <div className="flex max-w-[520px] flex-col gap-[22px]">
@@ -149,10 +150,10 @@ export function PassoContinuar() {
 
         <p className="text-sm leading-normal text-tinta-suave">
           Não lembra a senha?{" "}
-          <Link href="/ong/cadastro" className="font-semibold text-musgo underline underline-offset-2">
-            Comece de novo pelo CNPJ
+          <Link href="/recuperar-acesso" className="font-semibold text-musgo underline underline-offset-2">
+            Recupere o acesso pelo e-mail
           </Link>
-          . O cadastro anterior é apagado quando vocês criarem o novo acesso.
+          . Seus dados do cadastro serão mantidos.
         </p>
       </div>
 

@@ -8,3 +8,5 @@ export const recuperarSenhaSchema = solicitarRecuperacaoSchema.extend({
   codigo: codigoEmailSchema,
   newPassword: passwordSchema.max(128, "Senha deve ter no máximo 128 caracteres"),
 });
+export const confirmarReinicioSchema = z.object({ codigo: codigoEmailSchema, confirmar: z.literal(true) }).strict();
+export const solicitarReinicioSchema = z.object({}).strict();
