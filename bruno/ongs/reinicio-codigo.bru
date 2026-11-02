@@ -1,0 +1,20 @@
+meta {
+  name: solicitar confirmação de reinício
+  type: http
+  seq: 9
+}
+post {
+  url: {{baseUrl}}/{{folder}}/minha/reinicio/codigo
+  body: json
+  auth: inherit
+}
+headers {
+  Origin: http://localhost:3000
+}
+body:json {
+  {}
+}
+docs {
+  Exige sessão da ONG. Ajuste Origin para a origem do site em produção.
+  Envia código ao e-mail da sessão; não limpa nada ainda.
+}

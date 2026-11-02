@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
+import { Prisma } from "@/generated/prisma";
 import { distanciaKm } from "@/lib/mapa/geo";
 import { setCurrentRole } from "../../mocks/auth";
 
@@ -29,6 +30,7 @@ const ongRascunho = (extra: Record<string, unknown> = {}) => ({
   userId: "test-user-id",
   status: "RASCUNHO",
   passoAtual: 3,
+  updatedAt: new Date("2026-11-01T12:00:00Z"),
   localizacao: null,
   contatos: null,
   causas: [],
@@ -173,6 +175,32 @@ describe("rotas /api/ongs/minha/*", () => {
     db.ong.findUnique.mockResolvedValue(ongRascunho({ passoAtual: 7 }) as never);
     await putContatos(requisicao("PUT", "contatos", { email: { valor: "contato@casalar.org.br", visivel: true } }));
     expect(dadosDoUpdate().passoAtual).toBe(7);
+  });
+
+  describe("painel (ONG publicada edita pelos mesmos passos)", () => {
+    const contatos = { email: { valor: "contato@casalar.org.br", visivel: true } };
+
+    it("salva, desde que a ONG continue publicada e sem outra gravação no meio", async () => {
+      const publicada = ongRascunho({ status: "PUBLICADA", passoAtual: 8 });
+      db.ong.findUnique.mockResolvedValue(publicada as never);
+
+      const response = await putContatos(requisicao("PUT", "contatos", contatos));
+
+      expect(response.status).toBe(200);
+      expect(db.ong.update.mock.calls[0][0].where).toEqual({
+        id: ONG_ID,
+        userId: "test-user-id",
+        status: "PUBLICADA",
+        updatedAt: publicada.updatedAt,
+      });
+    });
+
+    it("409 se a ONG mudou desde a leitura (outra aba, suspensão)", async () => {
+      db.ong.findUnique.mockResolvedValue(ongRascunho({ status: "PUBLICADA", passoAtual: 8 }) as never);
+      db.ong.update.mockRejectedValue(new Prisma.PrismaClientKnownRequestError("conflito", { code: "P2025", clientVersion: "6.19.1" }));
+
+      expect((await putContatos(requisicao("PUT", "contatos", contatos))).status).toBe(409);
+    });
   });
 
   it("passo 4 responde 400 sem contato visível", async () => {

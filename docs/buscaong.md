@@ -108,10 +108,10 @@ ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até
 - Com 14 caracteres válidos, consulta `GET /api/cnpj/[cnpj]`. A rota:
   - é pública, com limite de 20 consultas por minuto por IP;
   - responde `JA_CADASTRADO` sem consultar a Receita quando a ONG já está **publicada** (ou suspensa);
-  - responde `EM_ANDAMENTO` (com os dados da Receita) quando há um cadastro começado e não publicado. Até aceitar os termos no passo 8, o cadastro é um rascunho, não uma conta;
+  - responde `EM_ANDAMENTO` (com os dados da Receita) quando há um cadastro começado e não publicado. A conta já existe, mas o perfil permanece como rascunho até aceitar os termos no passo 8;
   - responde `ELEGIVEL` ou `NAO_ELEGIVEL` (com o motivo) junto com os dados da Receita.
 - Estados do campo: digitando, validando, válido, inválido, já cadastrado, em andamento, não elegível, não encontrado e erro (Receita indisponível ou limite atingido).
-- **Cadastro em andamento:** a tela oferece "Continuar de onde parei" (vai para `/ong/cadastro/continuar`) e "Começar de novo" (segue o fluxo normal, avisando que o cadastro anterior será apagado ao criar o acesso).
+- **Cadastro em andamento:** a tela oferece "Continuar de onde parei" (vai para `/ong/cadastro/continuar`) e "Começar de novo" (exige entrar na própria conta e confirmar um código enviado ao e-mail já vinculado).
 - O CNPJ validado fica na **sessionStorage** do navegador até a conta ser criada. Nada vai para o banco antes disso.
 - "O endereço mudou" segue igual, mas grava `usarEnderecoReceita: false` (o endereço será pedido no passo 3).
 
@@ -120,15 +120,23 @@ ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até
 - `POST /api/ongs` (pública, 5 tentativas por minuto por IP) revalida o CNPJ no servidor e só então cria o usuário (perfil `ONG`, e-mail não verificado) e a `Ong` em `RASCUNHO` com `passoAtual: 3`. Se a `Ong` falhar, o usuário é apagado (sem conta órfã).
 - O better-auth envia um **código de 6 dígitos** por e-mail (Resend), válido por 10 minutos e guardado com hash. A tela tem 6 campos e reenvio depois de 60 s.
 - Com o código confirmado, a sessão é criada e a pessoa segue para o passo 3.
-- **Começar de novo:** com `recomecar: true`, o `POST /api/ongs` apaga o rascunho do CNPJ (o usuário dele, a `Ong`, sessões e contas) antes de criar a conta nova. O e-mail do rascunho apagado pode ser usado de novo. Sem `recomecar`, um CNPJ com rascunho responde 409 com `details.motivo: EM_ANDAMENTO`. ONG publicada nunca é apagada.
+- **Cadastros existentes são preservados:** `POST /api/ongs` nunca exclui nem substitui rascunhos. `recomecar: true` é recusado com 400; o valor antigo `false` ainda é aceito por compatibilidade. Um CNPJ com rascunho responde 409 com `details.motivo: EM_ANDAMENTO`.
+
+**Recomeçar com segurança** (`/ong/cadastro/reiniciar`):
+- O acesso pelo CNPJ leva a `/ong/cadastro/continuar?reiniciar=1`: é preciso entrar na conta da ONG. Quem já entrou vai direto à confirmação.
+- `POST /api/ongs/minha/reinicio/codigo` envia um código de seis dígitos para o e-mail da sessão, nunca para um endereço recebido no corpo. O better-auth armazena o hash; validade de dez minutos e três tentativas por código.
+- `POST /api/ongs/minha/reinicio` exige `{ codigo, confirmar: true }`, sessão de ONG e origem igual à do site. O código é validado e consumido pelo better-auth; a identidade resultante precisa ser a mesma da sessão.
+- Só os dados dos passos 3 a 7 são limpos. Conta, senha, e-mail, CNPJ e dados consultados na Receita são mantidos. A ONG volta ao passo 3, com opção de usar o endereço da Receita.
+- A limpeza é condicional ao dono, status `RASCUNHO` e versão `updatedAt`. Publicação e salvamentos (do cadastro e do painel) usam a mesma proteção contra dados antigos, condicionada à situação lida. Se outra ação alterar o cadastro, responde 409 e pede recarregamento. Publicadas e suspensas não podem recomeçar.
+- A troca de logo/capa continua sem apagar arquivos antigos do R2 (limpeza do bucket é pendência separada).
 
 **Continuar o cadastro** (`/ong/cadastro/continuar`):
 - E-mail e senha do passo 2. Com login certo, `/ong/cadastro/retomar` leva ao passo em que a pessoa parou (`passoAtual`).
 - Se a pessoa saiu antes de confirmar o e-mail, o better-auth responde `EMAIL_NOT_VERIFIED` (só depois de conferir a senha). A tela manda um código novo e confirma ali mesmo; com o código, a sessão abre e o cadastro continua.
-- Quem não lembra a senha é orientado a começar de novo pelo CNPJ (o "esqueci a senha" ainda não funciona, erro #7).
+- Quem não lembra a senha segue para `/recuperar-acesso`: código por e-mail e nova senha, preservando o cadastro. Depois de redefinir, é preciso entrar novamente; sessões anteriores são revogadas.
 - Sem login, as páginas dos passos 3 a 8 levam para cá. O `/login` também tem o link "Continue de onde parou".
 
-**Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`), ou cadastro em andamento sem `recomecar` (`details.motivo: EM_ANDAMENTO`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
+**Respostas de erro do `POST /api/ongs`:** 400 dados inválidos · 404 CNPJ não encontrado · 409 CNPJ ou e-mail já com conta (`details.campo`), ou cadastro em andamento (`details.motivo: EM_ANDAMENTO`) · 422 não elegível (`details.motivo`) · 429 limite · 503 Receita indisponível.
 
 ### 4.2 Passos 3 a 8: como está implementado
 
@@ -361,7 +369,7 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **Telas de login:** o protótipo não tem. `/login`, `/login/recuperar` e `/admin` seguem o visual do site e do admin; revisar com o design.
 - **Selo de CNPJ verificado:** exibir ou não.
 - **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).
-- **Rascunho apagado por outra pessoa:** "Começar de novo" só exige saber o CNPJ, que é público. Alguém poderia apagar o rascunho de uma ONG que ainda não publicou. É o mesmo problema de fundo de qualquer pessoa poder cadastrar um CNPJ primeiro (não há prova de que quem cadastra representa a ONG). Ver junto com o selo de CNPJ verificado e o admin.
+- **Representação da ONG:** reiniciar agora exige sessão e posse do e-mail já vinculado, mas o primeiro cadastro ainda não comprova que a pessoa representa a entidade. Ver junto com o selo de CNPJ verificado e o admin.
 - **Rascunhos abandonados:** ficam no banco até alguém continuar ou recomeçar. Apagar sozinho depois de um tempo (ex.: 30 dias, com cron da Vercel) foi deixado para depois.
 - **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
 - **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
@@ -371,7 +379,7 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **E-mails da equipe:** suspensão e reativação avisam a ONG; arquivar, suspender ou excluir avisam quem denunciou e deixou e-mail. O texto é provisório.
 - **Limite de denúncias:** por aparelho (navegador) e por IP, em memória (cada instância da Vercel conta separado). Para algo global, usar um store compartilhado.
 - **Grupo dos itens (A4):** campo novo, vazio nas listas do seed; o admin preenche.
-- **Escritas concorrentes na mesma ONG:** os services leem a ONG e regravam listas inteiras (urgências, itens). Duas abas salvando ao mesmo tempo podem perder uma das mudanças. Raro no uso esperado; se aparecer, condicionar a gravação ao `updatedAt` lido.
+- **Escritas concorrentes na mesma ONG:** os formulários do cadastro e do painel só gravam se a ONG não mudou desde a leitura (409 se mudou). As urgências ainda regravam a lista inteira sem essa condição: duas abas marcando ao mesmo tempo podem perder uma das mudanças.
 - **Login com Google:** o botão (quebrado, erro #8) saiu da tela de login. Decidir se ONG e admin vão entrar com Google.
 - **Raio e tamanho da lista:** 50 km e 30 ONGs foram escolhas iniciais. Revisar com dados reais (em cidade pequena, 50 km pode ser pouco; em SP, 30 pode ser pouco sem filtro).
 - **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.

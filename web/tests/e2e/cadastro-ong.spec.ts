@@ -73,18 +73,13 @@ test.describe('cadastro da ONG', () => {
       '/ong/cadastro/continuar'
     )
 
-    await page.getByRole('button', { name: 'Começar de novo' }).click()
-    await expect(page.getByText('o cadastro anterior deste CNPJ é apagado')).toBeVisible()
-    await page.getByRole('button', { name: 'Usar esses dados e continuar' }).click()
+    await expect(page.getByRole('link', { name: 'Começar de novo' })).toHaveAttribute(
+      'href', '/ong/cadastro/continuar?reiniciar=1'
+    )
+    await page.getByRole('link', { name: 'Começar de novo' }).click()
+    await expect(page).toHaveURL(`${BASE}/ong/cadastro/continuar?reiniciar=1`)
+    await expect(page.getByText('Depois, confirme o e-mail', { exact: false })).toBeVisible()
 
-    await expect(page).toHaveURL(`${BASE}/ong/cadastro/acesso`)
-    await page.locator('#email').fill('contato@casalar.org.br')
-    await page.locator('#senha').fill('Senha123')
-    await page.locator('#confirmacao-senha').fill('Senha123')
-
-    const criacao = page.waitForRequest('**/api/ongs')
-    await page.getByRole('button', { name: 'Criar acesso' }).click()
-    expect((await criacao).postDataJSON()).toMatchObject({ cnpj: CNPJ_EM_ANDAMENTO, recomecar: true })
   })
 
   test('valida o CNPJ, cria o acesso e confirma o código', async ({ page }) => {
@@ -116,7 +111,6 @@ test.describe('cadastro da ONG', () => {
       email: 'contato@casalar.org.br',
       password: 'Senha123',
       usarEnderecoReceita: true,
-      recomecar: false,
     })
 
     await expect(page.getByText('Digite o código enviado para contato@casalar.org.br')).toBeVisible()

@@ -130,7 +130,7 @@ describe("POST /api/ongs", () => {
 
     const response = await post({ ...corpo, recomecar: true });
 
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(400);
     expect(db.user.delete).not.toHaveBeenCalled();
   });
 
@@ -151,34 +151,23 @@ describe("POST /api/ongs", () => {
       expect(signUpEmail).not.toHaveBeenCalled();
     });
 
-    it("recomeçando, apaga o rascunho (com o usuário) antes de criar a conta nova", async () => {
-      const response = await post({ ...corpo, recomecar: true });
-
-      expect(response.status).toBe(201);
-      expect(db.user.delete).toHaveBeenCalledWith({ where: { id: "usuario-antigo" } });
-      expect(db.user.delete.mock.invocationCallOrder[0]).toBeLessThan(signUpEmail.mock.invocationCallOrder[0]);
-    });
-
-    it("recomeçando, aceita o mesmo e-mail do rascunho apagado", async () => {
-      db.user.findUnique.mockImplementation((async (args: { where: { id?: string; email?: string } }) => {
-        if (args.where.email) return { id: "usuario-antigo" }; // e-mail é do rascunho
-        return args.where.id === USER_ID ? { id: USER_ID } : null;
-      }) as never);
-
-      const response = await post({ ...corpo, recomecar: true });
-
-      expect(response.status).toBe(201);
-    });
-
-    it("recomeçando, ainda recusa e-mail de outra conta", async () => {
-      db.user.findUnique.mockResolvedValue({ id: "outra-conta" } as never);
-
-      const response = await post({ ...corpo, recomecar: true });
-
-      expect(response.status).toBe(409);
-      expect((await response.json()).error.details).toEqual({ campo: "email" });
+    it.each([true, "true", 1])("recusa tentativa pública de reinício com recomecar=%s", async (recomecar) => {
+      const response = await post({ ...corpo, recomecar });
+      expect(response.status).toBe(400);
       expect(db.user.delete).not.toHaveBeenCalled();
+      expect(signUpEmail).not.toHaveBeenCalled();
+      expect(lookupMock).not.toHaveBeenCalled();
     });
+
+    it("não substitui rascunho nem usando o e-mail já vinculado", async () => {
+      db.user.findUnique.mockResolvedValue({ id: "usuario-antigo" } as never);
+      const response = await post({ ...corpo, recomecar: false });
+      expect(response.status).toBe(409);
+      expect(db.user.delete).not.toHaveBeenCalled();
+      expect(db.ong.create).not.toHaveBeenCalled();
+      expect(lookupMock).not.toHaveBeenCalled();
+    });
+
   });
 
   it("devolve 422 quando o CNPJ não é elegível", async () => {

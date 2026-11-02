@@ -105,3 +105,17 @@ const allowedRoles: AllowedRoutes = {
 ```
 
 Use sempre a chave do **mesmo método** da função (`allowedRoles.GET` dentro de `GET`). Errar isso já causou uma falha de segurança no código herdado (bug #2).
+
+### Rotas de usuários
+
+As rotas reescritas `/api/users` e `/api/users/[id]` consultam a sessão com `auth.api.getSession({ headers: request.headers })` e verificam o perfil explicitamente. A listagem exige `ADMIN`; leitura, atualização e exclusão individuais permitem `ADMIN` ou a própria conta `ONG`. Sessão e permissão são verificadas antes do acesso ao banco. As respostas de erro dessas rotas seguem `{ error: { message } }`.
+
+O `idSchema` valida **IDs de conta** do better-auth: exatamente 32 caracteres alfanuméricos, sem conversão nem mudança das contas existentes. IDs de ONG são ObjectIds do MongoDB e não usam esse schema. As subrotas de e-mail e senha ainda são herdadas e têm pendências no bug #6.
+
+### Recuperação e reinício
+
+`POST /api/password/forgot` é público e aceita `{ email }`; a resposta de solicitação é sempre neutra para não enumerar contas. `POST /api/password/reset` aceita `{ email, codigo, newPassword }` e valida a política antes do service better-auth. Nenhuma dessas rotas escreve credenciais pelo Prisma.
+
+`POST /api/ongs/minha/reinicio/codigo` aceita `{}` e `/reinicio` aceita `{ codigo, confirmar: true }`. Exigem sessão ONG e header `Origin` igual à origem da requisição. Não aceitam IDs, CNPJ ou e-mail como alvo. O service resolve a ONG pela sessão e só limpa rascunho após confirmar posse do e-mail.
+
+Os salvamentos e a publicação do cadastro usam comparação com o `updatedAt` lido, além do dono e da situação lida (rascunho, publicada ou suspensa: o painel edita a ONG publicada pelos mesmos passos). Conflitos com outra gravação/reinício/publicação devolvem 409; nunca reaplicar automaticamente uma operação destrutiva sobre a versão nova.

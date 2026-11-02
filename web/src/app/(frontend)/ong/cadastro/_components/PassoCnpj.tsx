@@ -16,7 +16,7 @@ type Estado =
   | { tipo: "digitando" }
   | { tipo: "invalido" }
   | { tipo: "validando" }
-  | { tipo: "elegivel"; cnpj: string; receita: CnpjData; recomecar?: boolean }
+  | { tipo: "elegivel"; cnpj: string; receita: CnpjData }
   | { tipo: "em-andamento"; cnpj: string; receita: CnpjData }
   | { tipo: "nao-elegivel"; motivo: string; receita: CnpjData }
   | { tipo: "ja-cadastrado" }
@@ -74,7 +74,7 @@ export function PassoCnpj() {
   const salvo = !editado && dados && !dados.emailPendente ? dados : null;
   const valor = salvo ? formatCnpj(salvo.cnpj) : valorDigitado;
   const estado: Estado = salvo
-    ? { tipo: "elegivel", cnpj: salvo.cnpj, receita: salvo.receita, recomecar: salvo.recomecar }
+    ? { tipo: "elegivel", cnpj: salvo.cnpj, receita: salvo.receita }
     : estadoDigitado;
   const setEstado = setEstadoDigitado;
 
@@ -101,7 +101,7 @@ export function PassoCnpj() {
 
   function continuar(usarEnderecoReceita: boolean) {
     if (estado.tipo !== "elegivel") return;
-    salvar({ cnpj: estado.cnpj, receita: estado.receita, usarEnderecoReceita, recomecar: estado.recomecar });
+    salvar({ cnpj: estado.cnpj, receita: estado.receita, usarEnderecoReceita });
     router.push("/ong/cadastro/acesso");
   }
 
@@ -167,7 +167,7 @@ export function PassoCnpj() {
       {estado.tipo === "em-andamento" && (
         <div className="flex flex-col gap-4">
           <Aviso>
-            Este CNPJ tem um cadastro em andamento, ainda não publicado. Continue de onde parou ou comece de novo.
+            Este CNPJ tem um cadastro em andamento, ainda não publicado. Entre na conta para continuar ou recomeçar após confirmar seu e-mail.
           </Aviso>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -176,13 +176,12 @@ export function PassoCnpj() {
             >
               Continuar de onde parei
             </Link>
-            <button
-              type="button"
-              onClick={() => setEstado({ tipo: "elegivel", cnpj: estado.cnpj, receita: estado.receita, recomecar: true })}
-              className="h-[52px] cursor-pointer rounded-[15px] bg-salvia-clara px-[22px] text-base font-semibold text-musgo transition-colors hover:bg-salvia"
+            <Link
+              href="/ong/cadastro/continuar?reiniciar=1"
+              className="flex h-[52px] items-center rounded-[15px] bg-salvia-clara px-[22px] text-base font-semibold text-musgo transition-colors hover:bg-salvia"
             >
               Começar de novo
-            </button>
+            </Link>
           </div>
         </div>
       )}
@@ -199,11 +198,6 @@ export function PassoCnpj() {
 
       {estado.tipo === "elegivel" && (
         <>
-          {estado.recomecar && (
-            <Aviso>
-              Ao criar o acesso no próximo passo, o cadastro anterior deste CNPJ é apagado e tudo começa do zero.
-            </Aviso>
-          )}
           <CartaoReceita receita={estado.receita} elegivel />
           <div className="flex flex-wrap gap-3">
             <button

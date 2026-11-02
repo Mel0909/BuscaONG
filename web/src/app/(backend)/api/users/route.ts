@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { blockForbiddenRequests, zodErrorHandler } from "@/utils/api/server";
-import { getAllUsers } from "../../services/users";
-import { AllowedRoutes } from "@/types";
+import { auth } from "@/auth";
+import { getAllUsers } from "@/backend/services/users";
+import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { zodErrorHandler } from "@/utils/api/server";
 
-const allowedRoles: AllowedRoutes = {
-  GET: ["ADMIN"]
-}
-
-// rota de get all users
 export async function GET(request: NextRequest) {
   try {
-    const forbidden = await blockForbiddenRequests(request, allowedRoles.POST);
-    if (forbidden) {
-      return forbidden;
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user) {
+      return NextResponse.json(toErrorMessage("Faça login para continuar"), { status: 401 });
+    }
+    if (session.role !== "ADMIN") {
+      return NextResponse.json(toErrorMessage("Acesso negado"), { status: 403 });
     }
 
     const users = await getAllUsers();
     return NextResponse.json(users);
   } catch (error) {
-    if (error instanceof NextResponse) {
-      return error;
-    }
-
     return zodErrorHandler(error);
   }
 }

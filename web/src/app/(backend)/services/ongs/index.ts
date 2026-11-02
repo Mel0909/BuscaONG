@@ -50,23 +50,20 @@ export type NovaContaOng = {
   email: string;
   password: string;
   usarEnderecoReceita: boolean;
-  /** a pessoa escolheu "Começar de novo": apaga o rascunho que existir para este CNPJ */
-  recomecar: boolean;
 };
 
 /**
  * Passo 2 do cadastro: cria o usuário (better-auth, perfil ONG, e-mail ainda não verificado)
  * e a Ong em rascunho. O better-auth envia o código de verificação ao criar o usuário.
  * Revalida o CNPJ no servidor: não confia no que o passo 1 mostrou no navegador.
- * Se já houver um rascunho para o CNPJ, só segue com `recomecar`, e aí o rascunho (com o
- * usuário dele) é apagado antes de criar a conta nova.
+ * Um cadastro existente nunca é substituído por esta operação pública.
  */
-export async function criarContaOng({ cnpj, email, password, usarEnderecoReceita, recomecar }: NovaContaOng) {
+export async function criarContaOng({ cnpj, email, password, usarEnderecoReceita }: NovaContaOng) {
   const rascunho = await findOngByCnpj(cnpj);
   if (rascunho && rascunho.status !== "RASCUNHO") {
     throw new OngJaCadastradaError();
   }
-  if (rascunho && !recomecar) {
+  if (rascunho) {
     throw new CadastroEmAndamentoError();
   }
 
@@ -80,14 +77,8 @@ export async function criarContaOng({ cnpj, email, password, usarEnderecoReceita
   // usuário falso (contra enumeração de e-mails). Por isso a checagem vem antes.
   const emailNormalizado = email.toLowerCase();
   const donoDoEmail = await prisma.user.findUnique({ where: { email: emailNormalizado } });
-  // o e-mail do próprio rascunho que vai ser apagado pode ser usado de novo
-  if (donoDoEmail && donoDoEmail.id !== rascunho?.userId) {
+  if (donoDoEmail) {
     throw new EmailEmUsoError();
-  }
-
-  if (rascunho) {
-    // a Ong, as sessões e as contas do better-auth caem junto (onDelete: Cascade)
-    await prisma.user.delete({ where: { id: rascunho.userId } });
   }
 
   const { user } = await auth.api.signUpEmail({

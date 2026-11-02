@@ -16,6 +16,7 @@ import { slugLivre } from "@/lib/ong/slug";
 import { itemLivre } from "@/lib/ong/urgencia";
 import { normalizarChave } from "@/utils/formatters/texto";
 import {
+  CadastroAlteradoError,
   CadastroIncompletoError,
   ImagemInvalidaError,
   OngNaoEncontradaError,
@@ -64,30 +65,42 @@ export function posicaoPublica(
   return { type: "Point", coordinates: [aproximada.longitude, aproximada.latitude] };
 }
 
+/**
+ * Grava só se a ONG continua como foi lida (mesma situação e mesmo updatedAt): uma gravação
+ * baseada em dados anteriores a um reinício, à publicação ou a outra edição é recusada.
+ * Vale para o cadastro e para o painel, onde a ONG publicada edita o perfil pelos mesmos passos.
+ */
+async function atualizarCadastro(ong: Ong, data: Prisma.OngUpdateInput) {
+  try {
+    return await prisma.ong.update({
+      where: { id: ong.id, userId: ong.userId, status: ong.status, updatedAt: ong.updatedAt },
+      data: { ...data, updatedAt: new Date(Math.max(Date.now(), ong.updatedAt.getTime() + 1)) },
+      select: resumo,
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      throw new CadastroAlteradoError();
+    }
+    throw error;
+  }
+}
+
 /** Passo 3. */
 export async function salvarLocalizacao(userId: string, dados: LocalizacaoData) {
   const ong = await ongDoUsuario(userId);
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: {
-      endereco: dados.endereco,
-      localizacao: { type: "Point", coordinates: [dados.longitude, dados.latitude] },
-      localizacaoPublica: posicaoPublica(ong, dados, dados.mostrarSoBairro),
-      mostrarSoBairro: dados.mostrarSoBairro,
-      passoAtual: proximoPasso(ong, 3),
-    },
-    select: resumo,
+  return atualizarCadastro(ong, {
+    endereco: dados.endereco,
+    localizacao: { type: "Point", coordinates: [dados.longitude, dados.latitude] },
+    localizacaoPublica: posicaoPublica(ong, dados, dados.mostrarSoBairro),
+    mostrarSoBairro: dados.mostrarSoBairro,
+    passoAtual: proximoPasso(ong, 3),
   });
 }
 
 /** Passo 4. */
 export async function salvarContatos(userId: string, dados: ContatosData) {
   const ong = await ongDoUsuario(userId);
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: { contatos: dados, passoAtual: proximoPasso(ong, 4) },
-    select: resumo,
-  });
+  return atualizarCadastro(ong, { contatos: dados, passoAtual: proximoPasso(ong, 4) });
 }
 
 /** Passo 5. Item livre com o mesmo nome de um item da lista vira o item da lista. */
@@ -122,16 +135,12 @@ export async function salvarCausasItens(userId: string, dados: CausasItensData) 
   const itensDaOng = new Set([...itens, ...[...itensLivres.keys()].map(itemLivre)]);
   const urgencias = (ong.urgencias ?? []).filter((u) => itensDaOng.has(u.item));
 
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: {
-      causas,
-      itens: [...itens],
-      itensLivres: [...itensLivres.values()],
-      urgencias,
-      passoAtual: proximoPasso(ong, 5),
-    },
-    select: resumo,
+  return atualizarCadastro(ong, {
+    causas,
+    itens: [...itens],
+    itensLivres: [...itensLivres.values()],
+    urgencias,
+    passoAtual: proximoPasso(ong, 5),
   });
 }
 
@@ -179,15 +188,11 @@ export async function salvarVoluntariado(userId: string, dados: VoluntariadoData
     turnos: calcularTurnos(h.inicio, h.fim),
   }));
 
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: {
-      aceitaVoluntarios: dados.aceitaVoluntarios,
-      horariosVoluntariado,
-      requisitosVoluntariado: dados.requisitos,
-      passoAtual: proximoPasso(ong, 6),
-    },
-    select: resumo,
+  return atualizarCadastro(ong, {
+    aceitaVoluntarios: dados.aceitaVoluntarios,
+    horariosVoluntariado,
+    requisitosVoluntariado: dados.requisitos,
+    passoAtual: proximoPasso(ong, 6),
   });
 }
 
@@ -211,11 +216,7 @@ export async function salvarApresentacao(userId: string, dados: ApresentacaoData
     }
   }
 
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: { ...dados, passoAtual: proximoPasso(ong, 7) },
-    select: resumo,
-  });
+  return atualizarCadastro(ong, { ...dados, passoAtual: proximoPasso(ong, 7) });
 }
 
 /** O que ainda falta para publicar (vazio = pode publicar). Também alimenta a lista do passo 8. */
@@ -249,11 +250,8 @@ export async function publicarOng(userId: string) {
   for (let tentativa = 1; ; tentativa++) {
     const slug = ong.slug ?? (await slugLivre(ong.nomePublico!, slugOcupado));
     try {
-      return await prisma.ong.update({
-        where: { id: ong.id },
-        data: { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO, slug },
-        select: { ...resumo, publicadaEm: true, slug: true },
-      });
+      await atualizarCadastro(ong, { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO, slug });
+      return { id: ong.id, status: "PUBLICADA" as const, passoAtual: ULTIMO_PASSO, publicadaEm: agora, slug };
     } catch (error) {
       const slugRepetido = error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
       if (!slugRepetido || ong.slug || tentativa >= 3) throw error;

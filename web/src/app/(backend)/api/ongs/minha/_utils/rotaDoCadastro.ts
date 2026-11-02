@@ -3,6 +3,7 @@ import type { ZodType } from "zod";
 
 import {
   CadastroIncompletoError,
+  CadastroAlteradoError,
   ImagemInvalidaError,
   LimiteUrgenciasError,
   OngNaoEncontradaError,
@@ -19,6 +20,7 @@ const erro = (message: string, status: number, details?: unknown) =>
 
 /** Erros dos services do cadastro → resposta HTTP. */
 export function respostaDeErro(error: unknown) {
+  if (error instanceof CadastroAlteradoError) return erro(error.message, 409);
   if (error instanceof OngNaoEncontradaError) return erro(error.message, 404);
   if (error instanceof OpcaoInvalidaError) return erro(error.message, 400, [{ campo: error.campo, message: error.message }]);
   if (error instanceof ImagemInvalidaError) return erro(error.message, 400, [{ campo: error.campo, message: error.message }]);
