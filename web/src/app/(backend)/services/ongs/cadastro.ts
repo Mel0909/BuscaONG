@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import { buscarOpcoes } from "@/backend/services/listas";
-import type { Ong } from "@/generated/prisma";
+import { Prisma, type Ong } from "@/generated/prisma";
 import type {
   ApresentacaoData,
   CausasItensData,
@@ -11,6 +11,9 @@ import type {
 } from "@/backend/schemas";
 import { urlDeEnvio } from "@/lib/armazenamento";
 import { ATIVIDADE_OUTRA, calcularTurnos } from "@/lib/cadastro/voluntariado";
+import { posicaoAproximada } from "@/lib/mapa/geo";
+import { slugLivre } from "@/lib/ong/slug";
+import { itemLivre } from "@/lib/ong/urgencia";
 import { normalizarChave } from "@/utils/formatters/texto";
 import {
   CadastroIncompletoError,
@@ -42,6 +45,25 @@ function proximoPasso(ong: Pick<Ong, "passoAtual">, passo: number) {
 
 const resumo = { id: true, status: true, passoAtual: true } as const;
 
+/**
+ * Posição que a área pública vê: a real, ou um ponto sorteado perto dela para quem mostra só o
+ * bairro. Se o ponto e a escolha não mudaram, mantém o sorteio anterior: sortear de novo a cada
+ * salvamento daria várias amostras em volta do endereço, e a média delas o revelaria.
+ */
+export function posicaoPublica(
+  ong: Pick<Ong, "localizacao" | "localizacaoPublica" | "mostrarSoBairro">,
+  real: { latitude: number; longitude: number },
+  mostrarSoBairro: boolean
+) {
+  if (!mostrarSoBairro) return { type: "Point", coordinates: [real.longitude, real.latitude] };
+  const [lngAntes, latAntes] = ong.localizacao?.coordinates ?? [];
+  if (ong.mostrarSoBairro && ong.localizacaoPublica && lngAntes === real.longitude && latAntes === real.latitude) {
+    return { type: "Point", coordinates: ong.localizacaoPublica.coordinates };
+  }
+  const aproximada = posicaoAproximada(real);
+  return { type: "Point", coordinates: [aproximada.longitude, aproximada.latitude] };
+}
+
 /** Passo 3. */
 export async function salvarLocalizacao(userId: string, dados: LocalizacaoData) {
   const ong = await ongDoUsuario(userId);
@@ -50,6 +72,7 @@ export async function salvarLocalizacao(userId: string, dados: LocalizacaoData) 
     data: {
       endereco: dados.endereco,
       localizacao: { type: "Point", coordinates: [dados.longitude, dados.latitude] },
+      localizacaoPublica: posicaoPublica(ong, dados, dados.mostrarSoBairro),
       mostrarSoBairro: dados.mostrarSoBairro,
       passoAtual: proximoPasso(ong, 3),
     },
@@ -95,12 +118,17 @@ export async function salvarCausasItens(userId: string, dados: CausasItensData) 
     else if (!itensLivres.has(chave)) itensLivres.set(chave, { nome: nome.replace(/\s+/g, " "), chave });
   }
 
+  // item que saiu da lista leva junto a urgência dele
+  const itensDaOng = new Set([...itens, ...[...itensLivres.keys()].map(itemLivre)]);
+  const urgencias = (ong.urgencias ?? []).filter((u) => itensDaOng.has(u.item));
+
   return prisma.ong.update({
     where: { id: ong.id },
     data: {
       causas,
       itens: [...itens],
       itensLivres: [...itensLivres.values()],
+      urgencias,
       passoAtual: proximoPasso(ong, 5),
     },
     select: resumo,
@@ -201,22 +229,34 @@ export function pendenciasParaPublicar(ong: Ong): string[] {
   return pendencias;
 }
 
+const slugOcupado = async (slug: string) => !!(await prisma.ong.findFirst({ where: { slug }, select: { id: true } }));
+
 /** Passo 8: publica na hora, sem aprovação manual. Publicar de novo não muda nada. */
 export async function publicarOng(userId: string) {
   const ong = await ongDoUsuario(userId);
 
   if (ong.status === "SUSPENSA") throw new OngSuspensaError();
   if (ong.status === "PUBLICADA") {
-    return { id: ong.id, status: ong.status, passoAtual: ong.passoAtual, publicadaEm: ong.publicadaEm };
+    return { id: ong.id, status: ong.status, passoAtual: ong.passoAtual, publicadaEm: ong.publicadaEm, slug: ong.slug };
   }
 
   const pendencias = pendenciasParaPublicar(ong);
   if (pendencias.length > 0) throw new CadastroIncompletoError(pendencias);
 
   const agora = new Date();
-  return prisma.ong.update({
-    where: { id: ong.id },
-    data: { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO },
-    select: { ...resumo, publicadaEm: true },
-  });
+  // endereço da página pública; fica o mesmo se a ONG mudar de nome depois. O índice único do
+  // slug (pnpm db:seed) recusa o mesmo slug para duas ONGs publicando ao mesmo tempo: aí tenta o próximo.
+  for (let tentativa = 1; ; tentativa++) {
+    const slug = ong.slug ?? (await slugLivre(ong.nomePublico!, slugOcupado));
+    try {
+      return await prisma.ong.update({
+        where: { id: ong.id },
+        data: { status: "PUBLICADA", publicadaEm: agora, termosAceitosEm: agora, passoAtual: ULTIMO_PASSO, slug },
+        select: { ...resumo, publicadaEm: true, slug: true },
+      });
+    } catch (error) {
+      const slugRepetido = error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+      if (!slugRepetido || ong.slug || tentativa >= 3) throw error;
+    }
+  }
 }

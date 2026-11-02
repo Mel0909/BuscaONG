@@ -132,9 +132,13 @@ model Ong {
   passoAtual          Int              @default(3)
 
   // passo 3: localização
-  endereco        Endereco?
-  localizacao     Ponto?
-  mostrarSoBairro Boolean   @default(false) // o perfil mostra só o bairro e um pin aproximado
+  endereco           Endereco?
+  localizacao        Ponto?
+  mostrarSoBairro    Boolean   @default(false) // o perfil mostra só o bairro e um pin aproximado
+  // a posição que a área pública vê e consulta: a real, ou um ponto deslocado ao acaso
+  // (150 a 400 m) quando mostrarSoBairro. O desvio é sorteado ao salvar e guardado, para não
+  // dar para recalcular a posição real a partir de dados públicos.
+  localizacaoPublica Ponto?
 
   // passo 4: contatos e redes
   contatos Contatos?
@@ -159,13 +163,29 @@ model Ong {
   // passo 8: publicação
   termosAceitosEm DateTime?
   publicadaEm     DateTime?
+  // endereço da página pública (/ong/<slug>), criado ao publicar; não muda quando o nome muda.
+  // Sem @unique: o índice único do MongoDB não aceitaria vários rascunhos sem slug.
+  slug            String?
+
+  // painel: itens marcados como urgentes (O3)
+  urgencias Urgencia[]
 
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([slug])
   @@map("ong")
+}
+
+// item marcado como urgente no painel; o selo sai sozinho depois de `ate`
+type Urgencia {
+  item     String // slug do item da lista fixa, ou "livre:<chave>" para item livre
+  nome     String // nome do item quando foi marcado
+  detalhe  String? // até 120 caracteres
+  criadaEm DateTime
+  ate      DateTime
 }
 
 enum TipoLista {

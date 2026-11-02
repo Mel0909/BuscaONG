@@ -1,0 +1,18 @@
+meta {
+  name: listar perto de um ponto
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}?lat=-23.5505&lng=-46.6333&limite=30&item=fraldas&dia=SABADO
+  body: none
+  auth: none
+}
+
+docs {
+  Área pública (pública, 60 por minuto por IP). ONGs publicadas até 50 km do ponto, das mais próximas
+  para as mais distantes: { total, ongs: [...] }. limite=0 devolve só o total.
+  Filtros repetíveis: causa, item, livre (chave do item livre), dia (DOMINGO..SABADO), turno (MANHA,
+  TARDE, NOITE) e atividade. Dentro do grupo vale qualquer um; entre grupos, todos.
+}

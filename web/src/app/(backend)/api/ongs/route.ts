@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAPIError } from "better-auth/api";
 
-import { novaContaOngSchema } from "@/backend/schemas";
+import { filtrosSchema, listaProximasSchema, novaContaOngSchema } from "@/backend/schemas";
 import {
   CadastroEmAndamentoError,
   criarContaOng,
+  listarOngsProximas,
   EmailEmUsoError,
   OngJaCadastradaError,
   OngNaoElegivelError,
 } from "@/backend/services/ongs";
 import { CnpjLookupUnavailableError, CnpjNotFoundError } from "@/lib/cnpj";
+import { paramsParaFiltrosCrus } from "@/lib/mapa/filtros";
 import {
   clientIp,
   rateLimit,
@@ -22,9 +24,30 @@ import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 // pública: cria a conta, consulta a Receita e envia e-mail, então o limite é mais baixo
 const LIMITE = { limit: 5, windowMs: 60_000 };
+const LIMITE_LISTA = { limit: 60, windowMs: 60_000 };
 
 const erro = (message: string, status: number, details?: unknown) =>
   NextResponse.json(toErrorMessage(message, details), { status });
+
+// área pública (P1/P3): ONGs publicadas perto de um ponto, com os filtros da tela
+// GET /api/ongs?lat=-23.55&lng=-46.63&limite=30&causa=animais&item=fraldas&dia=SABADO
+export async function GET(request: NextRequest) {
+  try {
+    const limite = rateLimit(`ongs-lista:${clientIp(request)}`, LIMITE_LISTA);
+    if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
+
+    const params = request.nextUrl.searchParams;
+    const ponto = listaProximasSchema.safeParse(Object.fromEntries(params));
+    if (!ponto.success) return returnInvalidDataErrors(ponto.error);
+    const filtros = filtrosSchema.safeParse(paramsParaFiltrosCrus(params));
+    if (!filtros.success) return returnInvalidDataErrors(filtros.error);
+
+    const { lat, lng, limite: quantas } = ponto.data;
+    return NextResponse.json(await listarOngsProximas({ latitude: lat, longitude: lng }, filtros.data, quantas));
+  } catch (error) {
+    return zodErrorHandler(error);
+  }
+}
 
 // passo 2 do cadastro: cria a conta (e-mail ainda não verificado) e a ONG em rascunho
 export async function POST(request: NextRequest) {

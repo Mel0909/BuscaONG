@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
+import { distanciaKm } from "@/lib/mapa/geo";
 import { setCurrentRole } from "../../mocks/auth";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
-    ong: { findUnique: vi.fn(), update: vi.fn() },
+    ong: { findUnique: vi.fn(), update: vi.fn(), findFirst: vi.fn() },
     opcaoLista: { findMany: vi.fn() },
   },
 }));
@@ -132,6 +133,42 @@ describe("rotas /api/ongs/minha/*", () => {
     });
   });
 
+  describe("posição pública (passo 3)", () => {
+    const corpoLocalizacao = (mostrarSoBairro: boolean, latitude = -23.5893) => ({
+      endereco: { logradouro: "Rua A", bairro: "Centro", municipio: "São Paulo", uf: "SP", cep: "01001-000" },
+      latitude,
+      longitude: -46.6345,
+      mostrarSoBairro,
+    });
+    const publica = () => (dadosDoUpdate().localizacaoPublica as { coordinates: [number, number] }).coordinates;
+
+    it("sem 'só o bairro', a posição pública é a real", async () => {
+      await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(false)));
+      expect(publica()).toEqual([-46.6345, -23.5893]);
+    });
+
+    it("com 'só o bairro', sorteia um ponto a 150-400 m e guarda", async () => {
+      await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true)));
+      const [longitude, latitude] = publica();
+      const distancia = distanciaKm({ latitude: -23.5893, longitude: -46.6345 }, { latitude, longitude });
+      expect(distancia).toBeGreaterThanOrEqual(0.149);
+      expect(distancia).toBeLessThanOrEqual(0.401);
+    });
+
+    it("salvar de novo o mesmo ponto mantém o sorteio; mudar o ponto sorteia outro", async () => {
+      const sorteada = { type: "Point", coordinates: [-46.637, -23.587] };
+      db.ong.findUnique.mockResolvedValue(
+        ongRascunho({ localizacao: { type: "Point", coordinates: [-46.6345, -23.5893] }, localizacaoPublica: sorteada, mostrarSoBairro: true }) as never
+      );
+      await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true)));
+      expect(publica()).toEqual(sorteada.coordinates);
+
+      db.ong.update.mockClear();
+      await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true, -23.59)));
+      expect(publica()).not.toEqual(sorteada.coordinates);
+    });
+  });
+
   it("voltar a um passo anterior não reduz o passoAtual", async () => {
     db.ong.findUnique.mockResolvedValue(ongRascunho({ passoAtual: 7 }) as never);
     await putContatos(requisicao("PUT", "contatos", { email: { valor: "contato@casalar.org.br", visivel: true } }));
@@ -170,6 +207,19 @@ describe("rotas /api/ongs/minha/*", () => {
         itensLivres: [{ nome: "Cadeira de rodas", chave: "cadeira de rodas" }],
         passoAtual: 6,
       });
+    });
+
+    it("item que sai da lista leva junto a urgência dele", async () => {
+      const urgencia = (item: string) => ({ item, nome: item, detalhe: null, criadaEm: new Date(), ate: new Date(Date.now() + 86_400_000) });
+      db.ong.findUnique.mockResolvedValue(
+        ongRascunho({ urgencias: [urgencia("fraldas"), urgencia("livre:ventilador"), urgencia("livre:cadeira de rodas")] }) as never
+      );
+      db.opcaoLista.findMany.mockImplementation((async (args: { where: { slug?: { in: string[] } } }) =>
+        args.where.slug ? opcoes(...args.where.slug.in) : []) as never);
+
+      await putCausasItens(requisicao("PUT", "causas-itens", { causas: ["saude"], itens: [], itensLivres: ["Cadeira de rodas"] }));
+
+      expect(dadosDoUpdate().urgencias).toEqual([expect.objectContaining({ item: "livre:cadeira de rodas" })]);
     });
 
     it("400 para causa que não está na lista", async () => {
@@ -271,7 +321,26 @@ describe("rotas /api/ongs/minha/*", () => {
         status: "PUBLICADA",
         publicadaEm: expect.any(Date),
         termosAceitosEm: expect.any(Date),
+        slug: "casa-lar",
       });
+    });
+
+    it("o endereço da página pula slugs já usados por outra ONG", async () => {
+      db.ong.findUnique.mockResolvedValue(ongCompleta() as never);
+      db.ong.findFirst.mockImplementation((async (args: { where: { slug: string } }) =>
+        args.where.slug === "casa-lar" ? { id: "outra" } : null) as never);
+
+      await postPublicacao(requisicao("POST", "publicacao", { aceitaTermos: true }));
+
+      expect(dadosDoUpdate()).toMatchObject({ slug: "casa-lar-2" });
+    });
+
+    it("publicar de novo mantém o endereço da página", async () => {
+      db.ong.findUnique.mockResolvedValue({ ...ongCompleta(), slug: "casa-lar-antigo", status: "PUBLICADA" } as never);
+      const body = await (await postPublicacao(requisicao("POST", "publicacao", { aceitaTermos: true }))).json();
+
+      expect(body.slug).toBe("casa-lar-antigo");
+      expect(db.ong.update).not.toHaveBeenCalled();
     });
 
     it("403 para ONG suspensa", async () => {
