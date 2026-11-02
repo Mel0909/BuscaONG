@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { botoesDeContato } from "@/lib/ong/contatos";
 import { ehObjectId, slugDoNome, slugLivre } from "@/lib/ong/slug";
 import { prazoRestante, tempoDesde, urgenciaAtiva } from "@/lib/ong/urgencia";
 
@@ -27,6 +28,37 @@ describe("slug da página da ONG", () => {
   it("reconhece IDs do MongoDB", () => {
     expect(ehObjectId("6ae67eea8cf900bcea8cfe24")).toBe(true);
     expect(ehObjectId("casa-lar")).toBe(false);
+  });
+});
+
+describe("botões de contato da página (P5)", () => {
+  const todos = { whatsapp: "+5511971234567", email: "a@b.org", site: "https://b.org", instagram: "@bong" };
+  const rotulos = (b: { rotulo: string }[]) => b.map((x) => x.rotulo);
+
+  it("todos os contatos: WhatsApp e e-mail na barra, site e Instagram no fim da página", () => {
+    const { barra, fimDaPagina } = botoesDeContato(todos);
+    expect(rotulos(barra)).toEqual(["E-mail", "WhatsApp"]);
+    expect(barra.find((b) => b.primario)?.tipo).toBe("whatsapp");
+    expect(rotulos(fimDaPagina)).toEqual(["Site ↗", "Instagram ↗"]);
+    expect(barra[1].href).toBe("https://wa.me/5511971234567");
+  });
+
+  it("sem WhatsApp, o e-mail é o principal", () => {
+    const { barra, fimDaPagina } = botoesDeContato({ email: todos.email, instagram: todos.instagram });
+    expect(barra.find((b) => b.primario)?.tipo).toBe("email");
+    expect(rotulos(barra)).toEqual(["Instagram ↗", "E-mail"]);
+    expect(fimDaPagina).toEqual([]);
+  });
+
+  it("só um contato: um botão principal", () => {
+    const { barra } = botoesDeContato({ whatsapp: todos.whatsapp });
+    expect(barra).toHaveLength(1);
+    expect(barra[0].primario).toBe(true);
+  });
+
+  it("Instagram vira link do perfil", () => {
+    const { fimDaPagina } = botoesDeContato(todos);
+    expect(fimDaPagina[1].href).toBe("https://instagram.com/bong");
   });
 });
 

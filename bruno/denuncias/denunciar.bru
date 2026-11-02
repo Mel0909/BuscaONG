@@ -1,0 +1,26 @@
+meta {
+  name: denunciar perfil
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/{{folder}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ongId": "6ae67eea8cf900bcea8cfe24",
+    "motivo": "FECHOU",
+    "relato": "Fui entregar doação e o local está fechado.",
+    "email": ""
+  }
+}
+
+docs {
+  Pública (P5.1). motivo: FECHOU, PEDIU_DINHEIRO, NAO_E_ONG, VIOLENCIA, CONTEUDO_INADEQUADO ou OUTRO.
+  relato e email são opcionais. Só ONG publicada (404 para as outras).
+  Limites por IP: 10 por hora e 1 por perfil a cada 24 h (429).
+}

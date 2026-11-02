@@ -9,6 +9,7 @@ export * from "./elegibilidade";
 export * from "./erros";
 export * from "./cadastro";
 export * from "./publico";
+export * from "./perfil";
 
 export async function findOngByCnpj(cnpj: string) {
   return prisma.ong.findUnique({ where: { cnpj } });

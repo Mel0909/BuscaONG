@@ -170,6 +170,8 @@ model Ong {
   // painel: itens marcados como urgentes (O3)
   urgencias Urgencia[]
 
+  denuncias Denuncia[]
+
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -208,6 +210,39 @@ model OpcaoLista {
 
   @@unique([tipo, slug])
   @@map("opcao_lista")
+}
+
+// motivos da denúncia de perfil (P5.1); os mesmos da fila do admin (A2)
+enum MotivoDenuncia {
+  FECHOU // a ONG fechou ou mudou de endereço
+  PEDIU_DINHEIRO // pediu dinheiro ou dados pessoais
+  NAO_E_ONG
+  VIOLENCIA // vai direto para o topo da fila
+  CONTEUDO_INADEQUADO
+  OUTRO
+}
+
+enum StatusDenuncia {
+  ABERTA
+  ARQUIVADA // o admin analisou e não agiu
+  COM_ACAO // a ONG foi suspensa ou excluída
+}
+
+// denúncia feita por um visitante na página da ONG; a ONG não fica sabendo quem denunciou
+model Denuncia {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  ongId       String         @db.ObjectId
+  ong         Ong            @relation(fields: [ongId], references: [id], onDelete: Cascade)
+  motivo      MotivoDenuncia
+  relato      String?
+  email       String? // opcional, para a equipe dar retorno
+  status      StatusDenuncia @default(ABERTA)
+  resolucao   String? // motivo do admin ao arquivar ou agir
+  resolvidaEm DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@index([status, ongId])
+  @@map("denuncia")
 }
 
 // evitar mexer daqui pra baixo

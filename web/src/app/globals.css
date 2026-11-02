@@ -33,6 +33,9 @@
   /* terracota: só para urgência */
   --color-terracota: #B9472F;
   --color-terracota-escura: #8A2F1C;
+  /* fundo e texto do bloco "Urgente agora" (P5) */
+  --color-terracota-clara: #F6DED5;
+  --color-terracota-funda: #5C1E11;
 
   /* mel: "por que apareceu" */
   --color-mel: #FBE9B7;
