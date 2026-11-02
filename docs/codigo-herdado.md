@@ -18,7 +18,7 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 ### Back-end (~500 linhas)
 
 - [ ] `app/(backend)/api/users/**` (CRUD de users, troca de e-mail e senha)
-- [ ] `app/(backend)/api/password/forgot`, `reset`
+- [x] `app/(backend)/api/password/forgot`, `reset` (removidas; "esqueci a senha" usa o código por e-mail do better-auth)
 - [ ] `app/(backend)/schemas/*` (`auth.schema.ts`, `base.schema.ts`)
 - [ ] `app/(backend)/services/auth/*`, `services/users/*`
 - [ ] `app/(backend)/README.md`
@@ -27,16 +27,16 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Front-end (~610 linhas)
 
-- [ ] `app/(frontend)/(auth)/**` (login, logout, `LoginForm`). O cadastro genérico (`/cadastro`, `CadastroForm`, `PasswordRequirement`) e o `POST /api/users` já foram removidos
-- [ ] `app/(frontend)/(landing-pages)/page.tsx` (será substituído no Hello World da Etapa 5)
-- [ ] `app/(frontend)/admin/**` (página de login do admin, `AdminForm`, layout do dashboard, `AdminHeader`, sidebar, `admin.css`)
-- [ ] `app/not-found.tsx` (texto e estrutura; a imagem já foi trocada)
+- [ ] `app/(frontend)/(auth)/**`: login (`LoginForm`) e a tela de recuperar a senha foram reescritos; falta o `logout/page.tsx`. O cadastro genérico (`/cadastro`, `CadastroForm`, `PasswordRequirement`) e o `POST /api/users` já foram removidos
+- [x] `app/(frontend)/(landing-pages)/page.tsx` (virou a tela do mapa)
+- [x] `app/(frontend)/admin/**` (reescrito: login da equipe e as telas A1 a A4; o dashboard do template foi removido)
+- [x] `app/not-found.tsx` (reescrito)
 
 ### Componentes (~415 linhas)
 
-- [ ] `components/base/input/*` (`ValidatedInput`, `BaseCheckbox`, `RequiredTag`)
-- [ ] `components/base/nav/InitialNav`
-- [ ] `components/auth/*` (`CredentialsLoginForm`, `CredentialsButton`, `GoogleLoginButton`, `LoginOptionals`)
+- [x] `components/base/input/*` (`ValidatedInput`, `BaseCheckbox`, `RequiredTag`) (removidos)
+- [x] `components/base/nav/InitialNav` (removido)
+- [x] `components/auth/*` (`CredentialsLoginForm`, `CredentialsButton`, `GoogleLoginButton`, `LoginOptionals`) (removidos)
 - [ ] `components/common/ToastProvider.tsx`
 
 `components/base/brand/BuscaOngLogo.tsx` é **novo**, feito a partir do design do projeto.
@@ -48,11 +48,11 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [ ] `types/index.ts` (`AllowedRoutes`)
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
 - [ ] `auth.ts`: a configuração em si segue a documentação do better-auth. O plugin `customSession` com role é do template.
-- [ ] `lib/email/*` (wrapper do Resend, template `ResetPasswordEmail`)
+- [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend
 
 ### Estilos
 
-- [ ] `app/globals.css`: os utilitários `button-md`, `button-lg`, `login-button`, `login-background`, `opacityTransition`, `colorTransition`, `optional-label`, `auth-*` e `divisor` são do template. Os tokens de cor e fonte já são do projeto.
+- [x] `app/globals.css`: os utilitários do template (`button-md`, `button-lg`, `login-button`, `login-background`, `opacityTransition`, `colorTransition`, `optional-label`, `auth-*` e `divisor`) foram removidos. Os tokens de cor e fonte são do projeto.
 
 ### Testes (~135 linhas)
 
@@ -65,7 +65,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [ ] `.husky/pre-commit`, `.husky/pre-push`
 - [ ] `bruno/**` (requisições de auth, session e users, `collection.bru`)
 - [x] `README.md`: a seção "Padrões de projeto", adaptada do template, foi trocada por um índice da documentação
-- [ ] Modificação no `components/ui/sidebar.tsx` (prop `iconClassName`); o resto do arquivo é shadcn
+- [x] Modificação no `components/ui/sidebar.tsx` (prop `iconClassName`): o arquivo foi removido junto com o dashboard
 
 ## 3. Não é do template
 
@@ -76,6 +76,5 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 | `services/db/index.ts` (singleton do Prisma) | documentação do Prisma |
 | `playwright.config.ts`, `web/.gitignore`, `eslint.config.mjs`, `postcss.config.mjs`, base do `tsconfig.json`, `next.config.ts` | gerados ou descritos pela documentação de Next, Playwright, Tailwind |
 | `package.json`, `.npmrc`, `pnpm-workspace.yaml`, `.vscode/settings.json` | configuração trivial |
-| `web/public/icons/google-logo.png` | marca do Google, uso permitido no botão de login com Google |
 | `design/` | material de design do projeto, exportado por ferramenta de design (`support.js` é o runtime da ferramenta; conferir se os termos permitem publicá-lo) |
 | `docs/*`, `AGENTS.md`, `CLAUDE.md`, `BuscaOngLogo.tsx`, `icon.svg`, tokens de cor | escritos para o BuscaONG |

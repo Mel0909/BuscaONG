@@ -63,7 +63,7 @@ O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e co
 
 | Item | Função |
 |---|---|
-| `bruno/` | Requisições prontas (auth, session, users) e ambientes Dev/Prod para testar a API no app [Bruno](https://www.usebruno.com/). Também documenta a API. |
+| `bruno/` | Requisições prontas (auth, ongs, denúncias, admin...) e ambientes Dev/Prod para testar a API no app [Bruno](https://www.usebruno.com/). Também documenta a API. |
 | `.vscode/settings.json` | Indentação de 2 espaços para todo o time. |
 | `README.md` | Para pessoas: o que é o projeto e como rodar. |
 | `docs/` | Documentação técnica do time (produto, arquitetura, padrões, git, bugs). |
@@ -76,7 +76,8 @@ O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e co
 web/
 ├── prisma/
 │   ├── schema.prisma    modelos do banco (MongoDB)
-│   └── seed.mts         listas fixas (causas, itens, atividades) e índice geográfico (pnpm db:seed)
+│   ├── seed.mts         listas fixas (causas, itens, atividades), índice geográfico e slug das ONGs publicadas sem slug (pnpm db:seed)
+│   └── criar-admin.mts  cria uma conta de admin pelo terminal (pnpm admin:criar)
 ├── public/              arquivos estáticos servidos na raiz do site (/favicon, /icons/...)
 ├── src/                 código do app (ver §4)
 ├── tests/
@@ -107,9 +108,10 @@ Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.
 | `test:e2e` / `test:complete` | Playwright / Vitest + Playwright |
 | `postinstall` | `prisma generate` (automático após `pnpm install`) |
 | `db:push` | `prisma db push`: cria coleções e índices únicos no MongoDB a partir do schema |
-| `db:seed` | preenche as listas fixas e cria o índice `2dsphere` (rodar depois do `db:push`; pode repetir) |
+| `db:seed` | preenche as listas fixas, cria os índices que o Prisma não declara (`2dsphere` da posição pública, slug único) e completa ONGs antigas (posição pública e slug). Rodar depois do `db:push` e a cada deploy que mudar o banco; pode repetir |
+| `admin:criar` | cria uma conta de admin (pergunta e-mail, nome e senha no terminal) |
 
-Da raiz, os principais têm atalho: `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint` (= `lint:check`), `pnpm lint:fix`, `pnpm test`, `pnpm test:e2e`, `pnpm db:push`, `pnpm db:seed`. Os demais: `pnpm --filter web <script>`.
+Da raiz, os principais têm atalho: `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint` (= `lint:check`), `pnpm lint:fix`, `pnpm test`, `pnpm test:e2e`, `pnpm db:push`, `pnpm db:seed`, `pnpm admin:criar`. Os demais: `pnpm --filter web <script>`.
 
 **Onde fica cada dependência:**
 - **`web/package.json`:** o que o site usa para funcionar (Next, React, Prisma Client, better-auth...) e as configs ligadas ao Next (`eslint-config-next`, `prisma` CLI, Tailwind, SVGR).
@@ -141,28 +143,38 @@ Tudo **fora** de `app/` é código comum, que as páginas importam; o Next não 
 src/
 ├── app/                          O QUE o site tem
 │   ├── (frontend)/               páginas
-│   │   ├── (landing-pages)/      /            (home)
-│   │   ├── (auth)/               /login, /logout
-│   │   │   └── login/_components/   componentes usados só no /login
-│   │   ├── admin/                /admin (login do admin), /admin/dashboard
+│   │   ├── (landing-pages)/      /            (tela principal: mapa, lista, busca e filtros)
+│   │   │   ├── _components/      TelaMapa (estado e layout), MapaOngs, ListaOngs, PainelFiltros...
+│   │   │   └── _actions/         chamadas à API pública e à busca de lugares do Mapbox
+│   │   ├── (auth)/               /login, /login/recuperar (esqueci a senha), /logout
+│   │   │   ├── _components/      moldura das telas de acesso da ONG
+│   │   │   └── login/            formulário de login e, em recuperar/, o código por e-mail e a senha nova
+│   │   ├── admin/                /admin (login da equipe)
+│   │   │   └── (area)/           /admin/ongs, /denuncias, /registro, /listas (A1 a A4), com a barra do admin
+│   │   │       ├── _components/  ficha da ONG (contatos, Receita × declarado, ações) e peças comuns (ui.tsx)
+│   │   │       ├── _actions/     chamadas às rotas /api/admin/*
+│   │   │       └── _utils/       carregarAdmin: exige a sessão de um admin (no servidor)
+│   │   ├── ong/[slug]/           /ong/<slug> (página pública da ONG, P5) e o formulário de denúncia (P5.1)
 │   │   ├── ong/cadastro/         /ong/cadastro/* (os 8 passos do cadastro da ONG, mais continuar e retomar)
-│   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx)
+│   │   │   ├── _components/      barra de passos, telas de cada passo, mapa e peças comuns (ui.tsx, modo.tsx)
 │   │   │   ├── _actions/         chamadas à API dos passos 3 a 8
-│   │   │   └── _utils/           carregarPasso: sessão, ONG e trava de passos (no servidor)
+│   │   │   └── _utils/           carregarPasso (sessão, ONG e trava de passos) e dadosDosPassos (dados iniciais de cada formulário)
+│   │   ├── ong/painel/           /ong/painel/* (O2/O3): início, itens e urgência, perfil público, voluntariado
+│   │   │   └── _utils/           carregarPainel: sessão da ONG publicada (no servidor)
 │   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
-│   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = passos 3 a 8 do cadastro
-│   │   ├── services/             acesso ao banco via Prisma (ongs/: conta e cadastro; listas/: listas fixas)
+│   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = cadastro e painel da ONG; GET ongs, ongs/mapa, ongs/busca e POST denuncias = área pública; admin/* = área admin
+│   │   ├── services/             acesso ao banco via Prisma (ongs/: conta, cadastro, área pública, página e urgências; listas/: listas fixas; denuncias/; admin/: ONGs, listas e registro de ações)
 │   │   └── schemas/              validação de entrada com Zod
 │   ├── layout.tsx                layout raiz (fontes, <html>, toasts)
 │   ├── globals.css               Tailwind, tokens de cor e fonte e estilos globais
 │   ├── icon.svg                  favicon (marca do BuscaONG; convenção do Next)
 │   └── not-found.tsx             404
 ├── components/                   peças visuais reutilizáveis
-│   ├── ui/                       shadcn/ui (button, input, sidebar, sheet, tooltip...)
-│   ├── base/                     componentes do projeto (ValidatedInput, BaseCheckbox, InitialNav...)
+│   ├── ui/                       shadcn/ui (button, input, sheet, tooltip...)
+│   ├── base/                     componentes do projeto: Dialogo (janela por cima da página)
+│   │   ├── campos/               CampoSenha (com o olho) e CampoCodigo (6 dígitos)
 │   │   └── brand/BuscaOngLogo.tsx   logo do BuscaONG (BuscaOngMark + BuscaOngLogo)
-│   ├── auth/                     peças de login usadas em mais de uma tela
 │   ├── ong/                      peças da ONG usadas em mais de uma tela (CartaoOng)
 │   └── common/                   globais (ToastProvider)
 ├── hooks/                        hooks React reutilizáveis (use-mobile)
@@ -171,12 +183,15 @@ src/
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
 │   ├── armazenamento/            URLs assinadas para enviar imagens ao Cloudflare R2
 │   ├── cadastro/                 limites e regras do cadastro usados no servidor e na tela (turnos, tipos de imagem)
+│   ├── mapa/                     filtros da área pública (e o formato deles na URL) e contas de geografia
+│   ├── ong/                      slug da página, urgência (prazos, "há 2 h") e botões de contato da página da ONG
+│   ├── denuncia/                 motivos da denúncia e limites (24 h por perfil, topo da fila)
 │   ├── cnpj/                     consulta de CNPJ (BrasilAPI → Minha Receita → OpenCNPJ)
 │   ├── email/                    envio via Resend (no terminal em dev) + templates de e-mail
 │   ├── geocodificacao/           endereço → coordenadas pelo Nominatim (fila de 1/s e cache)
 │   └── utils.ts                  cn() para combinar classes Tailwind
 ├── utils/                        funções auxiliares do projeto
-│   ├── api/server/               helpers das rotas: blockForbiddenRequests, exigirSessaoOng, getUserFromRequest, validBody, errorHandlers, rateLimit
+│   ├── api/server/               helpers das rotas: blockForbiddenRequests, exigirSessaoOng, exigirSessaoAdmin, getUserFromRequest, validBody, errorHandlers, rateLimit
 │   ├── api/toErrorMessage.ts     erro → texto legível
 │   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
 │   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
@@ -191,8 +206,9 @@ src/
 - **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha, e o plugin `customSession`, que coloca o `role` do usuário na sessão. É importado por páginas, rotas da API e pelo proxy.
 - **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
   - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
-  - **Precisa de `ADMIN`:** `/admin/**`.
-  - **Quem já está logado é redirecionado para `/`:** `/login`.
+  - **Precisa de `ADMIN`:** `/admin/**` (sem login, vai para `/admin`; admin logado em `/admin` vai para `/admin/ongs`).
+  - **Quem já está logado sai do `/login`:** admin para `/admin/ongs`, ONG para `/ong/painel` (que leva o cadastro não terminado ao passo em que parou).
+  - O painel da ONG (`/ong/painel`) e os passos do cadastro conferem a sessão na própria página (`carregarPainel`, `carregarPasso`).
   - O Next exige esse nome e esse local (no Next 16, `proxy.ts` substituiu o `middleware.ts`).
 
 ### 4.4 Aliases de import (`tsconfig.json`)
@@ -264,6 +280,5 @@ Os padrões de front-end estão em [padroes-frontend.md](padroes-frontend.md) e 
 
 ## 7. Inconsistências conhecidas (herdadas do template)
 
-- `app/(frontend)/admin/dashboard/components/` deveria ser `_components/` pela convenção do projeto. Funciona porque não há `page.tsx` dentro.
 - `app/(backend)/services/` e `schemas/` ficam dentro de `app/` sem serem rotas. É uma escolha do template para manter o back-end agrupado; funciona porque não têm `route.ts`.
 - Bugs de código (segurança e funcionalidade) estão em [erros-a-consertar.md](erros-a-consertar.md).

@@ -24,8 +24,12 @@ pnpm install
 Crie o arquivo `web/.env` a partir de `web/.env.example` e preencha as variáveis (URL do MongoDB, segredo do Better Auth etc.).
 
 ```bash
+pnpm db:push       # coleções e índices no MongoDB
+pnpm db:seed       # listas fixas (causas, itens, atividades) e índice geográfico
 pnpm dev
 ```
+
+A área admin (`/admin`) precisa de uma conta de admin, criada pelo terminal com `pnpm admin:criar`.
 
 ## Tecnologias
 

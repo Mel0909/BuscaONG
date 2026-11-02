@@ -53,7 +53,8 @@ pnpm test          # Vitest (integração)
 pnpm test:e2e      # Playwright (precisa do dev rodando)
 pnpm build         # build de produção
 pnpm db:push       # cria coleções e índices no MongoDB (precisa do DATABASE_URL)
-pnpm db:seed       # listas fixas (causas, itens, atividades) e índice geográfico
+pnpm db:seed       # listas fixas, índices (geográfico e slug único) e dados que faltam em ONGs antigas
+pnpm admin:criar   # cria uma conta de admin (pergunta e-mail, nome e senha)
 ```
 
 Ferramentas de desenvolvimento (TypeScript, ESLint, Vitest, Playwright...) ficam no `package.json` da **raiz**; dependências do app ficam em `web/package.json`. Instale cada uma no lugar certo (`pnpm add -Dw <pkg>` para a raiz, `pnpm --filter web add <pkg>` para o app).
