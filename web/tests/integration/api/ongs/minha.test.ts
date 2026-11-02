@@ -157,7 +157,7 @@ describe("rotas /api/ongs/minha/*", () => {
       expect(distancia).toBeLessThanOrEqual(0.401);
     });
 
-    it("salvar de novo o mesmo ponto mantém o sorteio; mudar o ponto sorteia outro", async () => {
+    it("ajustar o pin mantém o desvio sorteado; mudar para longe sorteia outro", async () => {
       const sorteada = { type: "Point", coordinates: [-46.637, -23.587] };
       db.ong.findUnique.mockResolvedValue(
         ongRascunho({ localizacao: { type: "Point", coordinates: [-46.6345, -23.5893] }, localizacaoPublica: sorteada, mostrarSoBairro: true }) as never
@@ -165,9 +165,20 @@ describe("rotas /api/ongs/minha/*", () => {
       await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true)));
       expect(publica()).toEqual(sorteada.coordinates);
 
+      // ~80 m para o sul: a posição pública anda junto, com o mesmo desvio (nada de amostra nova)
       db.ong.update.mockClear();
       await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true, -23.59)));
-      expect(publica()).not.toEqual(sorteada.coordinates);
+      const [lng, lat] = publica();
+      expect(lng).toBeCloseTo(-46.637, 9);
+      expect(lat).toBeCloseTo(-23.587 + (-23.59 - -23.5893), 9);
+
+      // ~1,2 km: outro endereço, outro sorteio, a 150-400 m do ponto novo
+      db.ong.update.mockClear();
+      await putLocalizacao(requisicao("PUT", "localizacao", corpoLocalizacao(true, -23.6)));
+      const [lngLonge, latLonge] = publica();
+      const distancia = distanciaKm({ latitude: -23.6, longitude: -46.6345 }, { latitude: latLonge, longitude: lngLonge });
+      expect(distancia).toBeGreaterThanOrEqual(0.149);
+      expect(distancia).toBeLessThanOrEqual(0.401);
     });
   });
 

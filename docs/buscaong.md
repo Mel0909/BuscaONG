@@ -63,7 +63,7 @@ Protótipo P1 a P4 (a página da ONG e a denúncia estão na §3.2). Fica em `ap
 **Privacidade:** a área pública só vê e só consulta a **posição pública** (`localizacaoPublica`): a real, ou, para ONG com "mostrar só o bairro", um ponto **sorteado** a 150-400 m do endereço quando a localização é salva (gerador criptográfico, guardado no banco). Assim:
 - a coordenada exata nunca sai da API e não dá para recalculá-la a partir de dados públicos (o desvio não depende do ID nem de nada visível);
 - filtrar ou ordenar pela posição real deixaria descobrir o endereço encolhendo a área do mapa ou movendo o ponto de referência, então nenhuma consulta pública usa `localizacao`;
-- salvar de novo o mesmo ponto mantém o sorteio (vários sorteios em volta do endereço permitiriam tirar a média).
+- ajustar o pin (até 1 km) mantém o desvio sorteado, e a posição pública só anda junto; sorteia de novo só quando a ONG liga "só o bairro" ou muda para longe (vários sorteios em volta do mesmo endereço permitiriam tirar a média).
 
 ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até lá, não aparecem no mapa.
 

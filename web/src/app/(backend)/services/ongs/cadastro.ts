@@ -11,7 +11,7 @@ import type {
 } from "@/backend/schemas";
 import { urlDeEnvio } from "@/lib/armazenamento";
 import { ATIVIDADE_OUTRA, calcularTurnos } from "@/lib/cadastro/voluntariado";
-import { posicaoAproximada } from "@/lib/mapa/geo";
+import { distanciaKm, posicaoAproximada } from "@/lib/mapa/geo";
 import { slugLivre } from "@/lib/ong/slug";
 import { itemLivre } from "@/lib/ong/urgencia";
 import { normalizarChave } from "@/utils/formatters/texto";
@@ -46,10 +46,14 @@ function proximoPasso(ong: Pick<Ong, "passoAtual">, passo: number) {
 
 const resumo = { id: true, status: true, passoAtual: true } as const;
 
+/** Até essa distância, mover o pin é ajuste do mesmo endereço: o desvio sorteado continua o mesmo. */
+const MESMO_LUGAR_KM = 1;
+
 /**
  * Posição que a área pública vê: a real, ou um ponto sorteado perto dela para quem mostra só o
- * bairro. Se o ponto e a escolha não mudaram, mantém o sorteio anterior: sortear de novo a cada
- * salvamento daria várias amostras em volta do endereço, e a média delas o revelaria.
+ * bairro. Ajustar o pin mantém o desvio sorteado antes (só desloca junto): sortear de novo a cada
+ * ajuste daria várias amostras em volta do endereço, e a média delas o revelaria. Sorteia de novo
+ * só quando a ONG liga "só o bairro" ou muda para longe.
  */
 export function posicaoPublica(
   ong: Pick<Ong, "localizacao" | "localizacaoPublica" | "mostrarSoBairro">,
@@ -57,9 +61,10 @@ export function posicaoPublica(
   mostrarSoBairro: boolean
 ) {
   if (!mostrarSoBairro) return { type: "Point", coordinates: [real.longitude, real.latitude] };
-  const [lngAntes, latAntes] = ong.localizacao?.coordinates ?? [];
-  if (ong.mostrarSoBairro && ong.localizacaoPublica && lngAntes === real.longitude && latAntes === real.latitude) {
-    return { type: "Point", coordinates: ong.localizacaoPublica.coordinates };
+  const antes = ong.localizacao?.coordinates;
+  const publica = ong.localizacaoPublica?.coordinates;
+  if (ong.mostrarSoBairro && antes && publica && distanciaKm({ longitude: antes[0], latitude: antes[1] }, real) < MESMO_LUGAR_KM) {
+    return { type: "Point", coordinates: [real.longitude + (publica[0] - antes[0]), real.latitude + (publica[1] - antes[1])] };
   }
   const aproximada = posicaoAproximada(real);
   return { type: "Point", coordinates: [aproximada.longitude, aproximada.latitude] };
