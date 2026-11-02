@@ -23,6 +23,8 @@ describe("slug da página da ONG", () => {
     const ocupados = new Set(["casa-lar", "casa-lar-2"]);
     expect(await slugLivre("Casa Lar", async (s) => ocupados.has(s))).toBe("casa-lar-3");
     expect(await slugLivre("Painel", async () => false)).toBe("painel-2");
+    // nome que vira um ID de ONG (24 caracteres hexadecimais) não pode tomar o link /ong/<id>
+    expect(await slugLivre("6ae67eea8cf900bcea8cfe24", async () => false)).toBe("6ae67eea8cf900bcea8cfe24-2");
   });
 
   it("reconhece IDs do MongoDB", () => {

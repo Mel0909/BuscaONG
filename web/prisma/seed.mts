@@ -111,7 +111,7 @@ try {
         .slice(0, 60)
         .replace(/-+$/, "") || "ong";
     let slug = base;
-    for (let n = 2; RESERVADOS.has(slug) || (await prisma.ong.findFirst({ where: { slug }, select: { id: true } })); n++) {
+    for (let n = 2; RESERVADOS.has(slug) || /^[a-f0-9]{24}$/.test(slug) || (await prisma.ong.findFirst({ where: { slug }, select: { id: true } })); n++) {
       slug = `${base}-${n}`;
     }
     await prisma.ong.update({ where: { id: ong.id }, data: { slug } });

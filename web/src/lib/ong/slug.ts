@@ -26,7 +26,8 @@ export async function slugLivre(nome: string, ocupado: (slug: string) => Promise
   const base = slugDoNome(nome);
   for (let n = 1; ; n++) {
     const candidato = n === 1 ? base : `${base}-${n}`;
-    if (SLUGS_RESERVADOS.has(candidato)) continue;
+    // um slug igual ao ID de outra ONG tomaria o link antigo /ong/<id> dela
+    if (SLUGS_RESERVADOS.has(candidato) || ehObjectId(candidato)) continue;
     if (!(await ocupado(candidato))) return candidato;
   }
 }
