@@ -370,6 +370,10 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **Selo de CNPJ verificado:** exibir ou não.
 - **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).
 - **Representação da ONG:** reiniciar agora exige sessão e posse do e-mail já vinculado, mas o primeiro cadastro ainda não comprova que a pessoa representa a entidade. Ver junto com o selo de CNPJ verificado e o admin.
+- **CNPJ preso por um rascunho sem e-mail confirmado:** sem o "Começar de novo" público, um rascunho cujo e-mail nunca foi confirmado (e-mail digitado errado, ou alguém que ocupou o CNPJ com um e-mail descartável) não tem saída: o código vai para um endereço que a ONG não controla, e reiniciar exige login. Falta decidir a saída (ex.: o `POST /api/ongs` substituir o rascunho quando a conta dele nunca confirmou o e-mail e já passou a validade do código; ou o admin liberar o CNPJ).
+- **Tempo de resposta do "esqueci a senha":** a resposta é a mesma com ou sem conta, mas quem tem conta espera o envio do e-mail (centenas de ms a mais). Baixa gravidade, porque o `POST /api/ongs` já diz quando um e-mail tem conta. Para fechar: enviar o e-mail em segundo plano (`advanced.backgroundTasks` do better-auth com o `after()` do Next).
+- **Nomes das listas em cache por instância:** depois que o admin renomeia ou unifica uma opção (A4), as outras instâncias da Vercel mostram o nome antigo por até 5 minutos.
+- **E-mail de quem denuncia não é confirmado:** dá para informar o e-mail de outra pessoa, que depois recebe o aviso da decisão (com o nome da ONG). Limitado a 10 denúncias por hora por IP, e o aviso só sai depois da decisão do admin.
 - **Rascunhos abandonados:** ficam no banco até alguém continuar ou recomeçar. Apagar sozinho depois de um tempo (ex.: 30 dias, com cron da Vercel) foi deixado para depois.
 - **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
 - **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
