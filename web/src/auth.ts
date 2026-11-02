@@ -30,18 +30,8 @@ export const auth = betterAuth({
       enabled: true,
       requireEmailVerification: true,
       minPasswordLength: 8,
-      // sendResetPassword: async ({ user, url /*, token*/ }, ) => {
-        // // url already includes the reset token; just email it.
-        // await sendEmail({
-          // to: user.email,
-          // subject: "Reset your password",
-          // react: ResetPasswordEmail({ name: user.name, resetUrl: url }),
-        // });
-      // },
-      // // optional: runs after a successful reset
-      // onPasswordReset: async ({ user }) => {
-        // console.log("Password reset for:", user.email);
-      // },
+      // "esqueci a senha" usa código por e-mail (emailOTP, tipo forget-password), não link:
+      // tela /login/recuperar
     },
     user: {
         deleteUser: { 

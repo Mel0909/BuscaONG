@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth-client";
-import { CampoCodigo } from "./CampoCodigo";
-import { CampoSenha } from "./CampoSenha";
+import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
+import { CampoSenha } from "@/components/base/campos/CampoSenha";
 import { CabecalhoPasso, estiloBotaoPrimario, estiloCampo, estiloRotulo, FormularioPasso, MensagemErro } from "./ui";
 
 const ESPERA_REENVIO_MS = 60_000;

@@ -70,7 +70,9 @@ export async function proxy(request: NextRequest) {
   
   if (matchesAnyPattern(pathname, ROUTE_CONFIG.redirectIfAuth)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/", request.url));
+      // quem já entrou vai para a própria área (o painel leva o cadastro não terminado ao passo em que parou)
+      const destino = hasRequiredRole(userRole, ["ADMIN"]) ? "/admin/dashboard" : "/ong/painel";
+      return NextResponse.redirect(new URL(destino, request.url));
     }
     return NextResponse.next();
   }

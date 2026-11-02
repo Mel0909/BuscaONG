@@ -1,20 +1,17 @@
-import LoginForm from './_components/LoginForm';
-import BuscaOngLogo from '@/components/base/brand/BuscaOngLogo';
+import type { Metadata } from "next";
 
-function LoginPage() {
+import { MolduraAuth } from "../_components/MolduraAuth";
+import { LoginForm } from "./_components/LoginForm";
+
+export const metadata: Metadata = {
+  title: "Entrar · BuscaONG",
+};
+
+// login da ONG (o admin entra por /admin)
+export default function LoginPage() {
   return (
-    <main className="lg:h-screen flex">
-      <div className="w-[55%] h-full flex flex-col gap-8 items-center justify-center">
-        <LoginForm />
-      </div>
-
-      <div className="login-background h-full w-[45%] flex flex-col items-center py-32">
-        <h1>
-          <BuscaOngLogo size={80} variant="dark" />
-        </h1>
-      </div>
-    </main>
-   );
+    <MolduraAuth titulo="Entrar no painel" subtitulo="Para ONGs já cadastradas no BuscaONG.">
+      <LoginForm />
+    </MolduraAuth>
+  );
 }
-
-export default LoginPage;
