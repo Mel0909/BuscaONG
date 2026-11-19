@@ -29,7 +29,7 @@ export function LoginAdmin() {
     }
 
     const { data } = await authClient.getSession();
-    if (data?.role !== "ADMIN") {
+    if (data?.user.role !== "ADMIN") {
       await authClient.signOut();
       setEnviando(false);
       setErro("Esta conta não é de admin. ONGs entram pelo painel da ONG, em /login.");

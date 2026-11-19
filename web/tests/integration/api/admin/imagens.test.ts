@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { apagarArquivo } from "@/lib/armazenamento";
 import { sendEmail } from "@/lib/email";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -48,7 +48,7 @@ const patch = (body: unknown) =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  setCurrentRole("ADMIN");
+  entrarComo("ADMIN");
   db.ong.findUnique.mockResolvedValue(ong() as never);
   db.$runCommandRaw.mockResolvedValue({ n: 1, ok: 1 } as never);
   db.ong.updateMany.mockResolvedValue({ count: 1 } as never);
@@ -58,9 +58,9 @@ beforeEach(() => {
 
 describe("PATCH /api/admin/imagens (A5)", () => {
   it("401 sem login e 403 para conta de ONG", async () => {
-    setCurrentRole(null);
+    entrarComo(null);
     expect((await patch({ acao: "APROVAR", ongId: ID, tipo: "logo", chave: LOGO })).status).toBe(401);
-    setCurrentRole("ONG");
+    entrarComo("ONG");
     expect((await patch({ acao: "APROVAR", ongId: ID, tipo: "logo", chave: LOGO })).status).toBe(403);
     expect(db.$runCommandRaw).not.toHaveBeenCalled();
   });

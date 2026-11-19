@@ -3,9 +3,8 @@ import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./app/(backend)/services/db";
 
-import { customSession, emailOTP } from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins";
 import { createAuthMiddleware } from "better-auth/api";
-import { getUserRole } from "@/backend/services/auth";
 import { sendEmail } from "./lib/email";
 import { codigoVerificacaoEmail } from "./lib/email/templates/codigoVerificacao";
 import { validarRequisicaoAuth } from "./lib/auth-hooks";
@@ -58,6 +57,17 @@ export const auth = betterAuth({
       // rotas /api/password/forgot e /api/password/reset
     },
     user: {
+        // perfil da conta (enum Role do schema.prisma). Vem junto com a sessão, sem outra consulta,
+        // em session.user.role. input: false: o perfil nunca vem da requisição (no cadastro vira
+        // sempre ONG; o update-user recusa). Só o servidor o muda (ex.: pnpm admin:criar).
+        additionalFields: {
+            role: {
+                type: ["ONG", "ADMIN"],
+                required: true,
+                defaultValue: "ONG",
+                input: false,
+            },
+        },
         // nenhuma tela apaga a própria conta; a exclusão é do admin (ver disabledPaths acima)
         deleteUser: {
             enabled: false
@@ -87,14 +97,6 @@ export const auth = betterAuth({
             async sendVerificationOTP({ email, otp, type }) {
                 await sendEmail(codigoVerificacaoEmail(email, otp, type, OTP_VALIDADE_SEGUNDOS / 60));
             },
-        }),
-        customSession(async ({ user, session }) => {
-            const role = await getUserRole(session.userId);
-            return {
-                role,
-                user,
-                session
-            };
         }),
         nextCookies(),
     ],

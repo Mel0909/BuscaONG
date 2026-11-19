@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { itemParecido } from "@/backend/services/admin";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -37,7 +37,7 @@ const acao = () => db.acaoAdmin.create.mock.calls[0][0].data;
 describe("rotas do admin: listas fixas (A4)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    setCurrentRole("ADMIN");
+    entrarComo("ADMIN");
     db.opcaoLista.findMany.mockResolvedValue([opcao(A, "fraldas", "Fraldas")] as never);
     db.opcaoLista.findUnique.mockResolvedValue(null as never);
     db.opcaoLista.create.mockImplementation((async (args: { data: Record<string, unknown> }) => ({ id: B, ...args.data })) as never);
@@ -165,7 +165,7 @@ describe("rotas do admin: listas fixas (A4)", () => {
   });
 
   it("403 para conta de ONG", async () => {
-    setCurrentRole("ONG");
+    entrarComo("ONG");
     expect((await criar(requisicao("POST", { tipo: "ITEM", nome: "Algo" }), contexto())).status).toBe(403);
   });
 });

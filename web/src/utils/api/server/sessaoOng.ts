@@ -14,7 +14,7 @@ export async function exigirSessaoOng(request: NextRequest): Promise<SessaoOng |
   if (!session?.user) {
     return erroJson(401, "Faça login para continuar");
   }
-  if (session.role !== "ONG") {
+  if (session.user.role !== "ONG") {
     return erroJson(403, "Acesso negado - Permissões insuficientes");
   }
 

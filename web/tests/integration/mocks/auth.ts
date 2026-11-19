@@ -1,49 +1,29 @@
-import { vi } from 'vitest';
-import { Role } from '@/generated/prisma';
+import { vi } from "vitest";
+import type { Role } from "@/generated/prisma";
 
-let currentRole: Role | null = null
-let currentUser: any = null
-let currentSession: any = null
+// Sessão falsa para os testes de rota (o setup.ts troca o @/auth por este mock).
+// entrarComo("ONG" | "ADMIN") simula uma conta logada com esse perfil; entrarComo(null), ninguém.
+// O formato é o de auth.api.getSession: o perfil vem em user.role (additionalFields do better-auth).
 
-export const getCurrentRole = () => currentRole;
+export const USUARIO_DE_TESTE = { id: "test-user-id", email: "test@example.com", name: "Test User" };
 
-export const setCurrentRole = (role: Role | null) => {
-  currentRole = role
-  
-  if (role) {
-    currentUser = {
-      id: 'test-user-id',
-      email: 'test@example.com',
-      name: 'Test User'
-    }
-    currentSession = {
-      id: 'test-session-id',
-      userId: 'test-user-id',
-      expiresAt: new Date(Date.now() + 864000),
-      token: 'test-token'
-    }
-  } else {
-    currentUser = null
-    currentSession = null
-  }
+type Sessao = {
+  user: typeof USUARIO_DE_TESTE & { role: Role };
+  session: { id: string; userId: string; token: string; expiresAt: Date };
+};
+
+let sessao: Sessao | null = null;
+
+export function entrarComo(perfil: Role | null) {
+  sessao = perfil && {
+    user: { ...USUARIO_DE_TESTE, role: perfil },
+    session: { id: "test-session-id", userId: USUARIO_DE_TESTE.id, token: "test-token", expiresAt: new Date(Date.now() + 86_400_000) },
+  };
 }
 
 export const mockAuth = {
   api: {
-    getSession: vi.fn().mockImplementation(() => {
-      if (!currentSession) {
-        return Promise.resolve({ data: null, error: null })
-      }
-      
-      return Promise.resolve({
-          user: currentUser,
-          session: currentSession,
-          role: currentRole
-      })
-    })
-  }
-}
-
-export const mockGetUserRole = vi.fn().mockImplementation(() => {
-  return Promise.resolve(currentRole)
-})
+    // sem sessão, o better-auth devolve null
+    getSession: vi.fn(async () => sessao),
+  },
+};

@@ -20,7 +20,7 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 - [x] `app/(backend)/api/users/**` (listagem, conta por ID, troca de e-mail e senha): removidas, sem uso nas telas
 - [x] `app/(backend)/api/password/forgot`, `reset`: reescritas para recuperação por código via better-auth, com validação, limites e testes
 - [ ] `app/(backend)/schemas/base.schema.ts` (`auth.schema.ts`, `nameSchema` e `corSchema` foram removidos)
-- [ ] `app/(backend)/services/auth/user.ts` (`services/users/*` e o `comparePassword` com bcrypt foram removidos)
+- [x] `app/(backend)/services/auth/*`: `getUserRole` saiu com o `customSession`; `services/users/*` e o `comparePassword` com bcrypt também foram removidos. Fica só `recuperacao.ts`, escrito para o BuscaONG
 - [x] `app/(backend)/README.md` (removido; o conteúdo está em [padroes-api.md](padroes-api.md))
 
 Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-consertar.md).
@@ -47,7 +47,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [ ] `utils/validations/index.ts` (`hasUppercase` e afins; `zod.ts` e `isSafeRedirect` foram removidos)
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
-- [ ] `auth.ts`: a configuração em si segue a documentação do better-auth. O plugin `customSession` com role é do template.
+- [x] `auth.ts`: a configuração segue a documentação do better-auth. O plugin `customSession` do template deu lugar ao `user.additionalFields.role`
 - [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend
 
 ### Estilos

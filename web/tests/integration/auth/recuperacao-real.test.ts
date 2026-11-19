@@ -8,7 +8,6 @@ import { resetRateLimit } from "@/utils/api/server/rateLimit";
 // Exercita os endpoints reais e a configuração do app, isolando apenas banco e envio.
 vi.unmock("@/auth");
 vi.mock("@/backend/services/db", () => ({ default: {} }));
-vi.mock("@/backend/services/auth", () => ({ getUserRole: async () => "ONG" }));
 vi.mock("@/lib/email", () => ({ sendEmail: vi.fn() }));
 
 const email = "ong@example.com";
@@ -186,6 +185,28 @@ describe("códigos reais do better-auth", () => {
     expect(resposta.status).toBe(400);
     expect(vi.mocked(sendEmail).mock.calls).toHaveLength(enviosAntes);
     expect(storage.user.map((u) => u.email)).toEqual([email]);
+  });
+
+  it("o perfil vem na sessão, e nenhuma rota deixa a conta escolher o próprio", async () => {
+    // no cadastro, o perfil enviado é trocado pelo padrão (ONG)
+    await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123", role: "ADMIN" } as never });
+    expect(storage.user[0].role).toBe("ONG");
+    await real.api.verifyEmailOTP({ body: { email, otp: ultimoCodigo() } });
+    const login = await real.api.signInEmail({ body: { email, password: "Senha123" }, returnHeaders: true });
+    const cookie = login.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
+
+    const sessao = await real.api.getSession({ headers: new Headers({ cookie }) });
+    expect(sessao?.user.role).toBe("ONG");
+
+    const resposta = await real.handler(
+      new Request("http://localhost:3000/api/auth/update-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: cookie },
+        body: JSON.stringify({ role: "ADMIN" }),
+      })
+    );
+    expect(resposta.status).toBe(400);
+    expect(storage.user[0].role).toBe("ONG");
   });
 
   it("GET /api/auth/verify-email (confirmação por link) fica fechado pelo HTTP", async () => {

@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { Prisma } from "@/generated/prisma";
 import { distanciaKm } from "@/lib/mapa/geo";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 import { resetRateLimit } from "@/utils/api/server/rateLimit";
 
 vi.mock("@/backend/services/db", () => ({
@@ -70,7 +70,7 @@ describe("rotas /api/ongs/minha/*", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetRateLimit();
-    setCurrentRole("ONG");
+    entrarComo("ONG");
     db.ong.findUnique.mockResolvedValue(ongRascunho() as never);
     db.ong.update.mockImplementation((async (args: { data: Record<string, unknown> }) => ({
       id: ONG_ID,
@@ -87,14 +87,14 @@ describe("rotas /api/ongs/minha/*", () => {
     };
 
     it("401 sem login", async () => {
-      setCurrentRole(null);
+      entrarComo(null);
       const response = await putLocalizacao(requisicao("PUT", "localizacao", corpo));
       expect(response.status).toBe(401);
       expect(db.ong.update).not.toHaveBeenCalled();
     });
 
     it("403 para admin (só a conta da ONG mexe no cadastro)", async () => {
-      setCurrentRole("ADMIN");
+      entrarComo("ADMIN");
       const response = await putLocalizacao(requisicao("PUT", "localizacao", corpo));
       expect(response.status).toBe(403);
     });
