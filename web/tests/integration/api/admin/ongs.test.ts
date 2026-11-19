@@ -169,6 +169,23 @@ describe("rotas do admin: ONGs e denúncias", () => {
     expect(db.acaoAdmin.create.mock.calls[0][0].data).toMatchObject({ tipo: "REVALIDOU_CNPJ", motivo: "Situação mudou: Ativa → Baixada" });
   });
 
+  it("revalidar registra também a mudança de natureza jurídica", async () => {
+    vi.mocked(lookupCnpj).mockResolvedValue({
+      cnpj: "12345678000195",
+      razaoSocial: "ASSOCIACAO CASA LAR",
+      nomeFantasia: null,
+      situacaoCadastral: "ATIVA",
+      naturezaJuridica: { codigo: "3131", descricao: "Entidade Sindical" },
+      endereco: { tipoLogradouro: null, logradouro: null, numero: null, complemento: null, bairro: null, municipio: "SAO PAULO", uf: "SP", cep: null },
+      fonte: "brasilapi",
+    });
+
+    await revalidar(requisicao("POST", `ongs/${ID}/revalidacao`), contexto({ id: ID }));
+
+    expect(db.ong.update.mock.calls[0][0].data).toMatchObject({ naturezaJuridica: "3131" });
+    expect(db.acaoAdmin.create.mock.calls[0][0].data.motivo).toBe("Situação: Ativa · Natureza mudou: 399-9 → 313-1");
+  });
+
   describe("PATCH /api/admin/denuncias", () => {
     it("arquiva as denúncias abertas do motivo, avisa quem deixou e-mail e registra", async () => {
       db.denuncia.findMany.mockResolvedValue([{ id: "d1", email: "a@b.com" }, { id: "d2", email: "a@b.com" }, { id: "d3", email: null }] as never);

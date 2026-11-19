@@ -2,7 +2,7 @@ import prisma from "@/backend/services/db";
 import { avisarDenunciantes, resolverDenuncias, textoDoGrupo } from "@/backend/services/denuncias";
 import type { FiltroOngsAdmin } from "@/backend/schemas";
 import type { MotivoDenuncia, Ong, OngStatus, Prisma } from "@/generated/prisma";
-import { lookupCnpj } from "@/lib/cnpj";
+import { lookupCnpj, type CnpjData } from "@/lib/cnpj";
 import { NATUREZAS_RECUSADAS, naturezaAceita } from "@/lib/cnpj/naturezas";
 import { nomeDoMotivo } from "@/lib/denuncia/motivos";
 import { sendEmail } from "@/lib/email";
@@ -274,27 +274,45 @@ export async function excluirOng(autor: NonNullable<Autor>, id: string, motivo: 
   return { id };
 }
 
+/**
+ * Guarda o que a Receita diz agora (situação, natureza e endereço) e descreve a mudança para o
+ * registro. Usada pelo "Revalidar" da ficha e pela revalidação periódica (sistema).
+ */
+export async function aplicarConsultaReceita(
+  ong: Pick<Ong, "id" | "situacaoCadastral" | "naturezaJuridica">,
+  receita: CnpjData,
+  agora = new Date()
+) {
+  const natureza = receita.naturezaJuridica.codigo ?? ong.naturezaJuridica;
+  await prisma.ong.update({
+    where: { id: ong.id },
+    data: {
+      situacaoCadastral: receita.situacaoCadastral,
+      naturezaJuridica: natureza,
+      enderecoReceita: receita.endereco,
+      receitaConsultadaEm: agora,
+    },
+  });
+
+  const mudouSituacao = receita.situacaoCadastral !== ong.situacaoCadastral;
+  const mudouNatureza = natureza !== ong.naturezaJuridica;
+  const partes = [
+    mudouSituacao
+      ? `Situação mudou: ${capitalizarNome(ong.situacaoCadastral)} → ${capitalizarNome(receita.situacaoCadastral)}`
+      : `Situação: ${capitalizarNome(receita.situacaoCadastral)}`,
+    ...(mudouNatureza
+      ? [`Natureza mudou: ${formatarNaturezaJuridica(ong.naturezaJuridica)} → ${formatarNaturezaJuridica(natureza)}`]
+      : []),
+  ];
+  return { mudou: mudouSituacao || mudouNatureza, motivo: partes.join(" · ") };
+}
+
 /** Consulta o CNPJ de novo na Receita e guarda a situação, a natureza e o endereço atuais. */
 export async function revalidarCnpj(autor: NonNullable<Autor>, id: string) {
   const ong = await ongComEmail(id);
   const receita = await lookupCnpj(ong.cnpj);
-
-  await prisma.ong.update({
-    where: { id },
-    data: {
-      situacaoCadastral: receita.situacaoCadastral,
-      naturezaJuridica: receita.naturezaJuridica.codigo ?? ong.naturezaJuridica,
-      enderecoReceita: receita.endereco,
-      receitaConsultadaEm: new Date(),
-    },
-  });
-  const mudou = receita.situacaoCadastral !== ong.situacaoCadastral;
-  await registrarAcao(autor, "REVALIDOU_CNPJ", nomeDa(ong), {
-    alvoId: id,
-    motivo: mudou
-      ? `Situação mudou: ${capitalizarNome(ong.situacaoCadastral)} → ${capitalizarNome(receita.situacaoCadastral)}`
-      : `Situação: ${capitalizarNome(receita.situacaoCadastral)}`,
-  });
+  const { motivo } = await aplicarConsultaReceita(ong, receita);
+  await registrarAcao(autor, "REVALIDOU_CNPJ", nomeDa(ong), { alvoId: id, motivo });
   return fichaOngAdmin(id);
 }
 
