@@ -95,7 +95,6 @@ As rotas `/api/ongs/minha/reinicio` e `/codigo` exigem sessão ONG, origem do si
 |---|---|
 | `BETTER_AUTH_SECRET` | assina sessões e tokens; obrigatória em produção (`openssl rand -base64 32`) |
 | `BETTER_AUTH_URL` | URL base do site; usada nos links de e-mail |
-| `GOOGLE_ID`, `GOOGLE_SECRET` | só se o login com Google for ativado (bug #8) |
 
 ## 7. Consumo de códigos sob concorrência
 

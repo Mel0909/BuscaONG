@@ -78,13 +78,6 @@ export const auth = betterAuth({
             enabled: false,
         }
     },
-    // Descomente abaixo para ativar o provedor social google e login com google funcionar
-    // socialProviders: { 
-    //     google: { 
-    //        clientId: process.env.GOOGLE_ID as string, 
-    //        clientSecret: process.env.GOOGLE_SECRET as string, 
-    //     }, 
-    // }, 
     plugins: [
         // a verificação de e-mail usa código (OTP) em vez de link
         emailOTP({
