@@ -33,12 +33,15 @@ export const NOME_DA_ACAO: Record<TipoAcao, string> = {
   ADICIONOU_ITEM_LIVRE: "Adicionou item à lista",
   UNIFICOU_ITEM_LIVRE: "Unificou texto livre",
   MANTEVE_ITEM_LIVRE: "Manteve texto livre",
+  APROVOU_IMAGEM: "Aprovou imagem",
+  REMOVEU_IMAGEM: "Removeu imagem",
 };
 
 const TIPOS_DA_CATEGORIA: Record<Exclude<CategoriaAcao, "todas" | "sistema">, TipoAcao[]> = {
   suspensoes: ["SUSPENDEU_ONG", "REATIVOU_ONG"],
   exclusoes: ["EXCLUIU_ONG"],
   denuncias: ["ARQUIVOU_DENUNCIA"],
+  imagens: ["APROVOU_IMAGEM", "REMOVEU_IMAGEM"],
   listas: [
     "ADICIONOU_OPCAO",
     "EDITOU_OPCAO",

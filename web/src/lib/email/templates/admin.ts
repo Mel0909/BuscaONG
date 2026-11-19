@@ -35,6 +35,15 @@ export function reativacaoOngEmail(to: string, ongNome: string): Email {
   ]);
 }
 
+export function imagemRemovidaEmail(to: string, ongNome: string, tipo: "logo" | "capa", motivo: string): Email {
+  const qual = tipo === "logo" ? "a logo" : "a foto de capa";
+  return montar(to, `A equipe removeu ${qual} do perfil`, [
+    `A equipe do BuscaONG removeu ${qual} do perfil de ${ongNome}. O perfil continua no ar.`,
+    `Motivo: ${motivo}`,
+    "Vocês podem enviar outra imagem pelo painel, em Perfil público. Se acham que foi um engano, respondam este e-mail.",
+  ]);
+}
+
 const DECISOES = {
   arquivada: "A equipe analisou o perfil e não encontrou motivo para retirá-lo do ar. A denúncia foi arquivada.",
   suspensa: "A equipe analisou o perfil e o retirou do ar.",

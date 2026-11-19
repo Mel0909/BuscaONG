@@ -1,0 +1,27 @@
+meta {
+  name: revisar imagem
+  type: http
+  seq: 12
+}
+
+patch {
+  url: {{baseUrl}}/{{folder}}/imagens
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "acao": "REMOVER",
+    "ongId": "6ae67eea8cf900bcea8cfe24",
+    "tipo": "logo",
+    "chave": "ongs/6ae67eea8cf900bcea8cfe24/logo-0b6f3c1e-5d2a-4c8b-9e7f-1a2b3c4d5e6f.png",
+    "motivo": "Imagem inadequada"
+  }
+}
+
+docs {
+  A5: "ok" (acao APROVAR, sem motivo) ou remover (acao REMOVER, com motivo) a logo ou a capa nova de uma ONG.
+  A chave é a imagem que o admin viu: se a ONG trocou depois, responde 409. Remover apaga o arquivo do R2,
+  avisa a ONG por e-mail e vai para o registro. Devolve { ok: true }.
+}

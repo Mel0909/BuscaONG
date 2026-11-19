@@ -282,6 +282,8 @@ enum TipoAcao {
   ADICIONOU_ITEM_LIVRE // texto livre virou item da lista
   UNIFICOU_ITEM_LIVRE // texto livre passou para um item da lista
   MANTEVE_ITEM_LIVRE
+  APROVOU_IMAGEM // revisão de imagens (A5): "ok" na logo ou na capa nova
+  REMOVEU_IMAGEM
 }
 
 // registro de ações (A3): só se cria, nunca se edita nem apaga
