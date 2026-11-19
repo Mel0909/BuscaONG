@@ -159,6 +159,10 @@ model Ong {
   sobre          String?
   logo           String? // chave do arquivo no R2
   capa           String? // chave do arquivo no R2
+  // revisão das imagens pelo admin (A5): a imagem aparece na hora e o admin dá "ok" depois.
+  // Vazio ou false = imagem nova, ainda não vista (as imagens anteriores à revisão também entram).
+  logoRevisada   Boolean?
+  capaRevisada   Boolean?
 
   // passo 8: publicação
   termosAceitosEm DateTime?

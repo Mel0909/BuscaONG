@@ -227,14 +227,16 @@ export async function criarEnvioImagem(userId: string, { tipo, contentType, tama
 export async function salvarApresentacao(userId: string, dados: ApresentacaoData) {
   const ong = await ongDoUsuario(userId);
 
+  // imagem nova aparece na hora e entra na revisão do admin (A5); tirada, sai da revisão
+  const revisao: { logoRevisada?: boolean | null; capaRevisada?: boolean | null } = {};
   for (const campo of ["logo", "capa"] as const) {
     const chave = dados[campo];
-    if (chave && chave !== ong[campo] && !chaveDaOng(ong.id, campo, chave)) {
-      throw new ImagemInvalidaError(campo);
-    }
+    if (chave === ong[campo]) continue;
+    if (chave && !chaveDaOng(ong.id, campo, chave)) throw new ImagemInvalidaError(campo);
+    revisao[`${campo}Revisada`] = chave ? false : null;
   }
 
-  return atualizarCadastro(ong, { ...dados, passoAtual: proximoPasso(ong, 7) });
+  return atualizarCadastro(ong, { ...dados, ...revisao, passoAtual: proximoPasso(ong, 7) });
 }
 
 /** O que ainda falta para publicar (vazio = pode publicar). Também alimenta a lista do passo 8. */
