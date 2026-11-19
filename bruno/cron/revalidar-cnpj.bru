@@ -1,0 +1,22 @@
+meta {
+  name: revalidar cnpj
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/{{folder}}/revalidacao-cnpj
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{cronSecret}}
+}
+
+docs {
+  Rotina diária da Vercel (web/vercel.json). Consulta de novo o CNPJ das 10 ONGs (publicadas ou suspensas)
+  com a consulta à Receita mais antiga, há mais de 30 dias, e registra como "sistema" só o que mudou.
+  Exige o CRON_SECRET do web/.env no header (defina a variável secreta cronSecret no ambiente do Bruno);
+  sem o segredo configurado no servidor, responde 503. Resposta: { consultadas, mudaram, naoEncontradas, interrompida }.
+}
