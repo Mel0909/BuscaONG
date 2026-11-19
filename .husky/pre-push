@@ -1,32 +1,17 @@
-# Bloqueia push direto na main (ver docs/git.md)
-while read -r local_ref local_sha remote_ref remote_sha; do
-  if [ "$remote_ref" = "refs/heads/main" ]; then
+# Antes de cada push (docs/git.md §7): nada direto na main e, se a branch mexe no app (web/),
+# o lint sem erros. Build e e2e são lentos e ficam para antes de abrir o PR (docs/git.md §6).
+
+# o git manda uma linha por ref enviada: <ref local> <sha local> <ref remota> <sha remoto>
+while read -r _ _ ref_remota _; do
+  if [ "$ref_remota" = "refs/heads/main" ]; then
     echo "Push direto na main não é permitido. Envie a branch e abra um PR."
     exit 1
   fi
 done
 
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-# Verifica se o branch remoto existe. Se não existir, não usa origin/BRANCH no diff.
-if git show-ref --verify --quiet refs/remotes/origin/"$BRANCH"; then
-  CHANGED_FILES=$(git diff --name-only origin/"$BRANCH")
-else
-  CHANGED_FILES=$(git diff --name-only)
-fi
-
-# Check if any changed file is under the web/ folder
-if echo "$CHANGED_FILES" | grep -q "^web/"; then
-  echo "Detected changes in /web. Running lint..."
-  pnpm --filter web lint || exit 1
-
-  if [ "$BRANCH" = "main" ]; then
-    echo "You're on branch 'main'. Running web build and tests..."
-    pnpm --filter web test:e2e || exit 1
-    pnpm --filter web build || exit 1
-  else
-    echo "Not on 'main' branch. Skipping web build/tests."
-  fi
-else
-  echo "No changes in /web. Skipping lint and build steps."
+# o que a branch muda desde que saiu da main; sem a main remota, confere tudo
+base=$(git merge-base HEAD origin/main 2>/dev/null)
+if [ -z "$base" ] || git diff --name-only "$base" HEAD | grep -q "^web/"; then
+  echo "A branch mexe em web/: conferindo o lint (pnpm --filter web lint:check)"
+  pnpm --filter web lint:check || exit 1
 fi

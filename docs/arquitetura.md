@@ -55,7 +55,7 @@ Hooks do git, válidos para o repositório inteiro (por isso ficam na raiz, onde
 |---|---|---|
 | `pre-commit` | antes de cada commit | bloqueia commit na `main` e valida o nome da branch; se há arquivos de `web/` no stage, `pnpm --filter web test` |
 | `commit-msg` | ao escrever a mensagem | valida a mensagem com o commitlint |
-| `pre-push` | antes de cada push | bloqueia push para a `main`; se há mudanças em `web/`, `lint` |
+| `pre-push` | antes de cada push | bloqueia push para a `main`; se a branch mexe em `web/` desde que saiu da `main`, `lint:check` (sem `--fix`, para não mudar arquivos na hora do push) |
 
 O workflow `.github/workflows/convencoes.yml` repete as checagens de branch e commit no servidor e valida o título do PR. Regras completas em [git.md](git.md).
 
