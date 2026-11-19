@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 
+/** Um e-mail do site. O texto puro vai sempre (leitor de tela, cliente sem HTML); o HTML é opcional. */
 export type Email = {
   to: string;
   subject: string;
@@ -7,34 +8,33 @@ export type Email = {
   html?: string;
 };
 
-let client: Resend | null = null;
+/** Remetente de teste do Resend. Em produção, o build exige EMAIL_FROM (lib/ambiente.ts). */
+const REMETENTE_DE_TESTE = "BuscaONG <onboarding@resend.dev>";
+
+let resend: Resend | undefined;
 
 /**
- * Envia um e-mail pelo Resend (RESEND_API_KEY e EMAIL_FROM no .env).
- * Em desenvolvimento, sem RESEND_API_KEY, só escreve o e-mail no terminal,
- * para dar para testar fluxos como o código de verificação sem configurar nada.
+ * Envia pelo Resend (https://resend.com/docs/send-with-nodejs). Se o Resend recusar, lança erro, e
+ * quem chama decide: o código de verificação precisa falhar junto; os avisos da equipe só registram.
+ * Fora de produção, sem RESEND_API_KEY, escreve o e-mail no terminal em vez de enviar (dá para
+ * testar o cadastro e a recuperação de senha sem configurar nada).
  */
-export async function sendEmail(email: Email): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-
-  if (!apiKey) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("RESEND_API_KEY não configurada");
-    }
-    console.info(`\n[email] para: ${email.to}\n[email] assunto: ${email.subject}\n${email.text}\n`);
+export async function sendEmail({ to, subject, text, html }: Email): Promise<void> {
+  const chave = process.env.RESEND_API_KEY;
+  if (!chave) {
+    if (process.env.NODE_ENV === "production") throw new Error("RESEND_API_KEY não configurada");
+    console.info(`\n[e-mail não enviado: sem RESEND_API_KEY]\npara: ${to}\nassunto: ${subject}\n\n${text}\n`);
     return;
   }
 
-  client ??= new Resend(apiKey);
-  const { error } = await client.emails.send({
-    from: process.env.EMAIL_FROM ?? "BuscaONG <onboarding@resend.dev>",
-    to: email.to,
-    subject: email.subject,
-    text: email.text,
-    html: email.html,
+  resend ??= new Resend(chave);
+  const { error } = await resend.emails.send({
+    // || e não ??: uma variável definida mas vazia também cai no remetente de teste
+    from: process.env.EMAIL_FROM || REMETENTE_DE_TESTE,
+    to,
+    subject,
+    text,
+    html,
   });
-
-  if (error) {
-    throw new Error(`Falha ao enviar e-mail: ${error.message}`);
-  }
+  if (error) throw new Error(`O Resend recusou o e-mail: ${error.message}`);
 }

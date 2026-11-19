@@ -178,7 +178,7 @@ src/
 │   │   ├── campos/               CampoSenha (com o olho) e CampoCodigo (6 dígitos)
 │   │   └── brand/BuscaOngLogo.tsx   logo do BuscaONG (BuscaOngMark + BuscaOngLogo)
 │   ├── ong/                      peças da ONG usadas em mais de uma tela (CartaoOng)
-│   └── common/                   globais (ToastProvider)
+│   └── common/                   globais (Avisos: os toasts do site)
 ├── hooks/                        hooks React reutilizáveis (use-mobile)
 ├── lib/                          integração com libs e serviços
 │   ├── ambiente.ts               variáveis de ambiente exigidas no build de produção da Vercel
