@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { toErrorMessage } from "../toErrorMessage";
+import { erroJson } from "./respostas";
 
 export type SessaoAdmin = { id: string; email: string };
 
@@ -9,10 +9,10 @@ export async function exigirSessaoAdmin(request: NextRequest): Promise<SessaoAdm
   const session = await auth.api.getSession({ headers: request.headers });
 
   if (!session?.user) {
-    return NextResponse.json(toErrorMessage("Faça login para continuar"), { status: 401 });
+    return erroJson(401, "Faça login para continuar");
   }
   if (session.role !== "ADMIN") {
-    return NextResponse.json(toErrorMessage("Acesso negado - Permissões insuficientes"), { status: 403 });
+    return erroJson(403, "Acesso negado - Permissões insuficientes");
   }
 
   return { id: session.user.id, email: session.user.email };

@@ -28,7 +28,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 7 | ✅ | ~~"Esqueci a senha" nunca funciona e não avisa~~ | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | ✅ | ~~Botão "Entrar/Cadastro com Google" quebra (provedor desativado)~~ | `GoogleLoginButton.tsx`, `auth.ts` |
 | 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
-| 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
+| 10 | ✅ | ~~`validBody` devolve a resposta de erro como se fosse o corpo~~ | `utils/api/server/validBody.ts` |
 | 11 | ✅ | ~~Reset de senha sem validação da política~~ | `api/password/reset/route.ts` |
 | 12 | ✅ | ~~Admin pode apagar ou editar outros admins~~ | `api/users/[id]/route.ts` |
 | 13 | ✅ | ~~Regras de senha inconsistentes entre telas e rotas~~ | vários |
@@ -139,7 +139,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** o `redirect()` do `next/navigation` não funciona em event handlers nem callbacks de Client Components; ele lança um erro interno em vez de navegar.
 - **Correção:** usar `useRouter().push('/')`.
 
-### 10. 🟡 `validBody` devolve o erro como se fosse o corpo
+### 10. ✅ `validBody` devolve o erro como se fosse o corpo
+
+> **Corrigido:** o `validBody` deu lugar a `lerJson(request)`, que lança `JsonInvalidoError` com JSON malformado; o `erroNaRota` do `catch` responde 400 no formato da API (`{ "error": { "message": "JSON malformado" } }`). As quatro rotas que liam o JSON por conta própria (admin, reinício do cadastro e recuperação de senha) também passaram a usar o `lerJson`. Testes em `tests/unit/api/lerJson.test.ts` e nas rotas de cadastro, denúncia e admin.
 
 - **Onde:** [utils/api/server/validBody.ts](../web/src/utils/api/server/validBody.ts)
 - **Problema:** com JSON malformado, a função **retorna** um `NextResponse` em vez de lançar. Quem chama trata o retorno como corpo; por exemplo, `const { newEmail } = await validBody(...)` resulta em `undefined`. A mensagem "JSON malformado" nunca chega ao cliente; ele recebe um erro de validação genérico. Os `catch` das rotas já esperam um `NextResponse` lançado (`error instanceof NextResponse`).

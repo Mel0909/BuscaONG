@@ -6,9 +6,9 @@ import { paramsParaFiltrosCrus } from "@/lib/mapa/filtros";
 import {
   clientIp,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
-  zodErrorHandler,
+  erroNaRota,
 } from "@/utils/api/server";
 
 // o mapa pede pins a cada movimento (com espera), então o limite é mais folgado que o da lista
@@ -23,12 +23,12 @@ export async function GET(request: NextRequest) {
 
     const params = request.nextUrl.searchParams;
     const bbox = bboxSchema.safeParse(params.get("bbox") ?? undefined);
-    if (!bbox.success) return returnInvalidDataErrors(bbox.error);
+    if (!bbox.success) return erroDeValidacao(bbox.error);
     const filtros = filtrosSchema.safeParse(paramsParaFiltrosCrus(params));
-    if (!filtros.success) return returnInvalidDataErrors(filtros.error);
+    if (!filtros.success) return erroDeValidacao(filtros.error);
 
     return NextResponse.json(await pinsNoMapa(bbox.data, filtros.data));
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

@@ -5,9 +5,9 @@ import { sugerirItensLivres } from "@/backend/services/ongs";
 import {
   exigirSessaoOng,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
-  zodErrorHandler,
+  erroNaRota,
 } from "@/utils/api/server";
 
 // cada consulta agrega o texto livre de todas as ONGs; a tela consulta enquanto a ONG digita
@@ -23,10 +23,10 @@ export async function GET(request: NextRequest) {
     if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
 
     const resultado = sugestaoItensSchema.safeParse({ q: request.nextUrl.searchParams.get("q") ?? "" });
-    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+    if (!resultado.success) return erroDeValidacao(resultado.error);
 
     return NextResponse.json(await sugerirItensLivres(sessao.userId, resultado.data.q));
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

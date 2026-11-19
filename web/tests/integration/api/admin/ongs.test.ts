@@ -79,6 +79,20 @@ describe("rotas do admin: ONGs e denúncias", () => {
       const response = await alterarStatus(requisicao("PATCH", "ongs/abc", { status: "SUSPENSA", motivo: "Teste" }), contexto({ id: "abc" }));
       expect(response.status).toBe(400);
     });
+
+    it("400 no formato da API para JSON malformado, sem mexer na ONG", async () => {
+      const response = await alterarStatus(
+        new NextRequest("http://localhost:3000/api/x", {
+        method: "PATCH",
+        body: "{ não é json",
+        headers: { "Content-Type": "application/json" },
+      }),
+        contexto({ id: ID })
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: { message: "JSON malformado" } });
+      expect(db.ong.update).not.toHaveBeenCalled();
+    });
   });
 
   describe("suspender e reativar", () => {

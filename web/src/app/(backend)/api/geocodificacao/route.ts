@@ -5,11 +5,11 @@ import { geocodificar } from "@/lib/geocodificacao";
 import {
   exigirSessaoOng,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
-  zodErrorHandler,
+  erroJson,
+  erroNaRota,
 } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 // o Nominatim aceita 1 consulta por segundo no total; o limite por conta evita que uma só esgote
 const LIMITE = { limit: 10, windowMs: 60_000 };
@@ -24,23 +24,20 @@ export async function GET(request: NextRequest) {
     if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
 
     const resultado = geocodificacaoSchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
-    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+    if (!resultado.success) return erroDeValidacao(resultado.error);
 
     let ponto;
     try {
       ponto = await geocodificar(resultado.data);
     } catch {
-      return NextResponse.json(
-        toErrorMessage("Não foi possível localizar o endereço agora. Posicione o pin no mapa."),
-        { status: 503 }
-      );
+      return erroJson(503, "Não foi possível localizar o endereço agora. Posicione o pin no mapa.");
     }
 
     if (!ponto) {
-      return NextResponse.json(toErrorMessage("Endereço não encontrado no mapa. Posicione o pin."), { status: 404 });
+      return erroJson(404, "Endereço não encontrado no mapa. Posicione o pin.");
     }
     return NextResponse.json(ponto);
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

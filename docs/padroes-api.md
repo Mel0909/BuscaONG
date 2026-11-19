@@ -26,19 +26,19 @@ Regra principal: **a rota nunca importa o Prisma.** Se precisa de dado, pede ao 
 
 1. **Autorização:** `exigirSessaoOng(request)` ou `exigirSessaoAdmin(request)`. Se devolver um `NextResponse` (401 ou 403), devolva esse retorno. Rota pública não chama nenhuma das duas, mas ganha limite por IP (`rateLimit`).
 2. **Parâmetros da URL:** em Next 16, `params` é uma `Promise`. Sempre `const { id } = await params`.
-3. **Validação da entrada:** corpo e parâmetros passam pelo schema com `safeParse`. Se falhar, `returnInvalidDataErrors(resultado.error)` (400).
+3. **Validação da entrada:** corpo e parâmetros passam pelo schema com `safeParse`. Se falhar, `erroDeValidacao(resultado.error)` (400).
 4. **Regra de dono**, quando aplicável: a ONG só mexe nos próprios dados. O alvo sai da sessão (`userId`), nunca de um ID vindo da requisição.
 5. **Service.**
 6. **Resposta.**
 
-Envolva tudo em `try/catch` e, no `catch`, use `zodErrorHandler(error)` (400 para erro de validação, 500 para o resto).
+Envolva tudo em `try/catch`. No `catch`, trate primeiro os erros que a rota conhece (ex.: `OngJaCadastradaError` → 409) e termine com `erroNaRota(error)`: 400 para erro de validação do Zod; para o resto, 500 com mensagem genérica, e o detalhe vai só para o log do servidor.
 
 Exemplo de validação:
 
 ```ts
 const resultado = objectIdSchema.safeParse(id);
 if (!resultado.success) {
-  return returnInvalidDataErrors(resultado.error);
+  return erroDeValidacao(resultado.error);
 }
 ```
 
@@ -50,7 +50,7 @@ if (!resultado.success) {
 { "id": "…", "nome": "ONG Exemplo" }
 ```
 
-**Erro:** objeto `error` com `message`; `details` é opcional (lista de erros por campo). Gerado por `toErrorMessage(message, details)`.
+**Erro:** objeto `error` com `message`; `details` é opcional (lista de erros por campo). Gerado por `erroJson(status, message, { details })`.
 
 ```json
 { "error": { "message": "Email inválido", "details": [{ "campo": "email", "message": "Email inválido" }] } }
@@ -67,7 +67,7 @@ if (!resultado.success) {
 | 409 | conflito (ex.: CNPJ já cadastrado) |
 | 500 | erro inesperado |
 
-> ⚠️ **O código herdado não segue esse formato à risca.** O `validBody` responde `{ "error": "texto" }` para JSON malformado. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
+JSON malformado no corpo também é 400, no mesmo formato: `{ "error": { "message": "JSON malformado" } }`.
 
 ## 5. Utilitários disponíveis
 
@@ -78,11 +78,11 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 | `exigirSessaoOng(request)` | exige a sessão de uma conta `ONG` e devolve `{ userId, email }` (ou a resposta 401/403, no formato novo) |
 | `exigirSessaoAdmin(request)` | o mesmo para o perfil `ADMIN`; devolve `{ id, email }` |
 | `rateLimit(chave, { limit, windowMs })` + `tooManyRequests(s)` | limite simples em memória por chave (IP ou usuário) |
-| `validBody(request)` | lê o JSON do corpo ⚠️ ver bug #10 em [erros-a-consertar.md](erros-a-consertar.md) |
-| `returnInvalidDataErrors(zodError)` | resposta 400 padronizada a partir de um erro do Zod |
-| `zodErrorHandler(error)` | para o `catch`: 400 se for Zod, 500 caso contrário |
-
-E `toErrorMessage(message, details?)` em `@/utils/api/toErrorMessage`.
+| `lerJson(request, { vazio? })` | lê o JSON do corpo; malformado lança `JsonInvalidoError`, que o `erroNaRota` responde com 400. `vazio` diz quanto vale um corpo vazio (ex.: `{}`); sem ele, corpo vazio também é erro |
+| `erroJson(status, message, { details?, headers? })` | resposta de erro no formato da seção 4 |
+| `erroDeValidacao(zodError)` | resposta 400 a partir de um erro do Zod (a primeira mensagem e, em `details`, todas por campo) |
+| `erroNaRota(error)` | fim do `catch`: 400 se for Zod, 500 genérico caso contrário (com log) |
+| `corpoDeErro(message, details?)` | só o corpo `{ error: { message, details? } }`, para quem monta a resposta à mão |
 
 **Rotas do cadastro da ONG** (`api/ongs/minha/*`): todas seguem o mesmo roteiro (sessão de ONG → corpo validado → service), montado por `rotaDoCadastro(schema, service)` em `api/ongs/minha/_utils/rotaDoCadastro.ts`, que também traduz os erros dos services em respostas HTTP. Agem sempre sobre a ONG do usuário da sessão, nunca sobre um ID vindo da requisição.
 

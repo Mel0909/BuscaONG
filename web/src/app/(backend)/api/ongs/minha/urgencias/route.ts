@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { encerrarUrgenciaSchema, urgenciaSchema } from "@/backend/schemas";
 import { encerrarUrgencia, marcarUrgencia } from "@/backend/services/ongs";
-import { exigirSessaoOng, returnInvalidDataErrors } from "@/utils/api/server";
+import { exigirSessaoOng, erroDeValidacao } from "@/utils/api/server";
 import { respostaDeErro, rotaDoCadastro } from "../_utils/rotaDoCadastro";
 
 // painel (O3): marca um item da ONG como urgente por 3, 7 ou 14 dias
@@ -16,7 +16,7 @@ export async function DELETE(request: NextRequest) {
     if (sessao instanceof NextResponse) return sessao;
 
     const resultado = encerrarUrgenciaSchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
-    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+    if (!resultado.success) return erroDeValidacao(resultado.error);
 
     return NextResponse.json(await encerrarUrgencia(sessao.userId, resultado.data.item));
   } catch (error) {

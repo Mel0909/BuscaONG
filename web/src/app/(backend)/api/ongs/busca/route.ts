@@ -5,9 +5,9 @@ import { buscarOngsPorNome } from "@/backend/services/ongs";
 import {
   clientIp,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
-  zodErrorHandler,
+  erroNaRota,
 } from "@/utils/api/server";
 
 const LIMITE = { limit: 60, windowMs: 60_000 };
@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
     if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
 
     const resultado = buscaOngSchema.safeParse({ q: request.nextUrl.searchParams.get("q") ?? "" });
-    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+    if (!resultado.success) return erroDeValidacao(resultado.error);
 
     return NextResponse.json(await buscarOngsPorNome(resultado.data.q));
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

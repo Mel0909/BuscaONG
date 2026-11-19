@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { toErrorMessage } from "../toErrorMessage";
+import { erroJson } from "./respostas";
 
 // Limite simples em memória (janela fixa por chave).
 // Em ambiente serverless cada instância tem a própria contagem, então é uma proteção
@@ -44,8 +44,7 @@ export function clientIp(request: NextRequest): string {
 }
 
 export function tooManyRequests(retryAfterSeconds: number) {
-  return NextResponse.json(
-    toErrorMessage("Muitas requisições. Tente de novo em instantes."),
-    { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
-  );
+  return erroJson(429, "Muitas requisições. Tente de novo em instantes.", {
+    headers: { "Retry-After": String(retryAfterSeconds) },
+  });
 }

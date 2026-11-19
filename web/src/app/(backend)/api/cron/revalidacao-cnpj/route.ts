@@ -2,8 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { revalidarCnpjsAntigos } from "@/backend/services/admin";
-import { zodErrorHandler } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { erroJson, erroNaRota } from "@/utils/api/server";
 
 // rotina diária da Vercel (web/vercel.json); não pode vir de cache
 export const dynamic = "force-dynamic";
@@ -24,15 +23,15 @@ function mesmoSegredo(recebido: string, esperado: string) {
 export async function GET(request: NextRequest) {
   const segredo = process.env.CRON_SECRET;
   if (!segredo) {
-    return NextResponse.json(toErrorMessage("Revalidação automática não configurada"), { status: 503 });
+    return erroJson(503, "Revalidação automática não configurada");
   }
   if (!mesmoSegredo(request.headers.get("authorization") ?? "", `Bearer ${segredo}`)) {
-    return NextResponse.json(toErrorMessage("Não autorizado"), { status: 401 });
+    return erroJson(401, "Não autorizado");
   }
 
   try {
     return NextResponse.json(await revalidarCnpjsAntigos());
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }
