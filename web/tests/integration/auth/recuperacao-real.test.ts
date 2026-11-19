@@ -156,6 +156,7 @@ describe("códigos reais do better-auth", () => {
     "/email-otp/reset-password",
     "/request-password-reset",
     "/delete-user",
+    "/send-verification-email",
   ])("POST /api/auth%s fica fechado pelo HTTP", async (rota) => {
     const resposta = await real.handler(
       new Request(`http://localhost:3000/api/auth${rota}`, {
@@ -185,6 +186,26 @@ describe("códigos reais do better-auth", () => {
     expect(resposta.status).toBe(400);
     expect(vi.mocked(sendEmail).mock.calls).toHaveLength(enviosAntes);
     expect(storage.user.map((u) => u.email)).toEqual([email]);
+  });
+
+  it("GET /api/auth/verify-email (confirmação por link) fica fechado pelo HTTP", async () => {
+    const resposta = await real.handler(new Request("http://localhost:3000/api/auth/verify-email?token=qualquer"));
+    expect(resposta.status).toBe(404);
+  });
+
+  it("pedir de novo o código de confirmação por HTTP não manda e-mail", async () => {
+    await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123" } });
+    const enviosAntes = vi.mocked(sendEmail).mock.calls.length;
+    for (let i = 0; i < 5; i++) {
+      await real.handler(
+        new Request("http://localhost:3000/api/auth/send-verification-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+          body: JSON.stringify({ email }),
+        })
+      );
+    }
+    expect(vi.mocked(sendEmail).mock.calls).toHaveLength(enviosAntes);
   });
 
   it("o servidor continua pedindo o código de recuperação pela API interna", async () => {

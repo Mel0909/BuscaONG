@@ -23,7 +23,9 @@ export const auth = betterAuth({
     // - check-verification-otp conta as tentativas sem atomicidade e diz se a conta existe;
     // - login só por código daria acesso sem trocar a senha nem encerrar as sessões;
     // - recuperar a senha passa só por /api/password/*, com limite por IP;
-    // - apagar a conta tiraria do ar uma ONG suspensa e liberaria o CNPJ para um cadastro novo.
+    // - apagar a conta tiraria do ar uma ONG suspensa e liberaria o CNPJ para um cadastro novo;
+    // - a confirmação de e-mail é por código (/email-otp/*); o reenvio "por link" mandava o
+    //   código sem o limite por endereço, e o link não é usado.
     disabledPaths: [
         "/email-otp/check-verification-otp",
         "/sign-in/email-otp",
@@ -33,6 +35,8 @@ export const auth = betterAuth({
         "/request-password-reset",
         "/reset-password",
         "/delete-user",
+        "/send-verification-email",
+        "/verify-email",
     ],
     hooks: {
         // bloqueia o cadastro direto pelo HTTP e aplica a regra de senha no servidor
