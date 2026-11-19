@@ -1,27 +1,33 @@
 import { z } from "zod";
 
+import { REQUISITOS_SENHA, SENHA_MAXIMO } from "@/lib/senha";
+
+/** Senha nova (cadastro, recuperação): os requisitos de lib/senha.ts, até SENHA_MAXIMO caracteres. */
 export const passwordSchema = z
-    .string()
-    .min(8, "Senha deve ter pelo menos 8 caracteres")
-    .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
-    .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
-    .regex(/\d/, "Senha deve conter pelo menos um número");
+  .string({ error: "Informe a senha" })
+  .max(SENHA_MAXIMO, `A senha pode ter no máximo ${SENHA_MAXIMO} caracteres`)
+  .superRefine((senha, ctx) => {
+    for (const requisito of REQUISITOS_SENHA) {
+      if (!requisito.atende(senha)) ctx.addIssue({ code: "custom", message: requisito.mensagem });
+    }
+  });
 
-// 254 caracteres é o tamanho máximo de um endereço de e-mail (RFC 5321); sem limite, uma rota
-// pública (como a denúncia) gravaria um texto de qualquer tamanho
+/**
+ * E-mail sem espaços nas pontas e em minúsculas, que é como ele é guardado e comparado.
+ * 254 caracteres é o máximo de um endereço (RFC 5321); sem limite, uma rota pública (como a
+ * denúncia) gravaria um texto de qualquer tamanho.
+ */
 export const emailSchema = z
-    .string()
-    .max(254, "Email muito longo")
-    .email("Email inválido")
-    .transform(str => str.toLowerCase().trim());
+  .string({ error: "Informe o e-mail" })
+  .trim()
+  .toLowerCase()
+  .max(254, "E-mail muito longo")
+  .pipe(z.email("E-mail inválido"));
 
+/** Identificador de uma opção das listas fixas (causa, item, atividade): "cestas-basicas". */
 export const slugSchema = z
-    .string({
-      error: (issue) => issue.input === undefined 
-      ? "Slug é obrigatório" 
-      : "Slug deve ser um texto" 
-    })
-    .min(1, "Slug não pode estar vazio")
-    .max(100, "Slug não pode ter mais de 100 caracteres")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug deve conter apenas letras minúsculas, números e hífens, sem espaços")
-    .trim()
+  .string({ error: "Opção inválida" })
+  .trim()
+  .min(1, "Opção inválida")
+  .max(100, "Opção inválida")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Opção inválida");

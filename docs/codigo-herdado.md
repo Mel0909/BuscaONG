@@ -19,7 +19,7 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 
 - [x] `app/(backend)/api/users/**` (listagem, conta por ID, troca de e-mail e senha): removidas, sem uso nas telas
 - [x] `app/(backend)/api/password/forgot`, `reset`: reescritas para recuperação por código via better-auth, com validação, limites e testes
-- [ ] `app/(backend)/schemas/base.schema.ts` (`auth.schema.ts`, `nameSchema` e `corSchema` foram removidos)
+- [x] `app/(backend)/schemas/base.schema.ts`: reescrito; a regra de senha saiu para `lib/senha.ts`, fonte única das telas e do servidor (`auth.schema.ts`, `nameSchema` e `corSchema` foram removidos)
 - [x] `app/(backend)/services/auth/*`: `getUserRole` saiu com o `customSession`; `services/users/*` e o `comparePassword` com bcrypt também foram removidos. Fica só `recuperacao.ts`, escrito para o BuscaONG
 - [x] `app/(backend)/README.md` (removido; o conteúdo está em [padroes-api.md](padroes-api.md))
 
@@ -44,7 +44,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 ### Utilitários e núcleo (~315 linhas)
 
 - [x] `utils/api/server/*`: `validBody`, `errorHandlers` e `toErrorMessage` foram reescritos em `lerJson.ts` e `respostas.ts`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos
-- [ ] `utils/validations/index.ts` (`hasUppercase` e afins; `zod.ts` e `isSafeRedirect` foram removidos)
+- [x] `utils/validations/index.ts`: `hasUppercase` e afins deram lugar a `lib/senha.ts`; `zod.ts` e `isSafeRedirect` foram removidos
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [x] `proxy.ts`: reescrito com a checagem otimista do cookie (`getSessionCookie`), sem `ROUTE_CONFIG` nem `matchesAnyPattern`; o redirecionamento de quem já está logado foi para as páginas `/login` e `/admin`
 - [x] `auth.ts`: a configuração segue a documentação do better-auth. O plugin `customSession` do template deu lugar ao `user.additionalFields.role`, e o bloco comentado do Google saiu (o Google para ONGs será feito do zero)

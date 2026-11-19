@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth-client";
-import { hasLowercase, hasMinLength, hasNumber, hasUppercase } from "@/utils/validations";
+import { REQUISITOS_SENHA, senhaAtendeRequisitos } from "@/lib/senha";
 import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
 import { CampoSenha } from "@/components/base/campos/CampoSenha";
 
@@ -15,13 +15,6 @@ const estiloCampo =
   "h-[52px] w-full rounded-[14px] border border-borda bg-papel px-4 text-base outline-none focus:border-2 focus:border-musgo disabled:opacity-60";
 const estiloBotao =
   "h-[52px] cursor-pointer rounded-[15px] bg-musgo text-base font-semibold text-papel transition-colors hover:bg-musgo-escuro disabled:cursor-not-allowed disabled:opacity-60";
-
-const REQUISITOS = [
-  { texto: "8 ou mais caracteres", ok: hasMinLength },
-  { texto: "Uma letra maiúscula", ok: hasUppercase },
-  { texto: "Uma letra minúscula", ok: hasLowercase },
-  { texto: "Um número", ok: hasNumber },
-];
 
 /** POST /api/password/forgot ou /reset; não lança em erro de rede (vira status 0). */
 async function enviar(rota: "forgot" | "reset", corpo: Record<string, string>) {
@@ -75,7 +68,7 @@ export function RecuperarSenha() {
     setEtapa("codigo");
   }
 
-  const senhaValida = REQUISITOS.every((r) => r.ok(senha));
+  const senhaValida = senhaAtendeRequisitos(senha);
   const podeSalvar = codigo.length === TAMANHO_CODIGO && senhaValida && senha === confirmacao;
 
   async function redefinir() {
@@ -179,9 +172,9 @@ export function RecuperarSenha() {
         </label>
         <CampoSenha id="nova-senha" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
         <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-[13px]">
-          {REQUISITOS.map((r) => (
-            <li key={r.texto} className={r.ok(senha) ? "font-semibold text-musgo" : "text-tinta-suave"}>
-              {r.ok(senha) ? "✓" : "○"} {r.texto}
+          {REQUISITOS_SENHA.map((r) => (
+            <li key={r.texto} className={r.atende(senha) ? "font-semibold text-musgo" : "text-tinta-suave"}>
+              {r.atende(senha) ? "✓" : "○"} {r.texto}
             </li>
           ))}
         </ul>

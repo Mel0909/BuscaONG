@@ -184,6 +184,7 @@ src/
 │   ├── ambiente.ts               variáveis de ambiente exigidas no build de produção da Vercel
 │   ├── auth-client.ts            cliente better-auth para o navegador
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
+│   ├── senha.ts                  regra de senha única (requisitos da tela e do passwordSchema)
 │   ├── auth-consumo-otp.ts       consumo condicional de códigos, inclusive sob concorrência
 │   ├── auth-limites.ts           limite por e-mail compartilhado entre aliases de códigos
 │   ├── armazenamento/            URLs assinadas para enviar imagens ao Cloudflare R2
@@ -198,7 +199,7 @@ src/
 ├── utils/                        funções auxiliares do projeto
 │   ├── api/server/               helpers das rotas: exigirSessaoOng, exigirSessaoAdmin, lerJson, respostas de erro, rateLimit
 │   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
-│   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
+│   └── validations/              CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
 ├── types/                        declarações de tipos de bibliotecas (GeoJSON)
 ├── auth.ts                       configuração central do better-auth
 └── proxy.ts                      "porteiro": sem cookie de sessão, manda da área do admin e do painel para o login
