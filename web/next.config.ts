@@ -1,6 +1,17 @@
 import path from 'node:path';
 import { type NextConfig } from 'next';
 
+import { verificarAmbienteDeProducao } from './src/lib/ambiente';
+
+// no build de produção da Vercel, falha cedo se faltar uma variável essencial (ver src/lib/ambiente.ts)
+if (process.env.VERCEL_ENV === 'production') {
+  const { erros, avisos } = verificarAmbienteDeProducao(process.env);
+  for (const aviso of avisos) console.warn(`⚠ ${aviso}`);
+  if (erros.length > 0) {
+    throw new Error(`Variáveis de ambiente de produção com problema:\n- ${erros.join('\n- ')}`);
+  }
+}
+
 const nextConfig: NextConfig = {
   turbopack: {
     // raiz do monorepo; evita o Next adivinhar a raiz por lockfiles fora do repo

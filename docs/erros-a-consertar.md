@@ -34,7 +34,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 13 | ✅ | ~~Regras de senha inconsistentes entre telas e rotas~~ | vários |
 | 14 | ✅ | ~~Validação de nome rejeita hífen e apóstrofo~~ | `schemas/auth.schema.ts` |
 | 15 | ✅ | ~~`getUserRole` devolve `[]` em vez de `undefined`~~ | `services/auth/user.ts` |
-| 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
+| 16 | ✅ | ~~Build exibe erros de `BETTER_AUTH_SECRET` sem `.env`~~ | ambiente |
 | 17 | ✅ | ~~Aviso de "NFT list" no build (Prisma no trace do proxy)~~ | `proxy.ts`, `services/db` |
 | 18 | 🟡 | Falha intermitente ao baixar a fonte Bricolage no `next dev`/`next build` | `app/layout.tsx` |
 
@@ -192,7 +192,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** devolve `[]` quando não há `userId` e `Role | undefined` nos outros casos. O `role` da sessão pode virar um array.
 - **Correção:** retornar `undefined`.
 
-### 16. 🟡 Erros de `BETTER_AUTH_SECRET` no build
+### 16. ✅ Erros de `BETTER_AUTH_SECRET` no build
+
+> **Corrigido:** a premissa de que "em produção sem a variável o app usaria o segredo padrão" não vale mais: o better-auth 1.5 lança erro em produção com o segredo padrão, e todo login falharia. Para isso não aparecer só depois do deploy, o build de produção da Vercel agora falha listando as variáveis essenciais que faltam, sem mostrar valores (`web/src/lib/ambiente.ts`, chamado pelo `next.config.ts`; ver [autenticacao.md §6](autenticacao.md)). Sem `.env` local, o build fora da Vercel continua imprimindo o erro do better-auth; o README já manda criar o `.env`.
 
 - **Onde:** ambiente (`web/.env` inexistente)
 - **Problema:** sem `.env`, o `next build` imprime `BetterAuthError: You are using the default secret` várias vezes. O build conclui, mas em produção sem a variável o app usaria o segredo padrão.

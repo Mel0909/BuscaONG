@@ -96,6 +96,8 @@ As rotas `/api/ongs/minha/reinicio` e `/codigo` exigem sessão ONG, origem do si
 | `BETTER_AUTH_SECRET` | assina sessões e tokens; obrigatória em produção (`openssl rand -base64 32`) |
 | `BETTER_AUTH_URL` | URL base do site; usada nos links de e-mail |
 
+Em produção, o better-auth se recusa a usar o segredo padrão: sem `BETTER_AUTH_SECRET`, todo login falharia. Para não descobrir isso só depois do deploy, o build de produção da Vercel (`VERCEL_ENV=production`) para com a lista do que falta, sem mostrar valores. As variáveis essenciais são `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (com `https://`), `RESEND_API_KEY` e `EMAIL_FROM`. A lista e os avisos para as opcionais (Mapbox, `CRON_SECRET`, R2 e segredo com menos de 32 caracteres) ficam em `web/src/lib/ambiente.ts`, chamado pelo `next.config.ts`. Um build que falha na Vercel não tira do ar o deploy anterior.
+
 ## 7. Consumo de códigos sob concorrência
 
 A versão instalada do better-auth (1.5.5) faz a leitura e a exclusão do OTP em operações separadas. Uma tentativa errada concorrente podia recriar um código consumido; duas redefinições simultâneas podiam usar o mesmo código. A regressão foi reproduzida nos testes antes da proteção.

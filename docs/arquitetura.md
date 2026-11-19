@@ -181,6 +181,7 @@ src/
 │   └── common/                   globais (ToastProvider)
 ├── hooks/                        hooks React reutilizáveis (use-mobile)
 ├── lib/                          integração com libs e serviços
+│   ├── ambiente.ts               variáveis de ambiente exigidas no build de produção da Vercel
 │   ├── auth-client.ts            cliente better-auth para o navegador
 │   ├── auth-hooks.ts             hook do better-auth: regra de senha e bloqueio do cadastro direto
 │   ├── auth-consumo-otp.ts       consumo condicional de códigos, inclusive sob concorrência
