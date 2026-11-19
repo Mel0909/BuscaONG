@@ -7,21 +7,29 @@ meta {
 post {
   url: {{baseUrl}}/auth/sign-in/email
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
   {
-    "email": "daniela63@yahoo.com", 
-    "password": "Teste123", 
-    "callbackURL": "/"
+    "email": "{{email}}",
+    "password": "{{senha}}"
   }
 }
 
 script:post-response {
-  if (res.body && res.body.token) {
-    bru.setVar("sessionValue", res.body.token);
+  // guarda "nome=valor" do cookie de sessão (better-auth.session_token, ou __Secure-... em https)
+  const cookies = [].concat(res.headers["set-cookie"] || []);
+  const sessao = cookies.map((c) => c.split(";")[0]).find((c) => c.includes("better-auth.session_token="));
+  if (sessao) {
+    bru.setVar("cookieSessao", sessao);
   } else {
-    console.log("No ID found in response");
+    console.log("Login sem cookie de sessão: confira e-mail, senha e se o e-mail já foi confirmado.");
   }
+}
+
+docs {
+  Login de ONG ou admin (better-auth). Usa email e senha do ambiente.
+  Sucesso: 200 e o cookie de sessão, que a coleção passa a mandar (ver collection.bru).
+  E-mail ou senha errados: 401. E-mail de ONG ainda não confirmado: 403.
 }

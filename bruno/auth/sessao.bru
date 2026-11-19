@@ -1,0 +1,16 @@
+meta {
+  name: sessão atual
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/auth/get-session
+  body: none
+  auth: inherit
+}
+
+docs {
+  Sessão do cookie guardado pelo login: user (com role "ONG" ou "ADMIN") e session.
+  Sem login, ou com sessão vencida, responde null.
+}

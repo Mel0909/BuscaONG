@@ -1,4 +1,15 @@
 headers {
-  Cookie: better-auth.session_token={{sessionValue}}
-  origin: {{baseUrl}}
+  Cookie: {{cookieSessao}}
+  Origin: {{siteUrl}}
+}
+
+docs {
+  Coleção da API do BuscaONG. Escolha o ambiente (Dev ou Prod) e preencha email e senha nele.
+
+  Rotas que exigem login: rode auth/login antes. O login guarda o cookie de sessão (cookieSessao),
+  que vai em todas as requisições. O better-auth assina o cookie, então o token do corpo da
+  resposta não serve como cookie. Em produção (https), o nome do cookie ganha o prefixo __Secure-;
+  o script do login guarda o nome junto com o valor.
+
+  Origin: o better-auth e as rotas de reinício conferem a origem; ela é só o endereço do site, sem /api.
 }
