@@ -167,6 +167,26 @@ describe("códigos reais do better-auth", () => {
     expect(resposta.status).toBe(404);
   });
 
+  it("ONG logada não troca o e-mail nem dispara código para outro endereço", async () => {
+    await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123" } });
+    await real.api.verifyEmailOTP({ body: { email, otp: ultimoCodigo() } });
+    const login = await real.api.signInEmail({ body: { email, password: "Senha123" }, returnHeaders: true });
+    const cookie = login.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
+    const enviosAntes = vi.mocked(sendEmail).mock.calls.length;
+
+    const resposta = await real.handler(
+      new Request("http://localhost:3000/api/auth/change-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: cookie },
+        body: JSON.stringify({ newEmail: "vitima@example.com" }),
+      })
+    );
+
+    expect(resposta.status).toBe(400);
+    expect(vi.mocked(sendEmail).mock.calls).toHaveLength(enviosAntes);
+    expect(storage.user.map((u) => u.email)).toEqual([email]);
+  });
+
   it("o servidor continua pedindo o código de recuperação pela API interna", async () => {
     await real.api.signUpEmail({ body: { email, name: "Casa", password: "Senha123" } });
     await real.api.requestPasswordResetEmailOTP({ body: { email } });

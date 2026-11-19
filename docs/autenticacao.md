@@ -37,7 +37,7 @@ Configuração atual do `auth.ts`:
 - `emailOTP.disableSignUp: true`: códigos nunca criam usuários sem ONG.
 - Códigos limitados a três tentativas e dez minutos, com hash. O hook compartilha limites por e-mail entre as rotas próprias e os aliases do better-auth (3 envios ou 10 confirmações por minuto); APIs próprias também limitam IP/conta. São limites em memória, por instância, não um limite global distribuído.
 - Redefinir a senha revoga as sessões anteriores (`revokeSessionsOnPasswordReset`).
-- Exclusão e troca de e-mail habilitadas.
+- **Exclusão de conta e troca de e-mail desligadas** (`deleteUser.enabled` e `changeEmail.enabled` falsos). Nenhuma tela usa, e a troca de e-mail deixaria uma ONG logada mandar códigos para qualquer endereço, gastando o limite diário de e-mails do site.
 - O plugin `customSession` acrescenta o `role` do usuário à sessão.
 - O plugin `nextCookies` cuida dos cookies em Server Actions.
 
