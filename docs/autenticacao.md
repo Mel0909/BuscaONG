@@ -73,6 +73,8 @@ await authClient.signIn.email({ email, password, callbackURL: "/" });
 await authClient.signOut();
 ```
 
+O "Sair" do painel e do admin chama `authClient.signOut()`, que faz um `POST` em `/api/auth/sign-out`. Não existe página de logout por `GET`: um link ou uma imagem em outro site poderia encerrar a sessão de quem a abrisse.
+
 ## 5. Esqueci a senha
 
 O fluxo usa **código por e-mail**, reutilizando o plugin `emailOTP`:

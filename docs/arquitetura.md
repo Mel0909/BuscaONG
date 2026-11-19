@@ -147,7 +147,7 @@ src/
 │   │   ├── (landing-pages)/      /            (tela principal: mapa, lista, busca e filtros)
 │   │   │   ├── _components/      TelaMapa (estado e layout), MapaOngs, ListaOngs, PainelFiltros...
 │   │   │   └── _actions/         chamadas à API pública e à busca de lugares do Mapbox
-│   │   ├── (auth)/               /login, /login/recuperar (esqueci a senha), /logout
+│   │   ├── (auth)/               /login, /login/recuperar (esqueci a senha)
 │   │   │   ├── _components/      moldura das telas de acesso da ONG
 │   │   │   └── login/            formulário de login e, em recuperar/, o código por e-mail e a senha nova
 │   │   ├── admin/                /admin (login da equipe)
