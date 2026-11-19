@@ -32,7 +32,7 @@ Configuração atual do `auth.ts`:
 - Login por e-mail e senha, com **e-mail verificado obrigatório** (`requireEmailVerification`).
 - **Verificação por código** (plugin `emailOTP` com `overrideDefaultEmailVerification`): 6 dígitos, válido por 10 minutos, guardado com hash e enviado pelo Resend. Na criação da conta o código é enviado automaticamente (`sendOnSignUp`), e confirmar o código já cria a sessão (`autoSignInAfterVerification`).
 - **Hook `before`** (`lib/auth-hooks.ts`):
-  - aplica a regra de senha (8+, maiúscula, minúscula e número) em cadastro, troca e redefinição de senha;
+  - aplica a regra de senha (8 a 128 caracteres, com maiúscula, minúscula e número; letras acentuadas contam) em cadastro, troca e redefinição de senha. A regra fica num lugar só, `lib/senha.ts`: as telas mostram a lista de requisitos a partir dela, e o `passwordSchema` a aplica no servidor;
   - **bloqueia o cadastro direto** em `/api/auth/sign-up/email` vindo do HTTP. Só o servidor cria contas (`auth.api.signUpEmail`, sem `request`), pelo `POST /api/ongs`, junto com a ONG.
 - `emailOTP.disableSignUp: true`: códigos nunca criam usuários sem ONG.
 - Códigos limitados a três tentativas e dez minutos, com hash. O hook compartilha limites por e-mail entre as rotas próprias e os aliases do better-auth (3 envios ou 10 confirmações por minuto); APIs próprias também limitam IP/conta. São limites em memória, por instância, não um limite global distribuído.

@@ -5,17 +5,10 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import { REQUISITOS_SENHA, senhaAtendeRequisitos } from "@/lib/senha";
 import { useCadastro } from "./CadastroContext";
 import { CampoCodigo } from "@/components/base/campos/CampoCodigo";
 import { CampoSenha } from "@/components/base/campos/CampoSenha";
-
-// mesma regra que o servidor aplica (passwordSchema)
-const REGRAS_SENHA = [
-  { texto: "8 caracteres ou mais", ok: (s: string) => s.length >= 8 },
-  { texto: "uma letra maiúscula", ok: (s: string) => /[A-Z]/.test(s) },
-  { texto: "uma letra minúscula", ok: (s: string) => /[a-z]/.test(s) },
-  { texto: "um número", ok: (s: string) => /\d/.test(s) },
-];
 
 const ESPERA_REENVIO_MS = 60_000;
 const TAMANHO_CODIGO = 6;
@@ -164,7 +157,7 @@ export function PassoAcesso() {
     if (error) setErro({ mensagem: "Não foi possível reenviar o código agora. Tente de novo em instantes." });
   }
 
-  const senhaValida = REGRAS_SENHA.every((r) => r.ok(senha));
+  const senhaValida = senhaAtendeRequisitos(senha);
   // só avisa depois que a pessoa começou a digitar a confirmação
   const senhasDiferentes = confirmacao.length > 0 && confirmacao !== senha;
 
@@ -217,8 +210,8 @@ export function PassoAcesso() {
               aria-describedby="regras-senha"
             />
             <ul id="regras-senha" className="flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
-              {REGRAS_SENHA.map((regra) => {
-                const ok = regra.ok(senha);
+              {REQUISITOS_SENHA.map((regra) => {
+                const ok = regra.atende(senha);
                 return (
                   <li key={regra.texto} className={ok ? "font-semibold text-musgo" : "text-tinta-suave"}>
                     {ok ? "✓" : "·"} {regra.texto}

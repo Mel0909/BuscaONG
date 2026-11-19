@@ -9,6 +9,7 @@ import { sendEmail } from "./lib/email";
 import { codigoVerificacaoEmail } from "./lib/email/templates/codigoVerificacao";
 import { validarRequisicaoAuth } from "./lib/auth-hooks";
 import { protegerConsumoOtp } from "./lib/auth-consumo-otp";
+import { SENHA_MAXIMO, SENHA_MINIMO } from "./lib/senha";
 
 // código de 6 dígitos por e-mail, válido por 10 minutos (protótipo, cadastro passo 2)
 export const OTP_VALIDADE_SEGUNDOS = 10 * 60;
@@ -51,7 +52,8 @@ export const auth = betterAuth({
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
-      minPasswordLength: 8,
+      minPasswordLength: SENHA_MINIMO,
+      maxPasswordLength: SENHA_MAXIMO,
       revokeSessionsOnPasswordReset: true,
       // "esqueci a senha" usa código por e-mail (emailOTP), não link: tela /login/recuperar,
       // rotas /api/password/forgot e /api/password/reset

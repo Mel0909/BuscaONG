@@ -5,6 +5,13 @@ import { novaDenunciaSchema } from "@/backend/schemas";
 describe("emailSchema", () => {
   it("normaliza para minúsculas, sem espaço nas pontas", () => {
     expect(emailSchema.parse("Contato@CasaLar.org.br")).toBe("contato@casalar.org.br");
+    expect(emailSchema.parse("  Contato@CasaLar.org.br ")).toBe("contato@casalar.org.br");
+  });
+
+  it("recusa o que não é e-mail, com a mensagem em português", () => {
+    const resultado = emailSchema.safeParse("nao-e-email");
+    expect(resultado.success).toBe(false);
+    expect(resultado.error!.issues[0].message).toBe("E-mail inválido");
   });
 
   it("aceita até 254 caracteres (limite de um endereço de e-mail)", () => {
