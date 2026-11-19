@@ -19,15 +19,15 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 
 - [x] `app/(backend)/api/users/**` (listagem, conta por ID, troca de e-mail e senha): removidas, sem uso nas telas
 - [x] `app/(backend)/api/password/forgot`, `reset`: reescritas para recuperação por código via better-auth, com validação, limites e testes
-- [ ] `app/(backend)/schemas/base.schema.ts` (`auth.schema.ts` foi removido)
-- [ ] `app/(backend)/services/auth/*` (`services/users/*` foi removido)
-- [ ] `app/(backend)/README.md`
+- [ ] `app/(backend)/schemas/base.schema.ts` (`auth.schema.ts`, `nameSchema` e `corSchema` foram removidos)
+- [ ] `app/(backend)/services/auth/user.ts` (`services/users/*` e o `comparePassword` com bcrypt foram removidos)
+- [x] `app/(backend)/README.md` (removido; o conteúdo está em [padroes-api.md](padroes-api.md))
 
 Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-consertar.md).
 
 ### Front-end (~610 linhas)
 
-- [ ] `app/(frontend)/(auth)/**`: login (`LoginForm`) e a tela de recuperar a senha foram reescritos; falta o `logout/page.tsx`. O cadastro genérico (`/cadastro`, `CadastroForm`, `PasswordRequirement`) e o `POST /api/users` já foram removidos
+- [x] `app/(frontend)/(auth)/**`: login (`LoginForm`) e a tela de recuperar a senha foram reescritos; o `logout/page.tsx` (saía da conta por `GET`) foi removido. O cadastro genérico (`/cadastro`, `CadastroForm`, `PasswordRequirement`) e o `POST /api/users` já foram removidos
 - [x] `app/(frontend)/(landing-pages)/page.tsx` (virou a tela do mapa)
 - [x] `app/(frontend)/admin/**` (reescrito: login da equipe e as telas A1 a A4; o dashboard do template foi removido)
 - [x] `app/not-found.tsx` (reescrito)
@@ -44,7 +44,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 ### Utilitários e núcleo (~315 linhas)
 
 - [ ] `utils/api/server/*` (`validBody`, `errorHandlers`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos)
-- [ ] `utils/api/toErrorMessage.ts`, `utils/validations/*`
+- [ ] `utils/api/toErrorMessage.ts`, `utils/validations/index.ts` (`hasUppercase` e afins; `zod.ts` e `isSafeRedirect` foram removidos)
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
 - [ ] `auth.ts`: a configuração em si segue a documentação do better-auth. O plugin `customSession` com role é do template.
@@ -63,7 +63,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 - [x] `web/docs/API.md`, `FRONTEND.md`, `BETTER-AUTH.md`: removidos e reescritos como [padroes-api.md](padroes-api.md), [padroes-frontend.md](padroes-frontend.md) e [autenticacao.md](autenticacao.md)
 - [ ] `.husky/pre-commit`, `.husky/pre-push`
-- [ ] `bruno/**` (requisições de auth, session e users, `collection.bru`)
+- [ ] `bruno/**` (requisições de auth e session, `collection.bru`; as de users foram removidas)
 - [x] `README.md`: a seção "Padrões de projeto", adaptada do template, foi trocada por um índice da documentação
 - [x] Modificação no `components/ui/sidebar.tsx` (prop `iconClassName`): o arquivo foi removido junto com o dashboard
 
