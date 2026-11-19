@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/backend/services/db";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { CnpjLookupUnavailableError, CnpjNotFoundError, lookupCnpj } from "@/lib/cnpj";
 import { resetRateLimit } from "@/utils/api/server";
 import { createRequest } from "../../mocks/requests";

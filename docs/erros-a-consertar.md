@@ -35,7 +35,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 14 | ✅ | ~~Validação de nome rejeita hífen e apóstrofo~~ | `schemas/auth.schema.ts` |
 | 15 | ✅ | ~~`getUserRole` devolve `[]` em vez de `undefined`~~ | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
-| 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
+| 17 | ✅ | ~~Aviso de "NFT list" no build (Prisma no trace do proxy)~~ | `proxy.ts`, `services/db` |
 | 18 | 🟡 | Falha intermitente ao baixar a fonte Bricolage no `next dev`/`next build` | `app/layout.tsx` |
 
 ## Detalhes
@@ -198,7 +198,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** sem `.env`, o `next build` imprime `BetterAuthError: You are using the default secret` várias vezes. O build conclui, mas em produção sem a variável o app usaria o segredo padrão.
 - **Correção:** documentar no setup (o README já manda criar o `.env`) e garantir a variável na Vercel. Opcional: falhar o build de produção se ela faltar.
 
-### 17. 🟡 Aviso de "NFT list" no build
+### 17. ✅ Aviso de "NFT list" no build
+
+> **Corrigido em duas partes.** (1) O `proxy.ts` foi reescrito para só conferir o cookie de sessão, sem importar o `auth.ts` nem o Prisma. (2) O aviso continuou, agora vindo das rotas da API, porque o cliente gerado em `src/generated/prisma` procura arquivos a partir de `process.cwd()`. O Turbopack então rastreava o projeto inteiro: cada rota levava 597 arquivos, inclusive `tests/`, `tests/coverage/`, `next.config.ts` e o `.env` local. O cliente passou a ser gerado no lugar padrão (`node_modules/.prisma/client`, importado de `@prisma/client`), que o Next já trata como pacote externo. Sem o aviso, cada rota leva 259 arquivos, nenhum deles de `tests/` ou `.env`.
 
 - **Onde:** `next build` (Turbopack), trace a partir do `proxy.ts`
 - **Problema:** o build avisa "Encountered unexpected file in NFT list". O cliente Prisma gerado em `src/generated/prisma`, que faz operações de sistema de arquivos, entra no trace do `proxy.ts` via `auth.ts` → `services/db`. O build conclui, mas o trace pode incluir arquivos demais.

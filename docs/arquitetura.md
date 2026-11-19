@@ -96,7 +96,7 @@ web/
 └── package.json         dependências do app (runtime + configs ligadas ao Next) e scripts
 ```
 
-Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.d.ts`, `src/generated/` (cliente Prisma) e `.env`.
+Arquivos gerados, não versionados: `.next/` (build e cache do Next), `next-env.d.ts` e `.env`. O cliente Prisma é gerado em `node_modules/.prisma/client` (no `pnpm install` ou com `prisma generate`) e importado de `@prisma/client`.
 
 ### 3.1 Scripts do `web/`
 
@@ -199,7 +199,6 @@ src/
 │   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
 │   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
 ├── types/                        declarações de tipos de bibliotecas (GeoJSON)
-├── generated/                    cliente Prisma gerado (não editar, não versionado)
 ├── auth.ts                       configuração central do better-auth
 └── proxy.ts                      "porteiro": sem cookie de sessão, manda da área do admin e do painel para o login
 ```

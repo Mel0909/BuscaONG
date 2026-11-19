@@ -1,5 +1,5 @@
 import { buscarOpcoes } from "@/backend/services/listas";
-import type { Ong } from "@/generated/prisma";
+import type { Ong } from "@prisma/client";
 import { urlPublica } from "@/lib/armazenamento";
 import { PassoPublicar, type ItemVerificacao } from "../_components/PassoPublicar";
 import { rotaDoPasso } from "../_components/passos";

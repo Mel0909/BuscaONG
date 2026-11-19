@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { MotivoDenuncia } from "@/generated/prisma";
+import type { MotivoDenuncia } from "@prisma/client";
 import { MAX_RELATO, MOTIVOS_DENUNCIA } from "@/lib/denuncia/motivos";
 import { emailSchema } from "./base.schema";
 

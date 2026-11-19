@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import type { CategoriaAcao } from "@/backend/schemas";
-import type { Prisma, TipoAcao } from "@/generated/prisma";
+import type { Prisma, TipoAcao } from "@prisma/client";
 
 // Registro de ações (A3): toda ação do admin vira uma linha. Somente leitura: nada aqui
 // edita ou apaga linhas. Ações automáticas (sem admin) aparecem como "sistema".

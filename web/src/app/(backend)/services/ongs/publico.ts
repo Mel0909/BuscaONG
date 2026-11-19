@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import type { FiltrosData } from "@/backend/schemas";
-import type { Prisma } from "@/generated/prisma";
+import type { Prisma } from "@prisma/client";
 import { urlPublica } from "@/lib/armazenamento";
 import { ATIVIDADE_OUTRA, DIAS_VOLUNTARIADO, formatarHorario } from "@/lib/cadastro/voluntariado";
 import type { DiaFiltro } from "@/lib/mapa/filtros";

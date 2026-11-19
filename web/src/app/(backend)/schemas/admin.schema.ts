@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { TipoLista } from "@/generated/prisma";
+import type { TipoLista } from "@prisma/client";
 import { motivoDenunciaSchema, objectIdSchema } from "./denuncia.schema";
 
 // Área admin (A1 a A4). Toda ação que muda algo exige um motivo, que vai para o registro (A3).

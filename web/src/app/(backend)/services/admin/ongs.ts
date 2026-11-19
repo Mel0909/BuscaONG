@@ -1,7 +1,7 @@
 import prisma from "@/backend/services/db";
 import { avisarDenunciantes, resolverDenuncias, textoDoGrupo } from "@/backend/services/denuncias";
 import type { FiltroOngsAdmin } from "@/backend/schemas";
-import type { MotivoDenuncia, Ong, OngStatus, Prisma } from "@/generated/prisma";
+import type { MotivoDenuncia, Ong, OngStatus, Prisma } from "@prisma/client";
 import { lookupCnpj, type CnpjData } from "@/lib/cnpj";
 import { NATUREZAS_RECUSADAS, naturezaAceita } from "@/lib/cnpj/naturezas";
 import { nomeDoMotivo } from "@/lib/denuncia/motivos";

@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import type { NovaDenunciaData } from "@/backend/schemas";
-import type { MotivoDenuncia, StatusDenuncia } from "@/generated/prisma";
+import type { MotivoDenuncia, StatusDenuncia } from "@prisma/client";
 import { DENUNCIAS_PARA_TOPO, JANELA_TOPO_MS, nomeDoMotivo } from "@/lib/denuncia/motivos";
 import { sendEmail } from "@/lib/email";
 import { denunciaDecididaEmail } from "@/lib/email/templates/admin";

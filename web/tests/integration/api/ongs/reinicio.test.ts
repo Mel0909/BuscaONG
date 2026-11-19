@@ -9,7 +9,7 @@ import { POST as enviar } from "@/backend/api/ongs/minha/reinicio/codigo/route";
 import { POST as reiniciar } from "@/backend/api/ongs/minha/reinicio/route";
 import { publicarOng, salvarContatos } from "@/backend/services/ongs/cadastro";
 import { CadastroAlteradoError } from "@/backend/services/ongs/erros";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 
 vi.mock("@/backend/services/db", () => ({ default: {
   ong: { findUnique: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), update: vi.fn() },

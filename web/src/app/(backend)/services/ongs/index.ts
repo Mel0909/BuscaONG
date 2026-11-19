@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import prisma from "@/backend/services/db";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { lookupCnpj, type CnpjData } from "@/lib/cnpj";
 import { verificarElegibilidade, type MotivoNaoElegivel } from "./elegibilidade";
 import { CadastroEmAndamentoError, EmailEmUsoError, OngJaCadastradaError, OngNaoElegivelError } from "./erros";

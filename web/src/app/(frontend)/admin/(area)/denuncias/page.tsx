@@ -3,7 +3,7 @@ import Link from "next/link";
 import { motivoDenunciaSchema } from "@/backend/schemas";
 import { fichaOngAdmin } from "@/backend/services/admin";
 import { contarFila, filaDeDenuncias, relatosDoGrupo, textoDoGrupo } from "@/backend/services/denuncias";
-import type { StatusDenuncia } from "@/generated/prisma";
+import type { StatusDenuncia } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { DENUNCIAS_PARA_TOPO, nomeDoMotivo } from "@/lib/denuncia/motivos";
 import { ehObjectId } from "@/lib/ong/slug";

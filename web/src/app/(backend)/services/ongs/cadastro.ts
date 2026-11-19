@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import { buscarOpcoes } from "@/backend/services/listas";
-import { Prisma, type Ong } from "@/generated/prisma";
+import { Prisma, type Ong } from "@prisma/client";
 import type {
   ApresentacaoData,
   CausasItensData,

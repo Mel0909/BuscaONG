@@ -4,7 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { cn } from "@/lib/utils";
-import type { MotivoDenuncia } from "@/generated/prisma";
+import type { MotivoDenuncia } from "@prisma/client";
 import { chamarAdmin } from "../../_actions/api";
 import { CampoMotivo } from "../../_components/FichaOng";
 import { estiloBotaoClaro, estiloBotaoEscuro } from "../../_components/ui";

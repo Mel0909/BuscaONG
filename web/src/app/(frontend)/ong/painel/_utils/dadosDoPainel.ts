@@ -1,5 +1,5 @@
 import { itensDaOng, nomesDasListas, urgenciasAtivas } from "@/backend/services/ongs";
-import type { Ong } from "@/generated/prisma";
+import type { Ong } from "@prisma/client";
 import { urlPublica } from "@/lib/armazenamento";
 import type { DadosCartaoOng } from "@/components/ong/CartaoOng";
 

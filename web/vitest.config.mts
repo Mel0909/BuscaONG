@@ -36,7 +36,6 @@ export default defineConfig({
       'src/**/*.{ts,tsx}',      // só código; o Vitest 5 tenta parsear tudo que casar aqui
     ],
     exclude: [
-      'src/generated/**',       // exclude prisma-generated files
       'src/components/ui/**',   // exclude shadcn components
       '**/*.d.ts',              // exclude type defs
     ],
