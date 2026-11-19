@@ -4,6 +4,7 @@ import prisma from "@/backend/services/db";
 import { Prisma } from "@/generated/prisma";
 import { distanciaKm } from "@/lib/mapa/geo";
 import { setCurrentRole } from "../../mocks/auth";
+import { resetRateLimit } from "@/utils/api/server/rateLimit";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -68,6 +69,7 @@ const opcoes = (...slugs: string[]) => slugs.map((slug) => ({ slug, nome: slug }
 describe("rotas /api/ongs/minha/*", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetRateLimit();
     setCurrentRole("ONG");
     db.ong.findUnique.mockResolvedValue(ongRascunho() as never);
     db.ong.update.mockImplementation((async (args: { data: Record<string, unknown> }) => ({
@@ -302,20 +304,49 @@ describe("rotas /api/ongs/minha/*", () => {
   describe("passo 7", () => {
     const corpo = { nomePublico: "Casa Lar", descricaoCurta: "Acolhemos crianças." };
 
+    const UUID = "0b6f3c1e-5d2a-4c8b-9e7f-1a2b3c4d5e6f";
+
     it("aceita imagem gerada para esta ONG", async () => {
       const response = await putApresentacao(
-        requisicao("PUT", "apresentacao", { ...corpo, logo: `ongs/${ONG_ID}/logo-abc.png` })
+        requisicao("PUT", "apresentacao", { ...corpo, logo: `ongs/${ONG_ID}/logo-${UUID}.png` })
       );
       expect(response.status).toBe(200);
-      expect(dadosDoUpdate()).toMatchObject({ logo: `ongs/${ONG_ID}/logo-abc.png`, capa: null, sobre: null });
+      expect(dadosDoUpdate()).toMatchObject({ logo: `ongs/${ONG_ID}/logo-${UUID}.png`, capa: null, sobre: null });
     });
 
-    it("recusa chave de imagem de outra ONG", async () => {
-      const response = await putApresentacao(
-        requisicao("PUT", "apresentacao", { ...corpo, capa: "ongs/outra-ong/capa-abc.png" })
-      );
+    it.each([
+      ["de outra ONG", `ongs/6ae649983bbad49560772d99/capa-${UUID}.png`],
+      ["que sai da pasta da ONG", `ongs/${ONG_ID}/capa-x/../../6ae649983bbad49560772d99/capa-${UUID}.png`],
+      ["com consulta na URL", `ongs/${ONG_ID}/capa-${UUID}.png?x=1`],
+      ["de logo usada como capa", `ongs/${ONG_ID}/logo-${UUID}.png`],
+      ["com extensão que o envio não gera", `ongs/${ONG_ID}/capa-${UUID}.svg`],
+      ["fora do formato gerado", `ongs/${ONG_ID}/capa-abc.png`],
+      ["sem o ponto da extensão", `ongs/${ONG_ID}/capa-${UUID}/png`],
+    ])("recusa chave de imagem %s", async (_caso, capa) => {
+      const response = await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, capa }));
       expect(response.status).toBe(400);
       expect(db.ong.update).not.toHaveBeenCalled();
+    });
+
+    it("mantém a imagem já salva, mesmo em formato antigo", async () => {
+      db.ong.findUnique.mockResolvedValue(ongRascunho({ capa: "ongs/antiga/capa.png" }) as never);
+      const response = await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, capa: "ongs/antiga/capa.png" }));
+      expect(response.status).toBe(200);
+    });
+
+    it("limita os pedidos de URL de envio por conta (20 por hora)", async () => {
+      for (const nome of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"]) {
+        vi.stubEnv(nome, "");
+      }
+      try {
+        const pedir = () => postImagens(requisicao("POST", "imagens", { tipo: "capa", contentType: "image/png", tamanho: 1000 }));
+        for (let i = 0; i < 20; i++) expect((await pedir()).status).toBe(503);
+        const bloqueado = await pedir();
+        expect(bloqueado.status).toBe(429);
+        expect(Number(bloqueado.headers.get("Retry-After"))).toBeGreaterThan(0);
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
 
     it("pedir URL de envio sem o R2 configurado responde 503", async () => {

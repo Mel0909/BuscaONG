@@ -10,6 +10,7 @@ import type {
   VoluntariadoData,
 } from "@/backend/schemas";
 import { urlDeEnvio } from "@/lib/armazenamento";
+import { TIPOS_IMAGEM } from "@/lib/cadastro/limites";
 import { ATIVIDADE_OUTRA, calcularTurnos } from "@/lib/cadastro/voluntariado";
 import { distanciaKm, posicaoAproximada } from "@/lib/mapa/geo";
 import { slugLivre } from "@/lib/ong/slug";
@@ -204,6 +205,17 @@ export async function salvarVoluntariado(userId: string, dados: VoluntariadoData
 /** Prefixo das chaves de imagem de uma ONG no R2: ongs/<id>/logo-<uuid>.jpg */
 const prefixoImagem = (ongId: string, tipo: "logo" | "capa") => `ongs/${ongId}/${tipo}`;
 
+// o que urlDeEnvio gera depois do prefixo: "-<uuid>.<extensão>"
+const SUFIXO_IMAGEM = new RegExp(
+  `^-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(${Object.values(TIPOS_IMAGEM).join("|")})$`
+);
+
+/** A chave tem exatamente o formato gerado para esta ONG e este campo (nada de "../" nem "?"). */
+function chaveDaOng(ongId: string, tipo: "logo" | "capa", chave: string) {
+  const prefixo = prefixoImagem(ongId, tipo);
+  return chave.startsWith(prefixo) && SUFIXO_IMAGEM.test(chave.slice(prefixo.length));
+}
+
 /** URL assinada para o navegador enviar a logo ou a capa direto para o R2. */
 export async function criarEnvioImagem(userId: string, { tipo, contentType, tamanho }: EnvioImagemData) {
   const ong = await ongDoUsuario(userId);
@@ -216,7 +228,7 @@ export async function salvarApresentacao(userId: string, dados: ApresentacaoData
 
   for (const campo of ["logo", "capa"] as const) {
     const chave = dados[campo];
-    if (chave && chave !== ong[campo] && !chave.startsWith(`${prefixoImagem(ong.id, campo)}-`)) {
+    if (chave && chave !== ong[campo] && !chaveDaOng(ong.id, campo, chave)) {
       throw new ImagemInvalidaError(campo);
     }
   }

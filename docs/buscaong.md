@@ -185,8 +185,8 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 
 **Passo 7, Apresentação:**
 - Nome público (a primeira sugestão é a razão social) e descrição curta (até 160 caracteres) são obrigatórios; "Sobre a ONG" é opcional.
-- Logo (até 2 MB) e capa (até 5 MB) são opcionais, em JPG, PNG ou WebP, de qualquer formato e tamanho em pixels: as duas são cortadas no centro para caber no espaço (a logo vira quadrada). O navegador pede uma URL assinada (`POST /api/ongs/minha/imagens`) e envia o arquivo **direto para o Cloudflare R2**. Tipo e tamanho entram na assinatura, então o R2 recusa um arquivo diferente do declarado.
-- O banco guarda a **chave** do arquivo (`ongs/<id>/logo-<uuid>.png`); o `PUT` só aceita chaves com o prefixo da própria ONG.
+- Logo (até 2 MB) e capa (até 5 MB) são opcionais, em JPG, PNG ou WebP, de qualquer formato e tamanho em pixels: as duas são cortadas no centro para caber no espaço (a logo vira quadrada). O navegador pede uma URL assinada (`POST /api/ongs/minha/imagens`) e envia o arquivo **direto para o Cloudflare R2**. Tipo e tamanho entram na assinatura, então o R2 recusa um arquivo diferente do declarado. Cada conta pede no máximo **20 URLs de envio por hora** (cada URL cria um arquivo novo no bucket, e os antigos não são apagados).
+- O banco guarda a **chave** do arquivo (`ongs/<id>/logo-<uuid>.png`); o `PUT` só aceita chaves no formato exato que o envio gera para a própria ONG e o mesmo campo (`ongs/<id>/logo-<uuid>.<jpg|png|webp>`), sem `../` nem `?`; a imagem já salva continua valendo.
 - Sem as variáveis `R2_*`, o envio aparece como indisponível e a ONG segue sem imagens.
 - O bucket precisa de CORS liberando `PUT` a partir do domínio do site (e de `http://localhost:3000` em desenvolvimento).
 
