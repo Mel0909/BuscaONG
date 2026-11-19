@@ -247,7 +247,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 **A1, ONGs:** busca por nome, CNPJ ou cidade e filtros com contagem (todas, ativas, suspensas, CNPJ com problema, denunciadas, cadastro não terminado). "Revisar" marca a ONG com algum sinal. A ficha, à direita, tem:
 - "Ver página pública" e "Abrir no WhatsApp"; contatos com copiar ou abrir, marcando o que é **interno** (e-mail de acesso) e o que está **oculto** na página;
 - **Receita × declarado** (situação, natureza, cidade) e o botão **Revalidar**, que consulta o CNPJ de novo;
-- **Sinais:** situação diferente de ativa, denúncias abertas por motivo, cidade declarada diferente da Receita e "a ONG disse que o endereço da Receita mudou" (o protótipo pede que isso vire sinal, sem bloquear);
+- **Sinais:** situação diferente de ativa, natureza que não pode se cadastrar (o filtro "CNPJ com problema" também pega), denúncias abertas por motivo, cidade declarada diferente da Receita e "a ONG disse que o endereço da Receita mudou" (o protótipo pede que isso vire sinal, sem bloquear);
 - **Suspender** (sai do mapa na hora; a ONG recebe e-mail com o motivo; as denúncias abertas viram "com ação"), **Reativar** e **Excluir** (apaga a conta, o perfil e as denúncias; pede confirmação). Todas exigem motivo. O admin não edita perfis.
 
 **A2, Denúncias:** abas Abertas, Arquivadas e Com ação. Denúncias da mesma ONG e motivo viram uma linha; vão para o topo as de violência e as que têm 3 ou mais em 7 dias. A linha abre os relatos, a ficha resumida e duas ações com motivo: **Suspender ONG** ou **Arquivar denúncia** (sem mexer na ONG). Quem denunciou e deixou e-mail recebe um aviso da decisão.

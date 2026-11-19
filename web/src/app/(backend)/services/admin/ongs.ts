@@ -3,6 +3,7 @@ import { avisarDenunciantes, resolverDenuncias, textoDoGrupo } from "@/backend/s
 import type { FiltroOngsAdmin } from "@/backend/schemas";
 import type { MotivoDenuncia, Ong, OngStatus, Prisma } from "@/generated/prisma";
 import { lookupCnpj } from "@/lib/cnpj";
+import { NATUREZAS_RECUSADAS, naturezaAceita } from "@/lib/cnpj/naturezas";
 import { nomeDoMotivo } from "@/lib/denuncia/motivos";
 import { sendEmail } from "@/lib/email";
 import { reativacaoOngEmail, suspensaoOngEmail } from "@/lib/email/templates/admin";
@@ -26,7 +27,18 @@ function cidadeDiferente(ong: Pick<Ong, "endereco" | "enderecoReceita">) {
   return !!receita && !!declarada && normalizarChave(receita) !== normalizarChave(declarada);
 }
 
-const cnpjComProblema = (ong: Pick<Ong, "situacaoCadastral">) => ong.situacaoCadastral.toUpperCase() !== "ATIVA";
+const situacaoComProblema = (ong: Pick<Ong, "situacaoCadastral">) => ong.situacaoCadastral.toUpperCase() !== "ATIVA";
+/** Situação diferente de ativa, ou natureza que não pode se cadastrar (pode mudar numa revalidação). */
+const cnpjComProblema = (ong: Pick<Ong, "situacaoCadastral" | "naturezaJuridica">) =>
+  situacaoComProblema(ong) || !naturezaAceita(ong.naturezaJuridica);
+/** O mesmo, como filtro do banco (filtro "CNPJ com problema" do A1). */
+const ONDE_CNPJ_COM_PROBLEMA: Prisma.OngWhereInput = {
+  OR: [
+    { situacaoCadastral: { not: "ATIVA" } },
+    { NOT: { naturezaJuridica: { startsWith: "3" } } },
+    { naturezaJuridica: { in: Object.keys(NATUREZAS_RECUSADAS) } },
+  ],
+};
 
 /** Contagem de denúncias abertas por ONG. */
 async function denunciasAbertasPorOng(ongIds?: string[]) {
@@ -55,7 +67,7 @@ export async function contarOngsAdmin(): Promise<Record<FiltroOngsAdmin, number>
     prisma.ong.count({ where: { status: "PUBLICADA" } }),
     prisma.ong.count({ where: { status: "SUSPENSA" } }),
     prisma.ong.count({ where: { status: "RASCUNHO" } }),
-    prisma.ong.count({ where: { status: { not: "RASCUNHO" }, situacaoCadastral: { not: "ATIVA" } } }),
+    prisma.ong.count({ where: { AND: [{ status: { not: "RASCUNHO" } }, ONDE_CNPJ_COM_PROBLEMA] } }),
     denunciasAbertasPorOng().then((m) => m.size),
   ]);
   return { todas, ativas, suspensas, cnpj, denunciadas, rascunhos };
@@ -68,7 +80,7 @@ export async function listarOngsAdmin(filtro: FiltroOngsAdmin, busca: string, ag
   else if (filtro === "suspensas") onde.push({ status: "SUSPENSA" });
   else if (filtro === "rascunhos") onde.push({ status: "RASCUNHO" });
   else onde.push({ status: { not: "RASCUNHO" } });
-  if (filtro === "cnpj") onde.push({ situacaoCadastral: { not: "ATIVA" } });
+  if (filtro === "cnpj") onde.push(ONDE_CNPJ_COM_PROBLEMA);
   if (filtro === "denunciadas") onde.push({ id: { in: [...(await denunciasAbertasPorOng()).keys()] } });
 
   if (busca) {
@@ -94,6 +106,7 @@ export async function listarOngsAdmin(filtro: FiltroOngsAdmin, busca: string, ag
       cnpj: true,
       status: true,
       situacaoCadastral: true,
+      naturezaJuridica: true,
       endereco: true,
       enderecoReceita: true,
       urgencias: true,
@@ -164,7 +177,11 @@ export async function fichaOngAdmin(id: string): Promise<FichaOngAdmin | null> {
   });
 
   const sinais: string[] = [];
-  if (cnpjComProblema(ong)) sinais.push(`CNPJ com situação “${situacao}” na Receita (consulta de ${ong.receitaConsultadaEm.toLocaleDateString("pt-BR")})`);
+  if (situacaoComProblema(ong)) sinais.push(`CNPJ com situação “${situacao}” na Receita (consulta de ${ong.receitaConsultadaEm.toLocaleDateString("pt-BR")})`);
+  if (!naturezaAceita(ong.naturezaJuridica)) {
+    const recusada = NATUREZAS_RECUSADAS[ong.naturezaJuridica];
+    sinais.push(recusada ? `Natureza jurídica de ${recusada}, que não é ONG` : "Natureza jurídica com fins lucrativos");
+  }
   for (const d of denuncias) {
     const n = d._count._all;
     sinais.push(`${n} ${n === 1 ? "denúncia" : "denúncias"}: “${nomeDoMotivo(d.motivo)}”`);
@@ -183,13 +200,13 @@ export async function fichaOngAdmin(id: string): Promise<FichaOngAdmin | null> {
     whatsapp: c?.whatsapp?.valor ?? null,
     contatos,
     comparacao: [
-      { campo: "Situação", receita: situacao, declarado: "—", diferente: false, problema: cnpjComProblema(ong) },
+      { campo: "Situação", receita: situacao, declarado: "—", diferente: false, problema: situacaoComProblema(ong) },
       {
         campo: "Natureza",
         receita: formatarNaturezaJuridica(ong.naturezaJuridica) ?? "—",
         declarado: "—",
         diferente: false,
-        problema: !ong.naturezaJuridica.startsWith("3"),
+        problema: !naturezaAceita(ong.naturezaJuridica),
       },
       { campo: "Cidade", receita: cidadeReceita, declarado: cidadeDeclarada, diferente: cidadeDiferente(ong), problema: false },
     ],
