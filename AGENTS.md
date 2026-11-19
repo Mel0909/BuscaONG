@@ -31,7 +31,7 @@ Idioma: documentação, commits, branches e textos da interface em **português*
 - **Rotas da API não importam o Prisma**: rota → schema (Zod) → service ([docs/padroes-api.md](docs/padroes-api.md)).
 - **Cores só pelos tokens do projeto** (`bg-musgo`, `text-tinta`...). **Terracota é exclusiva de urgência** ([docs/buscaong.md §11](docs/buscaong.md)).
 - **Código herdado do template:** ao reescrever, **não copie** o código antigo; parta do requisito e da documentação oficial ([docs/codigo-herdado.md](docs/codigo-herdado.md)).
-- **Antes de mexer em `/api/users`, auth ou validação de IDs**, leia [docs/erros-a-consertar.md](docs/erros-a-consertar.md): há bugs de segurança conhecidos que dependem uns dos outros.
+- **Antes de mexer em auth ou validação de IDs**, leia [docs/erros-a-consertar.md](docs/erros-a-consertar.md): há bugs de segurança conhecidos que dependem uns dos outros.
 
 ### Ao trabalhar
 

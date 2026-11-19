@@ -132,7 +132,7 @@ No Next.js (App Router), **a estrutura de pastas dentro de `app/` define as URLs
 
 Convenções de pasta:
 - **`(nome)`**: *route group*. Organiza, mas **não aparece na URL**.
-- **`[nome]`**: segmento dinâmico (`[id]` → `/api/users/123`).
+- **`[nome]`**: segmento dinâmico (`[id]` → `/api/admin/ongs/123`).
 - **`_nome`**: pasta privada, **nunca** vira rota.
 
 Tudo **fora** de `app/` é código comum, que as páginas importam; o Next não cria URL para nada disso.

@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-// IDs de conta gerados pelo better-auth; não reutilizar para os ObjectIds de ONG.
-export const idSchema = z.string().regex(/^[A-Za-z0-9]{32}$/, "ID inválido");
-
 export const passwordSchema = z
     .string()
     .min(8, "Senha deve ter pelo menos 8 caracteres")

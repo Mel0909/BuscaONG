@@ -9,7 +9,3 @@ export async function getUserRole(userId: string) {
     return user?.role;
 }
 
-export async function getUserByEmail(email: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  return user;
-}

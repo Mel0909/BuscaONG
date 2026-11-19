@@ -67,7 +67,7 @@ if (!resultado.success) {
 | 409 | conflito (ex.: CNPJ já cadastrado) |
 | 500 | erro inesperado |
 
-> ⚠️ **O código herdado não segue esse formato à risca.** `blockForbiddenRequests`, `getUserFromRequest` e alguns retornos 403/409 usam `{ "error": "texto" }`, e o `POST /api/users` devolve `{ message, user }` no sucesso. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
+> ⚠️ **O código herdado não segue esse formato à risca.** `blockForbiddenRequests`, `getUserFromRequest` e alguns retornos 403/409 usam `{ "error": "texto" }`. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
 
 ## 5. Utilitários disponíveis
 
@@ -106,11 +106,9 @@ const allowedRoles: AllowedRoutes = {
 
 Use sempre a chave do **mesmo método** da função (`allowedRoles.GET` dentro de `GET`). Errar isso já causou uma falha de segurança no código herdado (bug #2).
 
-### Rotas de usuários
+### Sem rotas de usuários
 
-As rotas reescritas `/api/users` e `/api/users/[id]` consultam a sessão com `auth.api.getSession({ headers: request.headers })` e verificam o perfil explicitamente. A listagem exige `ADMIN`; leitura, atualização e exclusão individuais permitem `ADMIN` ou a própria conta `ONG`. Sessão e permissão são verificadas antes do acesso ao banco. As respostas de erro dessas rotas seguem `{ error: { message } }`.
-
-O `idSchema` valida **IDs de conta** do better-auth: exatamente 32 caracteres alfanuméricos, sem conversão nem mudança das contas existentes. IDs de ONG são ObjectIds do MongoDB e não usam esse schema. As subrotas de e-mail e senha ainda são herdadas e têm pendências no bug #6.
+As rotas `/api/users/*` do template foram removidas: nenhuma tela as usava, e o `DELETE` deixava a ONG apagar a própria conta (saindo de uma suspensão e liberando o CNPJ, sem registro). Conta de ONG nasce no `POST /api/ongs` e só o admin a exclui, pela ficha da ONG. Não recrie rotas genéricas de usuário; uma operação de conta nova entra como rota específica, com sessão, perfil e dono conferidos.
 
 ### Recuperação e reinício
 

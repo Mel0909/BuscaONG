@@ -7,7 +7,7 @@ Problemas encontrados no código herdado do template, numa revisão feita em 202
 
 Os comportamentos do better-auth citados abaixo foram conferidos no código da versão instalada (1.5.5).
 
-**Contexto do BuscaONG:** não há conta de doador, só **ONG e Admin** têm login (ver [buscaong.md](buscaong.md)). As rotas `/api/users/*` vieram do template genérico e podem ser redesenhadas, ou removidas, quando as features de ONG e Admin forem implementadas. Mesmo assim, enquanto existirem, estão expostas.
+**Contexto do BuscaONG:** não há conta de doador, só **ONG e Admin** têm login (ver [buscaong.md](buscaong.md)). As rotas `/api/users/*` vieram do template genérico e **foram removidas** (2026-11-19): nenhuma tela as usava. Os itens #1, #2, #5, #6, #12 e #14 ficam registrados pelo histórico.
 
 **Legenda:**
 - 🔴 segurança
@@ -24,15 +24,15 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 3 | ✅ | ~~Política de senha só existe no front; a API do better-auth aceita senhas fracas~~ | `auth.ts`, `CadastroForm.tsx` |
 | 4 | ✅ | ~~Chaves do Resend embutidas no bundle via `next.config.ts`~~ | `next.config.ts` |
 | 5 | ✅ | ~~Validação de ID exige UUID, mas o better-auth gera IDs alfanuméricos~~ | `schemas/base.schema.ts` |
-| 6 | 🟠 | Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão) | `api/users/[id]/email`, `.../password` |
+| 6 | ✅ | ~~Trocar e-mail e senha pela API sempre falha (chama o better-auth sem a sessão)~~ | `api/users/[id]/email`, `.../password` |
 | 7 | ✅ | ~~"Esqueci a senha" nunca funciona e não avisa~~ | `api/password/forgot/route.ts`, `auth.ts` |
 | 8 | ✅ | ~~Botão "Entrar/Cadastro com Google" quebra (provedor desativado)~~ | `GoogleLoginButton.tsx`, `auth.ts` |
 | 9 | ✅ | ~~`redirect()` dentro de `setTimeout` no cadastro~~ | `CadastroForm.tsx` |
 | 10 | 🟡 | `validBody` devolve a resposta de erro como se fosse o corpo | `utils/api/server/validBody.ts` |
 | 11 | ✅ | ~~Reset de senha sem validação da política~~ | `api/password/reset/route.ts` |
-| 12 | 🟡 | Admin pode apagar ou editar outros admins | `api/users/[id]/route.ts` |
+| 12 | ✅ | ~~Admin pode apagar ou editar outros admins~~ | `api/users/[id]/route.ts` |
 | 13 | ✅ | ~~Regras de senha inconsistentes entre telas e rotas~~ | vários |
-| 14 | 🟡 | Validação de nome rejeita hífen e apóstrofo | `schemas/auth.schema.ts` |
+| 14 | ✅ | ~~Validação de nome rejeita hífen e apóstrofo~~ | `schemas/auth.schema.ts` |
 | 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
 | 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
@@ -90,7 +90,9 @@ Caminhos relativos a `web/src/`.
 
   A opção (b) foi adotada junto com o #1. Os modelos de ONG usam ObjectId, com validação separada quando necessária.
 
-### 6. 🟠 Trocar e-mail e senha pela API sempre falha
+### 6. ✅ Trocar e-mail e senha pela API sempre falha
+
+> **Resolvido pela remoção:** as rotas `/api/users/[id]/email` e `/password` foram apagadas junto com o resto de `/api/users` (nenhuma tela trocava e-mail ou senha logada). A troca de e-mail também foi desligada no better-auth (`changeEmail.enabled: false`).
 
 - **Onde:**
   - [api/users/[id]/email/route.ts:38](../web/src/app/(backend)/api/users/[id]/email/route.ts#L38)
@@ -151,7 +153,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** `newPassword` vai direto para o better-auth, sem `passwordSchema` e sem `validBody`.
 - **Correção:** validar com `passwordSchema` (ou resolver junto com o hook do #3).
 
-### 12. 🟡 Sem hierarquia entre admins
+### 12. ✅ Sem hierarquia entre admins
+
+> **Resolvido pela remoção** de `/api/users/[id]`. Hoje nenhuma rota edita ou apaga contas de admin; elas são criadas pelo terminal (`pnpm admin:criar`).
 
 - **Onde:** [api/users/[id]/route.ts:38](../web/src/app/(backend)/api/users/[id]/route.ts#L38)
 - **Problema:** `ADMIN` pode apagar ou editar outros admins.
@@ -170,7 +174,9 @@ Caminhos relativos a `web/src/`.
 
 - **Correção:** uma única fonte, o `passwordSchema`, mais a configuração de `minPasswordLength` do better-auth.
 
-### 14. 🟡 Nome rejeita hífen e apóstrofo
+### 14. ✅ Nome rejeita hífen e apóstrofo
+
+> **Resolvido pela remoção** do `auth.schema.ts`, que só servia às rotas `/api/users`. Os nomes de ONG têm regra própria no cadastro.
 
 - **Onde:** [schemas/auth.schema.ts:14](../web/src/app/(backend)/schemas/auth.schema.ts#L14)
 - **Problema:** a regex `/^[a-zA-ZÀ-ÿ\s]+$/` rejeita "Ana-Clara" e "D'Ávila", e o intervalo `À-ÿ` aceita `×` e `÷`.
