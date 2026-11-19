@@ -1,4 +1,5 @@
 import type { CnpjData } from "@/lib/cnpj";
+import { naturezaAceita } from "@/lib/cnpj/naturezas";
 import {
   capitalizarNome,
   formatarEndereco,
@@ -14,7 +15,7 @@ type Props = {
 // "Encontrado na Receita Federal" do passo 1
 export function CartaoReceita({ receita, elegivel }: Props) {
   const situacaoOk = receita.situacaoCadastral === "ATIVA";
-  const naturezaOk = receita.naturezaJuridica.codigo?.startsWith("3") ?? false;
+  const naturezaOk = naturezaAceita(receita.naturezaJuridica.codigo);
   const natureza = [
     formatarNaturezaJuridica(receita.naturezaJuridica.codigo),
     receita.naturezaJuridica.descricao,

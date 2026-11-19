@@ -96,6 +96,15 @@ describe("GET /api/cnpj/[cnpj]", () => {
     expect(body.motivo).toBe("NATUREZA_COM_FINS_LUCRATIVOS");
   });
 
+  it("devolve NAO_ELEGIVEL para entidade sem fins lucrativos que não é ONG", async () => {
+    lookupMock.mockResolvedValue(cnpjDataMock({ naturezaJuridica: { codigo: "3131", descricao: "Entidade Sindical" } }));
+
+    const body = await (await get(CNPJ)).json();
+
+    expect(body.status).toBe("NAO_ELEGIVEL");
+    expect(body.motivo).toBe("NATUREZA_NAO_ACEITA");
+  });
+
   it("devolve 404 quando o CNPJ não existe na Receita", async () => {
     lookupMock.mockRejectedValue(new CnpjNotFoundError(CNPJ));
 

@@ -28,6 +28,8 @@ const MOTIVOS: Record<string, string> = {
     "Este CNPJ não está com situação ativa na Receita Federal. Só ONGs com CNPJ ativo podem se cadastrar.",
   NATUREZA_COM_FINS_LUCRATIVOS:
     "Este CNPJ não é de uma entidade sem fins lucrativos (associação, fundação ou organização religiosa).",
+  NATUREZA_NAO_ACEITA:
+    "O BuscaONG é só para ONGs. Cartórios, condomínios, partidos políticos, sindicatos e fundos não podem se cadastrar.",
 };
 
 async function consultar(cnpj: string, signal: AbortSignal): Promise<Estado> {
