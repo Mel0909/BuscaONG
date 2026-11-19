@@ -59,6 +59,7 @@ describe("GET /api/geocodificacao", () => {
 describe("GET /api/itens-livres", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetRateLimit();
     setCurrentRole("ONG");
   });
 
@@ -91,5 +92,11 @@ describe("GET /api/itens-livres", () => {
 
   it("400 com menos de 3 letras", async () => {
     expect((await getItensLivres(get("itens-livres?q=ve"))).status).toBe(400);
+  });
+
+  it("limita as consultas por conta (60 por minuto)", async () => {
+    db.ong.aggregateRaw.mockResolvedValue([] as never);
+    for (let i = 0; i < 60; i++) expect((await getItensLivres(get("itens-livres?q=ventil"))).status).toBe(200);
+    expect((await getItensLivres(get("itens-livres?q=ventil"))).status).toBe(429);
   });
 });

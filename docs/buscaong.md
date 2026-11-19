@@ -175,7 +175,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 - 1 a 3 causas e pelo menos um item (da lista ou livre).
 - As listas fixas ficam na coleção `opcao_lista` (modelo `OpcaoLista`, tipos `CAUSA`, `ITEM` e `ATIVIDADE`), preenchida por `pnpm db:seed` com as listas do protótipo. O admin vai gerenciá-las; a ONG guarda o `slug`, que não muda quando o nome muda.
 - Item livre (até 20, de 2 a 40 caracteres) é guardado com o nome digitado e uma `chave` normalizada (minúsculas, sem acento). Se a chave bate com um item da lista, vira o item da lista.
-- Enquanto a ONG digita (3+ letras), `GET /api/itens-livres?q=` sugere itens livres que outras ONGs **publicadas** já usaram, com quantas ONGs usam (texto de rascunho ou de ONG suspensa não aparece).
+- Enquanto a ONG digita (3+ letras), `GET /api/itens-livres?q=` sugere itens livres que outras ONGs **publicadas** já usaram, com quantas ONGs usam (texto de rascunho ou de ONG suspensa não aparece). Limite de 60 consultas por minuto por conta (a tela espera a pessoa parar de digitar).
 
 **Passo 6, Voluntariado (opcional):**
 - Ligado, exige pelo menos um horário (até 20). Desligado, os horários ficam guardados, mas não aparecem.
