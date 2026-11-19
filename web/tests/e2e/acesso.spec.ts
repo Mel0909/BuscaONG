@@ -114,7 +114,7 @@ test.describe('páginas que exigem sessão', () => {
     await expect(page.getByRole('link', { name: 'Recupere o acesso pelo e-mail' })).toHaveAttribute('href', '/login/recuperar')
   })
 
-  for (const secao of ['ongs', 'denuncias', 'registro', 'listas']) {
+  for (const secao of ['ongs', 'denuncias', 'imagens', 'registro', 'listas']) {
     test(`/admin/${secao} sem login leva ao login do admin`, async ({ page }) => {
       await page.goto(`${BASE}/admin/${secao}`)
       await expect(page).toHaveURL(`${BASE}/admin`)

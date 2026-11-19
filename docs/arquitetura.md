@@ -150,7 +150,7 @@ src/
 │   │   │   ├── _components/      moldura das telas de acesso da ONG
 │   │   │   └── login/            formulário de login e, em recuperar/, o código por e-mail e a senha nova
 │   │   ├── admin/                /admin (login da equipe)
-│   │   │   └── (area)/           /admin/ongs, /denuncias, /registro, /listas (A1 a A4), com a barra do admin
+│   │   │   └── (area)/           /admin/ongs, /denuncias, /imagens, /registro, /listas (A1 a A5), com a barra do admin
 │   │   │       ├── _components/  ficha da ONG (contatos, Receita × declarado, ações) e peças comuns (ui.tsx)
 │   │   │       ├── _actions/     chamadas às rotas /api/admin/*
 │   │   │       └── _utils/       carregarAdmin: exige a sessão de um admin (no servidor)
@@ -165,7 +165,7 @@ src/
 │   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
 │   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = cadastro e painel da ONG; GET ongs, ongs/mapa, ongs/busca e POST denuncias = área pública; admin/* = área admin
-│   │   ├── services/             acesso ao banco via Prisma (ongs/: conta, cadastro, área pública, página e urgências; listas/: listas fixas; denuncias/; admin/: ONGs, listas e registro de ações)
+│   │   ├── services/             acesso ao banco via Prisma (ongs/: conta, cadastro, área pública, página e urgências; listas/: listas fixas; denuncias/; admin/: ONGs, imagens, listas e registro de ações)
 │   │   └── schemas/              validação de entrada com Zod
 │   ├── layout.tsx                layout raiz (fontes, <html>, toasts)
 │   ├── globals.css               Tailwind, tokens de cor e fonte e estilos globais
