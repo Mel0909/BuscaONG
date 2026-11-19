@@ -7,8 +7,11 @@ export const passwordSchema = z
     .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
     .regex(/\d/, "Senha deve conter pelo menos um número");
 
+// 254 caracteres é o tamanho máximo de um endereço de e-mail (RFC 5321); sem limite, uma rota
+// pública (como a denúncia) gravaria um texto de qualquer tamanho
 export const emailSchema = z
     .string()
+    .max(254, "Email muito longo")
     .email("Email inválido")
     .transform(str => str.toLowerCase().trim());
 
