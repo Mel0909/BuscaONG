@@ -92,7 +92,7 @@ ONGs salvas antes da posição pública existir a ganham no `pnpm db:seed`; até
 1. **CNPJ**, validado em três camadas, em ordem:
    1. **Dígito verificador**, localmente, sem rede.
    2. **Consulta à BrasilAPI**, com fallback para Minha Receita e OpenCNPJ (ver §8.4).
-   3. **Situação cadastral ativa** e **natureza jurídica sem fins lucrativos**.
+   3. **Situação cadastral ativa** e **natureza jurídica sem fins lucrativos** (grupo 3), **fora** das naturezas do grupo 3 que não são ONGs: cartório (303-4), condomínios (308-5 e 331-0), comissão de conciliação prévia (310-7), mediação e arbitragem (311-5), partido político e seus órgãos (312-3, 325-5 a 328-0), frente plebiscitária (329-8), sindicato (313-1), fundo privado (324-7) e plano de previdência complementar (332-8). Lista em `lib/cnpj/naturezas.ts`; a recusa usa o motivo `NATUREZA_NAO_ACEITA`.
 2. Criar acesso (login da ONG).
 3. Localização no mapa.
 4. Contatos e redes sociais.
@@ -385,7 +385,7 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **Grupo dos itens (A4):** campo novo, vazio nas listas do seed; o admin preenche.
 - **Login com Google:** o botão (quebrado, erro #8) saiu da tela de login. Decidir se ONG e admin vão entrar com Google.
 - **Raio e tamanho da lista:** 50 km e 30 ONGs foram escolhas iniciais. Revisar com dados reais (em cidade pequena, 50 km pode ser pouco; em SP, 30 pode ser pouco sem filtro).
-- **Naturezas jurídicas do grupo 3 que não são ONGs:** a regra aceita todo o grupo 3, que também inclui serviço notarial (cartório, 303-4), condomínio edilício (308-5), entidade sindical (313-1) e órgãos de partido político (325-5 a 328-0), conforme a [tabela de natureza jurídica do IBGE/Concla](https://concla.ibge.gov.br/estrutura/natjur-estrutura/natureza-juridica-2021). Decidir se esses códigos devem ser recusados.
+- **Naturezas jurídicas do grupo 3 que não são ONGs:** ✅ decidido em 2026-11-19: cartório, condomínios, conciliação, mediação e arbitragem, partidos, frente plebiscitária, sindicato, fundo privado e previdência complementar são recusados (§4). Organização religiosa, comunidade indígena, serviço social autônomo (Sistema S), OS, Oscip e unidade executora continuam aceitos.
 - **E-mail já cadastrado no passo 2:** hoje a resposta diz explicitamente que o e-mail já tem conta. Isso revela se um e-mail está cadastrado, mas só para quem tem um CNPJ elegível e ainda sem conta, e com limite de tentativas. A alternativa é uma mensagem genérica.
 - **Cor de erro:** a paleta não tem cor de erro (terracota é só para urgência). Os erros de formulário usam borda `tinta` e texto neutro.
 

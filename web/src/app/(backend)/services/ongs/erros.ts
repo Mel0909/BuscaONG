@@ -72,7 +72,9 @@ export class OngNaoElegivelError extends Error {
     super(
       motivo === "SITUACAO_NAO_ATIVA"
         ? "O CNPJ não está com situação ativa na Receita Federal."
-        : "O CNPJ não é de uma entidade sem fins lucrativos."
+        : motivo === "NATUREZA_NAO_ACEITA"
+          ? "O BuscaONG é só para ONGs: este tipo de entidade não pode se cadastrar."
+          : "O CNPJ não é de uma entidade sem fins lucrativos."
     );
     this.name = "OngNaoElegivelError";
   }
