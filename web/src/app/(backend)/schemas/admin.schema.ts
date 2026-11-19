@@ -72,8 +72,23 @@ export const decisaoItemLivreSchema = z
     z.object({ acao: z.literal("MANTER"), chave: z.string().trim().min(1).max(60) }).strict(),
   ], { error: "Ação inválida" });
 
+/**
+ * PATCH /api/admin/imagens (A5): "ok" ou remover a logo ou a capa nova de uma ONG.
+ * `chave` é a imagem que o admin viu: se a ONG trocou depois, a ação não vale (409).
+ */
+export const revisaoImagemSchema = z.discriminatedUnion(
+  "acao",
+  [
+    z.object({ acao: z.literal("APROVAR"), ongId: objectIdSchema, tipo: z.enum(["logo", "capa"]), chave: z.string().min(1).max(200) }).strict(),
+    z
+      .object({ acao: z.literal("REMOVER"), ongId: objectIdSchema, tipo: z.enum(["logo", "capa"]), chave: z.string().min(1).max(200), motivo })
+      .strict(),
+  ],
+  { error: "Ação inválida" }
+);
+
 /** Categorias do filtro do registro de ações (A3). */
-export const CATEGORIAS_ACAO = ["todas", "suspensoes", "exclusoes", "denuncias", "listas", "sistema"] as const;
+export const CATEGORIAS_ACAO = ["todas", "suspensoes", "exclusoes", "denuncias", "imagens", "listas", "sistema"] as const;
 
 /** GET /api/admin/acoes (CSV) e a página do registro. */
 export const filtroAcoesSchema = z.object({
@@ -92,5 +107,6 @@ export type StatusOngAdminData = z.infer<typeof statusOngAdminSchema>;
 export type NovaOpcaoData = z.infer<typeof novaOpcaoSchema>;
 export type EdicaoOpcaoData = z.infer<typeof edicaoOpcaoSchema>;
 export type DecisaoItemLivreData = z.infer<typeof decisaoItemLivreSchema>;
+export type RevisaoImagemData = z.infer<typeof revisaoImagemSchema>;
 export type CategoriaAcao = (typeof CATEGORIAS_ACAO)[number];
 export type FiltroOngsAdmin = (typeof FILTROS_ONGS_ADMIN)[number];

@@ -185,7 +185,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 
 **Passo 7, Apresentação:**
 - Nome público (a primeira sugestão é a razão social) e descrição curta (até 160 caracteres) são obrigatórios; "Sobre a ONG" é opcional.
-- Logo (até 2 MB) e capa (até 5 MB) são opcionais, em JPG, PNG ou WebP, de qualquer formato e tamanho em pixels: as duas são cortadas no centro para caber no espaço (a logo vira quadrada). O navegador pede uma URL assinada (`POST /api/ongs/minha/imagens`) e envia o arquivo **direto para o Cloudflare R2**. Tipo e tamanho entram na assinatura, então o R2 recusa um arquivo diferente do declarado. Cada conta pede no máximo **20 URLs de envio por hora** (cada URL cria um arquivo novo no bucket, e os antigos não são apagados).
+- Logo (até 2 MB) e capa (até 5 MB) são opcionais, em JPG, PNG ou WebP, de qualquer formato e tamanho em pixels: as duas são cortadas no centro para caber no espaço (a logo vira quadrada). Aparecem no perfil na hora e entram na revisão da equipe (A5, §7.1). O navegador pede uma URL assinada (`POST /api/ongs/minha/imagens`) e envia o arquivo **direto para o Cloudflare R2**. Tipo e tamanho entram na assinatura, então o R2 recusa um arquivo diferente do declarado. Cada conta pede no máximo **20 URLs de envio por hora** (cada URL cria um arquivo novo no bucket, e os antigos não são apagados).
 - O banco guarda a **chave** do arquivo (`ongs/<id>/logo-<uuid>.png`); o `PUT` só aceita chaves no formato exato que o envio gera para a própria ONG e o mesmo campo (`ongs/<id>/logo-<uuid>.<jpg|png|webp>`), sem `../` nem `?`; a imagem já salva continua valendo.
 - Sem as variáveis `R2_*`, o envio aparece como indisponível e a ONG segue sem imagens.
 - O bucket precisa de CORS liberando `PUT` a partir do domínio do site (e de `http://localhost:3000` em desenvolvimento).
@@ -237,12 +237,13 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 
 - **ONGs:** gestão das ONGs cadastradas.
 - **Denúncias:** fila das denúncias de perfil.
+- **Imagens:** revisão das logos e capas novas (a imagem aparece na hora; o admin dá "ok" depois).
 - **Registro de ações:** log das ações administrativas.
 - **Listas fixas:** listas de causas e itens usadas nos filtros e no cadastro.
 
-### 7.1 Como está implementado (A1 a A4)
+### 7.1 Como está implementado (A1 a A5)
 
-`/admin` é o login da equipe; as seções ficam em `/admin/ongs`, `/admin/denuncias`, `/admin/registro` e `/admin/listas`, com a barra escura do protótipo (visual neutro, sem o creme do site). **Contas de admin são criadas pelo terminal**, com `pnpm admin:criar` (e-mail, nome e senha; a senha segue a mesma regra e é gravada pelo better-auth). Uma conta de ONG não vira admin.
+`/admin` é o login da equipe; as seções ficam em `/admin/ongs`, `/admin/denuncias`, `/admin/imagens`, `/admin/registro` e `/admin/listas`, com a barra escura do protótipo (visual neutro, sem o creme do site). **Contas de admin são criadas pelo terminal**, com `pnpm admin:criar` (e-mail, nome e senha; a senha segue a mesma regra e é gravada pelo better-auth). Uma conta de ONG não vira admin.
 
 **A1, ONGs:** busca por nome, CNPJ ou cidade e filtros com contagem (todas, ativas, suspensas, CNPJ com problema, denunciadas, cadastro não terminado). "Revisar" marca a ONG com algum sinal. A ficha, à direita, tem:
 - "Ver página pública" e "Abrir no WhatsApp"; contatos com copiar ou abrir, marcando o que é **interno** (e-mail de acesso) e o que está **oculto** na página;
@@ -254,12 +255,14 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 
 **A3, Registro de ações:** somente leitura (nenhuma linha se edita ou apaga). Busca, filtros (suspensões, exclusões, denúncias, listas, sistema) e **Exportar CSV** (`GET /api/admin/acoes`). Toda ação do admin vira uma linha com quem, o quê, o alvo (o nome como era na hora) e o motivo.
 
+**A5, Imagens** (não está no protótipo): a logo e a capa aparecem no perfil assim que a ONG envia (sem moderação antes). A seção lista as imagens ainda não revisadas de perfis publicados, das mais antigas para as mais novas, e a barra mostra quantas são. **Ok** tira da lista (sem mexer no `updatedAt`, para não dar conflito no formulário da ONG); **Remover** exige motivo, tira a imagem do perfil, apaga o arquivo do R2 (o link antigo para de abrir), avisa a ONG por e-mail e vai para o registro. As duas valem só para a imagem que o admin viu: se a ONG trocou nesse meio-tempo, responde 409. Imagens salvas antes da revisão existir também entram na lista. Campos: `logoRevisada` e `capaRevisada` (ausente, `false` ou `null` = não revisada).
+
 **A4, Listas:** causas, itens e atividades, com quantas ONGs usam cada opção.
 - **Arrastar** (ou as setas, pelo teclado) muda a ordem dos filtros e do cadastro.
 - **Editar:** renomear (o slug guardado nas ONGs não muda), grupo (só itens), desativar (some do cadastro e dos filtros, mas vale para quem já usa) e **unificar** com outra opção (as ONGs passam para a outra, inclusive as urgências, e esta sai da lista). Opção em uso não se exclui.
 - **Sugestões do texto livre:** itens que as ONGs escreveram à mão, dos mais usados para os menos, com "Parecido com X" quando há um item próximo na lista. **Adicionar à lista** ou **Unificar** passam as ONGs para o item da lista (o filtro do mapa passa a encontrá-las); **Manter como texto livre** tira a sugestão.
 
-**Rotas** (todas exigem perfil `ADMIN`; ID no formato de ObjectId): `PATCH` e `DELETE /api/admin/ongs/[id]`, `POST /api/admin/ongs/[id]/revalidacao`, `PATCH /api/admin/denuncias`, `POST /api/admin/listas`, `PATCH` e `DELETE /api/admin/listas/[id]`, `POST /api/admin/listas/[id]/unificacao`, `PUT /api/admin/listas/ordem`, `POST /api/admin/itens-livres`, `GET /api/admin/acoes`. Erros: 400 dados inválidos · 401/403 sessão · 404 não existe · 409 ação que não vale no estado atual (reativar ONG ativa, excluir opção em uso, nome repetido) · 503 Receita indisponível.
+**Rotas** (todas exigem perfil `ADMIN`; ID no formato de ObjectId): `PATCH` e `DELETE /api/admin/ongs/[id]`, `POST /api/admin/ongs/[id]/revalidacao`, `PATCH /api/admin/denuncias`, `POST /api/admin/listas`, `PATCH` e `DELETE /api/admin/listas/[id]`, `POST /api/admin/listas/[id]/unificacao`, `PUT /api/admin/listas/ordem`, `POST /api/admin/itens-livres`, `PATCH /api/admin/imagens`, `GET /api/admin/acoes`. Erros: 400 dados inválidos · 401/403 sessão · 404 não existe · 409 ação que não vale no estado atual (reativar ONG ativa, excluir opção em uso, nome repetido) · 503 Receita indisponível.
 
 ## 8. Stack técnica
 
@@ -365,7 +368,7 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 
 ## 9. Decisões em aberto
 
-- **Moderação automática de imagem:** ferramenta ainda não escolhida. O protótipo prevê moderar antes de publicar; hoje as imagens do passo 7 vão direto para o R2 e aparecem no perfil.
+- **Moderação de imagem:** ✅ decidido em 2026-11-19: sem ferramenta automática e sem moderar antes. A imagem aparece na hora e a equipe revisa depois (A5, §7.1).
 - **Telas de login:** o protótipo não tem. `/login`, `/login/recuperar` e `/admin` seguem o visual do site e do admin; revisar com o design.
 - **Selo de CNPJ verificado:** exibir ou não.
 - **Imagens trocadas no R2:** quando a ONG troca ou remove a logo ou a capa, o arquivo antigo continua no bucket. Falta uma limpeza (ex.: regra de ciclo de vida ou apagar ao salvar).

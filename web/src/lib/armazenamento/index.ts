@@ -2,7 +2,7 @@
 // O navegador envia o arquivo direto para o R2 com uma URL assinada pelo servidor;
 // o arquivo não passa pelo servidor do app.
 import { randomUUID } from "node:crypto";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { TIPOS_IMAGEM, type TipoImagem } from "@/lib/cadastro/limites";
 
@@ -56,4 +56,14 @@ export async function urlDeEnvio(prefixo: string, contentType: TipoImagem, taman
   );
 
   return { chave, urlEnvio, url: `${r2.urlPublica}/${chave}` };
+}
+
+/**
+ * Apaga um arquivo do bucket (ex.: imagem removida pela equipe, para o link antigo parar de abrir).
+ * Sem o R2 configurado, não faz nada.
+ */
+export async function apagarArquivo(chave: string): Promise<void> {
+  const r2 = config();
+  if (!r2) return;
+  await r2.client.send(new DeleteObjectCommand({ Bucket: r2.bucket, Key: chave }));
 }

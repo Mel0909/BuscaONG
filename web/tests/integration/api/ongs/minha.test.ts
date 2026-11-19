@@ -328,6 +328,25 @@ describe("rotas /api/ongs/minha/*", () => {
       expect(db.ong.update).not.toHaveBeenCalled();
     });
 
+    it("imagem nova entra na revisão do admin; trocar de novo também", async () => {
+      await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, logo: `ongs/${ONG_ID}/logo-${UUID}.png` }));
+      expect(dadosDoUpdate()).toMatchObject({ logoRevisada: false });
+      expect(dadosDoUpdate()).not.toHaveProperty("capaRevisada");
+    });
+
+    it("manter a mesma imagem não a manda de novo para a revisão", async () => {
+      const logo = `ongs/${ONG_ID}/logo-${UUID}.png`;
+      db.ong.findUnique.mockResolvedValue(ongRascunho({ logo, logoRevisada: true }) as never);
+      await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, logo }));
+      expect(dadosDoUpdate()).not.toHaveProperty("logoRevisada");
+    });
+
+    it("tirar a imagem limpa a revisão", async () => {
+      db.ong.findUnique.mockResolvedValue(ongRascunho({ capa: `ongs/${ONG_ID}/capa-${UUID}.png`, capaRevisada: false }) as never);
+      await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, capa: null }));
+      expect(dadosDoUpdate()).toMatchObject({ capa: null, capaRevisada: null });
+    });
+
     it("mantém a imagem já salva, mesmo em formato antigo", async () => {
       db.ong.findUnique.mockResolvedValue(ongRascunho({ capa: "ongs/antiga/capa.png" }) as never);
       const response = await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, capa: "ongs/antiga/capa.png" }));

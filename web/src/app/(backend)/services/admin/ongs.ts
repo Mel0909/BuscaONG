@@ -18,7 +18,7 @@ import { registrarAcao, type Autor } from "./registro";
 // Gestão de ONGs (A1). O admin não edita perfis: vê, suspende, reativa, exclui e revalida o CNPJ.
 // Toda ação vai para o registro (A3).
 
-const nomeDa = (ong: Pick<Ong, "nomePublico" | "razaoSocial">) => ong.nomePublico ?? capitalizarNome(ong.razaoSocial);
+export const nomeDa = (ong: Pick<Ong, "nomePublico" | "razaoSocial">) => ong.nomePublico ?? capitalizarNome(ong.razaoSocial);
 
 /** Cidade declarada (passo 3) diferente da que está na Receita: sinal para a auditoria, sem bloquear. */
 function cidadeDiferente(ong: Pick<Ong, "endereco" | "enderecoReceita">) {

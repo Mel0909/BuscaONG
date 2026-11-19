@@ -8,12 +8,15 @@ import { cn } from "@/lib/utils";
 const SECOES = [
   { href: "/admin/ongs", nome: "ONGs" },
   { href: "/admin/denuncias", nome: "Denúncias" },
+  { href: "/admin/imagens", nome: "Imagens" },
   { href: "/admin/registro", nome: "Registro de ações" },
   { href: "/admin/listas", nome: "Listas" },
 ];
 
-/** Barra do admin (A1 a A4): escura, com as seções e a contagem de denúncias abertas. */
-export function BarraAdmin({ email, denunciasAbertas }: { email: string; denunciasAbertas: number }) {
+type Props = { email: string; denunciasAbertas: number; imagensParaRevisar: number };
+
+/** Barra do admin (A1 a A5): escura, com as seções, as denúncias abertas e as imagens a revisar. */
+export function BarraAdmin({ email, denunciasAbertas, imagensParaRevisar }: Props) {
   const caminho = usePathname();
   const router = useRouter();
 
@@ -44,6 +47,9 @@ export function BarraAdmin({ email, denunciasAbertas }: { email: string; denunci
               {s.nome}
               {s.href === "/admin/denuncias" && denunciasAbertas > 0 && (
                 <span className="rounded-md bg-terracota px-[5px] text-[11px] font-bold text-branco">{denunciasAbertas}</span>
+              )}
+              {s.href === "/admin/imagens" && imagensParaRevisar > 0 && (
+                <span className="rounded-md bg-cinza-linha px-[5px] text-[11px] font-bold text-grafite">{imagensParaRevisar}</span>
               )}
             </Link>
           );

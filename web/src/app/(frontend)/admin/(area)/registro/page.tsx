@@ -10,6 +10,7 @@ const CATEGORIAS: { valor: CategoriaAcao; nome: string }[] = [
   { valor: "suspensoes", nome: "Suspensões" },
   { valor: "exclusoes", nome: "Exclusões" },
   { valor: "denuncias", nome: "Denúncias" },
+  { valor: "imagens", nome: "Imagens" },
   { valor: "listas", nome: "Listas" },
   { valor: "sistema", nome: "Sistema" },
 ];
