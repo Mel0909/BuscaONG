@@ -247,7 +247,7 @@ A partir do passo 3 a conta já existe, então **cada passo grava no banco** ao 
 
 **A1, ONGs:** busca por nome, CNPJ ou cidade e filtros com contagem (todas, ativas, suspensas, CNPJ com problema, denunciadas, cadastro não terminado). "Revisar" marca a ONG com algum sinal. A ficha, à direita, tem:
 - "Ver página pública" e "Abrir no WhatsApp"; contatos com copiar ou abrir, marcando o que é **interno** (e-mail de acesso) e o que está **oculto** na página;
-- **Receita × declarado** (situação, natureza, cidade) e o botão **Revalidar**, que consulta o CNPJ de novo;
+- **Receita × declarado** (situação, natureza, cidade) e o botão **Revalidar**, que consulta o CNPJ de novo. Além do botão, uma **rotina diária** (cron da Vercel, `web/vercel.json`, 09:00 UTC = 06:00 em Brasília, a qualquer momento dentro da hora no plano gratuito) revalida as 10 ONGs publicadas ou suspensas com a consulta mais antiga, feita há mais de 30 dias, uma por vez. Só o que muda (situação ou natureza) vai para o registro, como "sistema"; CNPJ não encontrado também é registrado. Se a Receita não responde, a rodada para e continua no dia seguinte. A rota `GET /api/cron/revalidacao-cnpj` exige o `CRON_SECRET` (a Vercel o manda no header `Authorization`); sem ele configurado, recusa tudo;
 - **Sinais:** situação diferente de ativa, natureza que não pode se cadastrar (o filtro "CNPJ com problema" também pega), denúncias abertas por motivo, cidade declarada diferente da Receita e "a ONG disse que o endereço da Receita mudou" (o protótipo pede que isso vire sinal, sem bloquear);
 - **Suspender** (sai do mapa na hora; a ONG recebe e-mail com o motivo; as denúncias abertas viram "com ação"), **Reativar** e **Excluir** (apaga a conta, o perfil e as denúncias; pede confirmação). Todas exigem motivo. O admin não edita perfis.
 
@@ -381,7 +381,7 @@ Implementação: `web/src/lib/cnpj/` (`lookupCnpj`, timeout de 5 s por API, mesm
 - **Termos de uso:** o texto em `/termos` é provisório e precisa de revisão, inclusive jurídica.
 - **Lista de atividades de voluntariado:** cinco das oito são provisórias (ver §4.2).
 - **Ordenação por urgência:** o protótipo diz que a urgência muda "o selo, o pin e a ordenação", mas a lista P3 do próprio protótipo segue por distância. A lista continua por distância.
-- **Revalidação automática do CNPJ:** o registro do protótipo (A3) mostra revalidações feitas pelo "sistema". Hoje só há o botão "Revalidar" na ficha (A1); revalidar todas periodicamente (cron da Vercel) fica para depois.
+- **Revalidação automática do CNPJ:** ✅ feita em 2026-11-19: rotina diária da Vercel (§7.1). Com 10 ONGs por dia, cada ONG é revalidada a cada 30 dias enquanto houver até ~300 ONGs; acima disso, o intervalo aumenta (subir `ONGS_POR_RODADA` ou rodar mais vezes por dia, no plano pago).
 - **Terracota no admin:** o protótipo do admin usa terracota para alertas ("Revisar", a contagem de denúncias, "Excluir"), fora da regra de "só urgência" do site público. Foi mantido como no protótipo.
 - **E-mails da equipe:** suspensão e reativação avisam a ONG; arquivar, suspender ou excluir avisam quem denunciou e deixou e-mail. O texto é provisório.
 - **Limite de denúncias:** por aparelho (navegador) e por IP, em memória (cada instância da Vercel conta separado). Para algo global, usar um store compartilhado.

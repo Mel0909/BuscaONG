@@ -88,6 +88,7 @@ web/
 ├── components.json      configuração do shadcn/ui (onde gerar componentes)
 ├── eslint.config.mjs    regras de lint (eslint-config-next)
 ├── next.config.ts       configuração do Next (raiz do Turbopack, SVG via SVGR)
+├── vercel.json          rotinas agendadas da Vercel (revalidação diária do CNPJ)
 ├── playwright.config.ts configuração dos testes e2e
 ├── postcss.config.mjs   plugin do Tailwind CSS 4
 ├── tsconfig.json        estende ../tsconfig.base.json; opções do Next + aliases de import
@@ -164,7 +165,7 @@ src/
 │   │   │   └── _utils/           carregarPainel: sessão da ONG publicada (no servidor)
 │   │   └── termos/               /termos (termos de uso, texto provisório)
 │   ├── (backend)/                back-end
-│   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = cadastro e painel da ONG; GET ongs, ongs/mapa, ongs/busca e POST denuncias = área pública; admin/* = área admin
+│   │   ├── api/                  endpoints REST (route.ts); ongs/minha/* = cadastro e painel da ONG; GET ongs, ongs/mapa, ongs/busca e POST denuncias = área pública; admin/* = área admin; cron/* = rotinas da Vercel (exigem CRON_SECRET)
 │   │   ├── services/             acesso ao banco via Prisma (ongs/: conta, cadastro, área pública, página e urgências; listas/: listas fixas; denuncias/; admin/: ONGs, imagens, listas e registro de ações)
 │   │   └── schemas/              validação de entrada com Zod
 │   ├── layout.tsx                layout raiz (fontes, <html>, toasts)
