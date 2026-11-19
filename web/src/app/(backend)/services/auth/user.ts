@@ -1,7 +1,7 @@
 import prisma from "../db";
 
 export async function getUserRole(userId: string) {
-    if (!userId) return [];
+    if (!userId) return undefined;
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true }

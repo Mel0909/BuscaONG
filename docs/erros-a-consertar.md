@@ -33,7 +33,7 @@ Os comportamentos do better-auth citados abaixo foram conferidos no código da v
 | 12 | ✅ | ~~Admin pode apagar ou editar outros admins~~ | `api/users/[id]/route.ts` |
 | 13 | ✅ | ~~Regras de senha inconsistentes entre telas e rotas~~ | vários |
 | 14 | ✅ | ~~Validação de nome rejeita hífen e apóstrofo~~ | `schemas/auth.schema.ts` |
-| 15 | 🟡 | `getUserRole` devolve `[]` em vez de `undefined` | `services/auth/user.ts` |
+| 15 | ✅ | ~~`getUserRole` devolve `[]` em vez de `undefined`~~ | `services/auth/user.ts` |
 | 16 | 🟡 | Build exibe erros de `BETTER_AUTH_SECRET` sem `.env` | ambiente |
 | 17 | 🟡 | Aviso de "NFT list" no build (Prisma no trace do proxy) | `proxy.ts`, `services/db` |
 | 18 | 🟡 | Falha intermitente ao baixar a fonte Bricolage no `next dev`/`next build` | `app/layout.tsx` |
@@ -182,7 +182,9 @@ Caminhos relativos a `web/src/`.
 - **Problema:** a regex `/^[a-zA-ZÀ-ÿ\s]+$/` rejeita "Ana-Clara" e "D'Ávila", e o intervalo `À-ÿ` aceita `×` e `÷`.
 - **Correção:** usar `\p{L}` com flag `u` e permitir `'` e `-`. Os nomes de ONG terão regra própria (com números, `&` etc.).
 
-### 15. 🟡 `getUserRole` com retorno inconsistente
+### 15. ✅ `getUserRole` com retorno inconsistente
+
+> **Corrigido:** sem `userId` devolve `undefined` sem consultar o banco. Teste em `web/tests/unit/services/auth.test.ts`.
 
 - **Onde:** [services/auth/user.ts:4](../web/src/app/(backend)/services/auth/user.ts#L4)
 - **Problema:** devolve `[]` quando não há `userId` e `Role | undefined` nos outros casos. O `role` da sessão pode virar um array.
