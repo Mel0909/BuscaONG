@@ -2,7 +2,9 @@
 
 Inventário do que ainda veio do template "monorepo base" (de onde saiu o projeto noctiluz), levantado em 2026-10-02.
 
-**Decisão:** o código abaixo é **mantido por enquanto e reescrito aos poucos**, conforme as features de ONG e Admin forem implementadas. A meta é não sobrar nada da seção 2 até o lançamento do BuscaONG.
+**Decisão:** o código abaixo foi mantido no começo e reescrito aos poucos, com a meta de não sobrar nada da seção 2 até o lançamento do BuscaONG.
+
+**Situação em 2026-11-19:** todos os itens da seção 2 foram reescritos ou removidos (PRs #19 a #28). O arquivo fica como registro do que veio do template e do que entrou no lugar.
 
 > Isto é um inventário técnico, não um parecer jurídico. O template não tinha arquivo LICENSE, o que por padrão significa "todos os direitos reservados" aos autores. A propriedade de software feito por membros de empresa júnior depende do estatuto e dos termos de voluntariado da organização.
 
