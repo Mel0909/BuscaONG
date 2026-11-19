@@ -151,4 +151,4 @@ echo "feat(ong): adiciona mapa" | pnpm exec commitlint
   - exigir o check "Branch, título e commits" verde;
   - bloquear force push e exclusão;
   - deixar só "merge commit" e/ou "rebase" habilitados (desabilitar squash).
-- **`.husky/pre-push`:** o trecho que roda e2e e build quando a branch atual é `main` deixou de ser alcançável na prática, já que não se trabalha mais na `main`. Avaliar mover build e e2e para um workflow de CI no PR.
+- **Build e testes no CI:** os hooks rodam o Vitest (commit) e o lint (push) só na máquina de quem trabalha; build e e2e ficam por conta de quem abre o PR. Avaliar um workflow de CI no PR que rode lint, Vitest e build (o e2e precisa de um MongoDB de teste).
