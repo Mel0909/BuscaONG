@@ -6,12 +6,12 @@ import { INTERVALO_DENUNCIA_MS } from "@/lib/denuncia/motivos";
 import {
   clientIp,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
   validBody,
-  zodErrorHandler,
+  erroJson,
+  erroNaRota,
 } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 // pública: além do limite geral, uma denúncia por perfil a cada 24 h por IP
 // (a tela também guarda no aparelho; nenhum dos dois é garantia, só freio contra abuso)
@@ -29,12 +29,11 @@ export async function POST(request: NextRequest) {
     if (body instanceof NextResponse) return body;
 
     const resultado = novaDenunciaSchema.safeParse(body);
-    if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+    if (!resultado.success) return erroDeValidacao(resultado.error);
 
     const porPerfil = rateLimit(`denuncias:${ip}:${resultado.data.ongId}`, LIMITE_POR_PERFIL);
     if (!porPerfil.ok) {
-      return NextResponse.json(toErrorMessage("Você já denunciou este perfil hoje. A equipe vai analisar."), {
-        status: 429,
+      return erroJson(429, "Você já denunciou este perfil hoje. A equipe vai analisar.", {
         headers: { "Retry-After": String(porPerfil.retryAfterSeconds) },
       });
     }
@@ -42,8 +41,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(await criarDenuncia(resultado.data), { status: 201 });
   } catch (error) {
     if (error instanceof PerfilNaoEncontradoError) {
-      return NextResponse.json(toErrorMessage(error.message), { status: 404 });
+      return erroJson(404, error.message);
     }
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

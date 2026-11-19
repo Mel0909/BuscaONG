@@ -15,15 +15,14 @@ import { ArmazenamentoIndisponivelError } from "@/lib/armazenamento";
 import {
   exigirSessaoOng,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
   validBody,
-  zodErrorHandler,
+  erroJson,
+  erroNaRota,
 } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
-const erro = (message: string, status: number, details?: unknown) =>
-  NextResponse.json(toErrorMessage(message, details), { status });
+const erro = (message: string, status: number, details?: unknown) => erroJson(status, message, { details });
 
 /** Erros dos services do cadastro → resposta HTTP. */
 export function respostaDeErro(error: unknown) {
@@ -36,7 +35,7 @@ export function respostaDeErro(error: unknown) {
   if (error instanceof LimiteUrgenciasError) return erro(error.message, 422);
   if (error instanceof PrazoObrigatorioError) return erro(error.message, 400, [{ campo: "dias", message: error.message }]);
   if (error instanceof ArmazenamentoIndisponivelError) return erro(error.message, 503);
-  return zodErrorHandler(error);
+  return erroNaRota(error);
 }
 
 /** Limite por conta: `nome` separa a contagem de cada rota. */
@@ -66,7 +65,7 @@ export function rotaDoCadastro<T>(
       if (body instanceof NextResponse) return body;
 
       const resultado = schema.safeParse(body);
-      if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+      if (!resultado.success) return erroDeValidacao(resultado.error);
 
       return NextResponse.json(await service(sessao.userId, resultado.data), { status });
     } catch (error) {

@@ -6,11 +6,11 @@ import { CnpjLookupUnavailableError, CnpjNotFoundError } from "@/lib/cnpj";
 import {
   clientIp,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
-  zodErrorHandler,
+  erroJson,
+  erroNaRota,
 } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 // pública: usada no passo 1 do cadastro, antes de existir conta
 const LIMITE = { limit: 20, windowMs: 60_000 };
@@ -27,22 +27,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const validationResult = cnpjSchema.safeParse(cnpj);
 
     if (!validationResult.success) {
-      return returnInvalidDataErrors(validationResult.error);
+      return erroDeValidacao(validationResult.error);
     }
 
     const consulta = await consultarCnpjParaCadastro(validationResult.data);
     return NextResponse.json(consulta);
   } catch (error) {
     if (error instanceof CnpjNotFoundError) {
-      return NextResponse.json(toErrorMessage("CNPJ não encontrado na Receita Federal"), { status: 404 });
+      return erroJson(404, "CNPJ não encontrado na Receita Federal");
     }
     if (error instanceof CnpjLookupUnavailableError) {
-      return NextResponse.json(
-        toErrorMessage("Não foi possível consultar a Receita Federal agora. Tente de novo em instantes."),
-        { status: 503 }
-      );
+      return erroJson(503, "Não foi possível consultar a Receita Federal agora. Tente de novo em instantes.");
     }
 
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

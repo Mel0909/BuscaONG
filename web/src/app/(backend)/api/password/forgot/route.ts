@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { solicitarRecuperacaoSchema } from "@/backend/schemas/recuperacao.schema";
 import { solicitarRecuperacao } from "@/backend/services/auth/recuperacao";
-import { clientIp, rateLimit, returnInvalidDataErrors, tooManyRequests } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { clientIp, rateLimit, erroDeValidacao, tooManyRequests, erroJson } from "@/utils/api/server";
 
 export async function POST(request: NextRequest) {
   const limite = rateLimit(`recuperacao:solicitar:${clientIp(request)}`, { limit: 5, windowMs: 60_000 });
@@ -11,10 +10,10 @@ export async function POST(request: NextRequest) {
   try {
     corpo = await request.json();
   } catch {
-    return NextResponse.json(toErrorMessage("JSON malformado"), { status: 400 });
+    return erroJson(400, "JSON malformado");
   }
   const resultado = solicitarRecuperacaoSchema.safeParse(corpo);
-  if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+  if (!resultado.success) return erroDeValidacao(resultado.error);
   try {
     await solicitarRecuperacao(resultado.data.email, request.headers);
   } catch {

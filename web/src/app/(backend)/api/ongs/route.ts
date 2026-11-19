@@ -15,19 +15,18 @@ import { paramsParaFiltrosCrus } from "@/lib/mapa/filtros";
 import {
   clientIp,
   rateLimit,
-  returnInvalidDataErrors,
+  erroDeValidacao,
   tooManyRequests,
   validBody,
-  zodErrorHandler,
+  erroJson,
+  erroNaRota,
 } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 // pública: cria a conta, consulta a Receita e envia e-mail, então o limite é mais baixo
 const LIMITE = { limit: 5, windowMs: 60_000 };
 const LIMITE_LISTA = { limit: 60, windowMs: 60_000 };
 
-const erro = (message: string, status: number, details?: unknown) =>
-  NextResponse.json(toErrorMessage(message, details), { status });
+const erro = (message: string, status: number, details?: unknown) => erroJson(status, message, { details });
 
 // área pública (P1/P3): ONGs publicadas perto de um ponto, com os filtros da tela
 // GET /api/ongs?lat=-23.55&lng=-46.63&limite=30&causa=animais&item=fraldas&dia=SABADO
@@ -38,14 +37,14 @@ export async function GET(request: NextRequest) {
 
     const params = request.nextUrl.searchParams;
     const ponto = listaProximasSchema.safeParse(Object.fromEntries(params));
-    if (!ponto.success) return returnInvalidDataErrors(ponto.error);
+    if (!ponto.success) return erroDeValidacao(ponto.error);
     const filtros = filtrosSchema.safeParse(paramsParaFiltrosCrus(params));
-    if (!filtros.success) return returnInvalidDataErrors(filtros.error);
+    if (!filtros.success) return erroDeValidacao(filtros.error);
 
     const { lat, lng, limite: quantas } = ponto.data;
     return NextResponse.json(await listarOngsProximas({ latitude: lat, longitude: lng }, filtros.data, quantas));
   } catch (error) {
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }
 
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const validationResult = novaContaOngSchema.safeParse(body);
     if (!validationResult.success) {
-      return returnInvalidDataErrors(validationResult.error);
+      return erroDeValidacao(validationResult.error);
     }
 
     const conta = await criarContaOng(validationResult.data);
@@ -85,6 +84,6 @@ export async function POST(request: NextRequest) {
       return erro(error.message, 400);
     }
 
-    return zodErrorHandler(error);
+    return erroNaRota(error);
   }
 }

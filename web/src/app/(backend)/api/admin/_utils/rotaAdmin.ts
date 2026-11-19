@@ -4,10 +4,9 @@ import type { ZodType } from "zod";
 import { objectIdSchema } from "@/backend/schemas";
 import { AcaoInvalidaError, NaoEncontradoError, OpcaoDuplicadaError, OpcaoEmUsoError } from "@/backend/services/admin";
 import { CnpjLookupUnavailableError, CnpjNotFoundError } from "@/lib/cnpj";
-import { exigirSessaoAdmin, returnInvalidDataErrors, zodErrorHandler, type SessaoAdmin } from "@/utils/api/server";
-import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { erroDeValidacao, erroJson, erroNaRota, exigirSessaoAdmin, type SessaoAdmin } from "@/utils/api/server";
 
-const erro = (message: string, status: number) => NextResponse.json(toErrorMessage(message), { status });
+const erro = (message: string, status: number) => erroJson(status, message);
 
 /** Erros dos services do admin → resposta HTTP. */
 export function respostaAdmin(error: unknown) {
@@ -17,7 +16,7 @@ export function respostaAdmin(error: unknown) {
   }
   if (error instanceof CnpjNotFoundError) return erro("CNPJ não encontrado na Receita Federal", 404);
   if (error instanceof CnpjLookupUnavailableError) return erro(error.message, 503);
-  return zodErrorHandler(error);
+  return erroNaRota(error);
 }
 
 type Contexto = { params: Promise<Record<string, string>> };
@@ -39,7 +38,7 @@ export function rotaAdmin<T>(
       const segmentos = (await params) ?? {};
       if (segmentos.id !== undefined) {
         const id = objectIdSchema.safeParse(segmentos.id);
-        if (!id.success) return returnInvalidDataErrors(id.error);
+        if (!id.success) return erroDeValidacao(id.error);
       }
 
       const texto = await request.text();
@@ -51,7 +50,7 @@ export function rotaAdmin<T>(
       }
 
       const resultado = schema.safeParse(body);
-      if (!resultado.success) return returnInvalidDataErrors(resultado.error);
+      if (!resultado.success) return erroDeValidacao(resultado.error);
 
       return NextResponse.json(await acao(admin, resultado.data, segmentos), { status });
     } catch (error) {
