@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { sendEmail } from "@/lib/email";
 import { lookupCnpj } from "@/lib/cnpj";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -57,7 +57,7 @@ const contexto = (params: Record<string, string> = {}) => ({ params: Promise.res
 describe("rotas do admin: ONGs e denúncias", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    setCurrentRole("ADMIN");
+    entrarComo("ADMIN");
     db.ong.findUnique.mockResolvedValue(ong() as never);
     db.ong.update.mockResolvedValue({} as never);
     db.denuncia.findMany.mockResolvedValue([] as never);
@@ -68,9 +68,9 @@ describe("rotas do admin: ONGs e denúncias", () => {
 
   describe("acesso", () => {
     it("401 sem login e 403 para conta de ONG", async () => {
-      setCurrentRole(null);
+      entrarComo(null);
       expect((await alterarStatus(requisicao("PATCH", `ongs/${ID}`, { status: "SUSPENSA", motivo: "Teste" }), contexto({ id: ID }))).status).toBe(401);
-      setCurrentRole("ONG");
+      entrarComo("ONG");
       expect((await alterarStatus(requisicao("PATCH", `ongs/${ID}`, { status: "SUSPENSA", motivo: "Teste" }), contexto({ id: ID }))).status).toBe(403);
       expect(db.ong.update).not.toHaveBeenCalled();
     });
@@ -256,7 +256,7 @@ describe("rotas do admin: ONGs e denúncias", () => {
     });
 
     it("403 para conta de ONG", async () => {
-      setCurrentRole("ONG");
+      entrarComo("ONG");
       expect((await exportar(new NextRequest("http://localhost:3000/api/admin/acoes"))).status).toBe(403);
     });
   });

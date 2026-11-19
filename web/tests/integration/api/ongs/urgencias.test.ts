@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { Prisma } from "@/generated/prisma";
 import { limparCacheNomes } from "@/backend/services/ongs";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -52,7 +52,7 @@ describe("/api/ongs/minha/urgencias", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     limparCacheNomes();
-    setCurrentRole("ONG");
+    entrarComo("ONG");
     db.ong.findUnique.mockResolvedValue(ong() as never);
     db.ong.update.mockResolvedValue({} as never);
     db.opcaoLista.findMany.mockResolvedValue([
@@ -123,9 +123,9 @@ describe("/api/ongs/minha/urgencias", () => {
   });
 
   it("401 sem login e 403 para admin", async () => {
-    setCurrentRole(null);
+    entrarComo(null);
     expect((await marcar({ item: "fraldas", dias: 7 })).status).toBe(401);
-    setCurrentRole("ADMIN");
+    entrarComo("ADMIN");
     expect((await marcar({ item: "fraldas", dias: 7 })).status).toBe(403);
   });
 

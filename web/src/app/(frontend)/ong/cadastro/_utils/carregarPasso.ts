@@ -13,7 +13,7 @@ import { rotaDoPasso } from "../_components/passos";
 export async function carregarPasso(passo: number) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/ong/cadastro/continuar");
-  if (session.role !== "ONG") redirect("/");
+  if (session.user.role !== "ONG") redirect("/");
 
   const ong = await buscarOngDoUsuario(session.user.id);
   if (!ong) redirect("/ong/cadastro");

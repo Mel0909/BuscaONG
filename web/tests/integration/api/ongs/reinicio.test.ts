@@ -4,7 +4,7 @@ import { APIError } from "better-auth/api";
 import { auth } from "@/auth";
 import prisma from "@/backend/services/db";
 import { resetRateLimit } from "@/utils/api/server/rateLimit";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 import { POST as enviar } from "@/backend/api/ongs/minha/reinicio/codigo/route";
 import { POST as reiniciar } from "@/backend/api/ongs/minha/reinicio/route";
 import { publicarOng, salvarContatos } from "@/backend/services/ongs/cadastro";
@@ -27,7 +27,7 @@ const request = (corpo: unknown = body, origin: string | null = "http://localhos
 });
 
 beforeEach(() => {
-  vi.clearAllMocks(); resetRateLimit(); setCurrentRole("ONG");
+  vi.clearAllMocks(); resetRateLimit(); entrarComo("ONG");
   api.sendVerificationOTP.mockReset(); api.signInEmailOTP.mockReset();
   db.ong.findUnique.mockResolvedValue(ong as never);
   db.ong.updateMany.mockResolvedValue({ count: 1 });
@@ -38,9 +38,9 @@ beforeEach(() => {
 
 describe("reinício de rascunho", () => {
   it.each([enviar, reiniciar])("exige sessão ONG", async (rota) => {
-    setCurrentRole(null);
+    entrarComo(null);
     expect((await rota(request())).status).toBe(401);
-    setCurrentRole("ADMIN");
+    entrarComo("ADMIN");
     expect((await rota(request())).status).toBe(403);
     expect(db.ong.updateMany).not.toHaveBeenCalled();
   });

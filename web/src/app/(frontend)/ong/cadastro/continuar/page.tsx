@@ -8,7 +8,7 @@ import { PassoContinuar } from "../_components/PassoContinuar";
 export default async function CadastroContinuarPage({ searchParams }: { searchParams: Promise<{ reiniciar?: string }> }) {
   const reiniciar = (await searchParams).reiniciar === "1";
   const session = await auth.api.getSession({ headers: await headers() });
-  if (session?.user && session.role === "ONG") redirect(reiniciar ? "/ong/cadastro/reiniciar" : "/ong/cadastro/retomar");
+  if (session?.user && session.user.role === "ONG") redirect(reiniciar ? "/ong/cadastro/reiniciar" : "/ong/cadastro/retomar");
 
   return <PassoContinuar reiniciar={reiniciar} />;
 }

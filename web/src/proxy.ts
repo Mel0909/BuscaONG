@@ -49,7 +49,7 @@ export async function proxy(request: NextRequest) {
     headers: await headers()
   });
   
-  const userRole = session?.role as Role | undefined;
+  const userRole = session?.user.role as Role | undefined;
   const isAuthenticated = !!session?.user;
 
   // Handle /admin special route

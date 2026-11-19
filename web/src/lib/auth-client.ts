@@ -1,7 +1,9 @@
-import type { auth } from "@/auth";
-import { createAuthClient } from "better-auth/react" // make sure to import from better-auth/react
-import { customSessionClient, emailOTPClient } from "better-auth/client/plugins";
+import { createAuthClient } from "better-auth/react";
+import { emailOTPClient, inferAdditionalFields } from "better-auth/client/plugins";
 
-export const authClient =  createAuthClient({
-    plugins: [customSessionClient<typeof auth>(), emailOTPClient()],
-})
+import type { auth } from "@/auth";
+
+// cliente do better-auth para Client Components; inferAdditionalFields traz o tipo de user.role
+export const authClient = createAuthClient({
+  plugins: [inferAdditionalFields<typeof auth>(), emailOTPClient()],
+});

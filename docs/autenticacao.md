@@ -38,7 +38,7 @@ Configuração atual do `auth.ts`:
 - Códigos limitados a três tentativas e dez minutos, com hash. O hook compartilha limites por e-mail entre as rotas próprias e os aliases do better-auth (3 envios ou 10 confirmações por minuto); APIs próprias também limitam IP/conta. São limites em memória, por instância, não um limite global distribuído.
 - Redefinir a senha revoga as sessões anteriores (`revokeSessionsOnPasswordReset`).
 - **Exclusão de conta e troca de e-mail desligadas** (`deleteUser.enabled` e `changeEmail.enabled` falsos). Nenhuma tela usa, e a troca de e-mail deixaria uma ONG logada mandar códigos para qualquer endereço, gastando o limite diário de e-mails do site.
-- O plugin `customSession` acrescenta o `role` do usuário à sessão.
+- **Perfil (`role`) como campo extra do usuário** (`user.additionalFields`): vem com a sessão em `session.user.role`, sem outra consulta ao banco. Tem `input: false`, então nenhuma rota do better-auth aceita o perfil vindo da requisição: no cadastro ele vira sempre `ONG`, e o `update-user` recusa a mudança. Só o servidor muda o perfil (ex.: `pnpm admin:criar`). No navegador, o tipo vem do plugin `inferAdditionalFields` (`lib/auth-client.ts`).
 - O plugin `nextCookies` cuida dos cookies em Server Actions.
 
 ## 3. Regras
@@ -61,7 +61,7 @@ import { auth } from "@/auth";
 import { headers } from "next/headers";
 
 const session = await auth.api.getSession({ headers: await headers() });
-// session?.user, session?.role
+// session?.user, session?.user.role ("ONG" ou "ADMIN")
 ```
 
 **No navegador** (Client Component):
@@ -95,7 +95,6 @@ As rotas `/api/ongs/minha/reinicio` e `/codigo` exigem sessão ONG, origem do si
 |---|---|
 | `BETTER_AUTH_SECRET` | assina sessões e tokens; obrigatória em produção (`openssl rand -base64 32`) |
 | `BETTER_AUTH_URL` | URL base do site; usada nos links de e-mail |
-| `GOOGLE_ID`, `GOOGLE_SECRET` | só se o login com Google for ativado (bug #8) |
 
 ## 7. Consumo de códigos sob concorrência
 

@@ -11,7 +11,7 @@ export async function exigirSessaoAdmin(request: NextRequest): Promise<SessaoAdm
   if (!session?.user) {
     return erroJson(401, "Faça login para continuar");
   }
-  if (session.role !== "ADMIN") {
+  if (session.user.role !== "ADMIN") {
     return erroJson(403, "Acesso negado - Permissões insuficientes");
   }
 

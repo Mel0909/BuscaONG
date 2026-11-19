@@ -206,7 +206,7 @@ src/
 
 ### 4.3 Arquivos centrais
 
-- **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha, e o plugin `customSession`, que coloca o `role` do usuário na sessão. É importado por páginas, rotas da API e pelo proxy.
+- **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha e o perfil (`role`) como campo extra do usuário, que chega com a sessão em `session.user.role`. É importado por páginas, rotas da API e pelo proxy.
 - **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
   - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
   - **Precisa de `ADMIN`:** `/admin/**` (sem login, vai para `/admin`; admin logado em `/admin` vai para `/admin/ongs`).

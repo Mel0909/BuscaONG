@@ -13,8 +13,8 @@ import { buscarOngDoUsuario } from "@/backend/services/ongs";
 export const carregarPainel = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/login");
-  if (session.role === "ADMIN") redirect("/admin");
-  if (session.role !== "ONG") redirect("/");
+  if (session.user.role === "ADMIN") redirect("/admin");
+  if (session.user.role !== "ONG") redirect("/");
 
   const ong = await buscarOngDoUsuario(session.user.id);
   if (!ong) redirect("/ong/cadastro");

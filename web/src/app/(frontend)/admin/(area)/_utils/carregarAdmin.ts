@@ -8,7 +8,7 @@ import { auth } from "@/auth";
 export const carregarAdmin = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/admin");
-  if (session.role !== "ADMIN") redirect("/");
+  if (session.user.role !== "ADMIN") redirect("/");
   return { id: session.user.id, email: session.user.email };
 });
 

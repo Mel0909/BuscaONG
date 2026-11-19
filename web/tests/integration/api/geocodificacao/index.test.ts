@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
 import { geocodificar } from "@/lib/geocodificacao";
 import { resetRateLimit } from "@/utils/api/server";
-import { setCurrentRole } from "../../mocks/auth";
+import { entrarComo } from "../../mocks/auth";
 
 vi.mock("@/lib/geocodificacao", () => ({ geocodificar: vi.fn() }));
 vi.mock("@/backend/services/db", () => ({ default: { ong: { aggregateRaw: vi.fn() } } }));
@@ -20,7 +20,7 @@ describe("GET /api/geocodificacao", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetRateLimit();
-    setCurrentRole("ONG");
+    entrarComo("ONG");
   });
 
   it("devolve o ponto do endereço", async () => {
@@ -34,7 +34,7 @@ describe("GET /api/geocodificacao", () => {
   });
 
   it("exige login de ONG (o serviço externo tem limite)", async () => {
-    setCurrentRole(null);
+    entrarComo(null);
     expect((await getGeocodificacao(get("geocodificacao?municipio=Recife&uf=PE"))).status).toBe(401);
     expect(geocodificarMock).not.toHaveBeenCalled();
   });
@@ -60,7 +60,7 @@ describe("GET /api/itens-livres", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetRateLimit();
-    setCurrentRole("ONG");
+    entrarComo("ONG");
   });
 
   it("sugere itens de outras ONGs pelo começo do nome normalizado", async () => {
