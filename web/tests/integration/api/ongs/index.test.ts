@@ -15,7 +15,7 @@ vi.mock("@/lib/cnpj", async (importOriginal) => ({
 
 vi.mock("@/backend/services/db", () => ({
   default: {
-    ong: { findUnique: vi.fn(), create: vi.fn() },
+    ong: { findUnique: vi.fn(), create: vi.fn(), deleteMany: vi.fn() },
     user: { findUnique: vi.fn(), delete: vi.fn() },
   },
 }));
@@ -140,6 +140,9 @@ describe("POST /api/ongs", () => {
     beforeEach(() => {
       // a busca por CNPJ acha o rascunho; a criação da ONG nova não passa por findUnique
       db.ong.findUnique.mockResolvedValue(rascunho as never);
+      // a conta do rascunho confirmou o e-mail (o caso comum: cadastro parado no meio)
+      db.user.findUnique.mockImplementation((async (args: { where: { id?: string } }) =>
+        args.where.id === "usuario-antigo" ? { id: "usuario-antigo", emailVerified: true, createdAt: new Date(0) } : null) as never);
     });
 
     it("sem escolher recomeçar, responde 409 EM_ANDAMENTO e não apaga nada", async () => {
@@ -160,12 +163,66 @@ describe("POST /api/ongs", () => {
     });
 
     it("não substitui rascunho nem usando o e-mail já vinculado", async () => {
-      db.user.findUnique.mockResolvedValue({ id: "usuario-antigo" } as never);
+      db.user.findUnique.mockResolvedValue({ id: "usuario-antigo", emailVerified: true, createdAt: new Date(0) } as never);
       const response = await post({ ...corpo, recomecar: false });
       expect(response.status).toBe(409);
       expect(db.user.delete).not.toHaveBeenCalled();
       expect(db.ong.create).not.toHaveBeenCalled();
       expect(lookupMock).not.toHaveBeenCalled();
+    });
+
+    describe("conta do rascunho nunca confirmou o e-mail", () => {
+      const dono = (minutosAtras: number, emailVerified = false) =>
+        ({ id: "usuario-antigo", emailVerified, createdAt: new Date(Date.now() - minutosAtras * 60_000) }) as never;
+      const donoDoRascunho = (valor: unknown) =>
+        db.user.findUnique.mockImplementation((async (args: { where: { id?: string } }) =>
+          args.where.id === "usuario-antigo" ? valor : args.where.id === USER_ID ? { id: USER_ID } : null) as never);
+
+      it("há menos de 1 hora: continua protegido (409)", async () => {
+        donoDoRascunho(dono(30));
+        expect((await post()).status).toBe(409);
+        expect(db.user.delete).not.toHaveBeenCalled();
+      });
+
+      it("há mais de 1 hora: libera o CNPJ e cria o cadastro novo", async () => {
+        donoDoRascunho(dono(90));
+        const response = await post();
+
+        expect(response.status).toBe(201);
+        const apagou = db.user.delete.mock.calls[0][0] as { where: Record<string, unknown> };
+        expect(apagou.where).toMatchObject({ id: "usuario-antigo" });
+        // só apaga se ainda estiver sem confirmar e antigo (a condição vai junto no delete)
+        expect(JSON.stringify(apagou.where)).toContain('"isSet":false');
+        expect(apagou.where.createdAt).toHaveProperty("lt");
+        expect(db.ong.deleteMany).toHaveBeenCalledWith({ where: { id: "ong-antiga", status: "RASCUNHO" } });
+        expect(signUpEmail).toHaveBeenCalled();
+      });
+
+      it("conta confirmada nunca é liberada, mesmo antiga", async () => {
+        donoDoRascunho(dono(60 * 24 * 30, true));
+        expect((await post()).status).toBe(409);
+        expect(db.user.delete).not.toHaveBeenCalled();
+      });
+
+      it("se a conta confirmou no meio do caminho, não apaga o rascunho (409)", async () => {
+        donoDoRascunho(dono(90));
+        db.user.delete.mockRejectedValueOnce(
+          new Prisma.PrismaClientKnownRequestError("não achou", { code: "P2025", clientVersion: "6" })
+        );
+        db.user.findUnique.mockImplementation((async (args: { where: { id?: string } }) =>
+          args.where.id === "usuario-antigo" ? { id: "usuario-antigo", emailVerified: true, createdAt: new Date(0) } : null) as never);
+
+        expect((await post()).status).toBe(409);
+        expect(db.ong.deleteMany).not.toHaveBeenCalled();
+        expect(signUpEmail).not.toHaveBeenCalled();
+      });
+
+      it("CNPJ não elegível não libera nada", async () => {
+        donoDoRascunho(dono(90));
+        lookupMock.mockResolvedValue(cnpjDataMock({ situacaoCadastral: "BAIXADA" }));
+        expect((await post()).status).toBe(422);
+        expect(db.user.delete).not.toHaveBeenCalled();
+      });
     });
 
   });

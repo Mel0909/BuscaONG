@@ -12,7 +12,7 @@ vi.mock("@/lib/cnpj", async (importOriginal) => ({
 }));
 
 vi.mock("@/backend/services/db", () => ({
-  default: { ong: { findUnique: vi.fn() } },
+  default: { ong: { findUnique: vi.fn() }, user: { findUnique: vi.fn() } },
 }));
 
 import { GET } from "@/backend/api/cnpj/[cnpj]/route";
@@ -68,12 +68,29 @@ describe("GET /api/cnpj/[cnpj]", () => {
   });
 
   it("devolve EM_ANDAMENTO (não 'já cadastrado') para cadastro não publicado", async () => {
-    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status: "RASCUNHO" } as never);
+    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status: "RASCUNHO", userId: "u1" } as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ emailVerified: true, createdAt: new Date(0) } as never);
     lookupMock.mockResolvedValue(cnpjDataMock());
 
     const body = await (await get(CNPJ)).json();
 
     expect(body).toMatchObject({ status: "EM_ANDAMENTO", cnpj: CNPJ, receita: { cnpj: CNPJ } });
+  });
+
+  it("rascunho de conta que não confirmou o e-mail há mais de 1 hora: CNPJ volta a ficar livre", async () => {
+    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status: "RASCUNHO", userId: "u1" } as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ emailVerified: false, createdAt: new Date(Date.now() - 2 * 3_600_000) } as never);
+    lookupMock.mockResolvedValue(cnpjDataMock());
+
+    expect((await (await get(CNPJ)).json()).status).toBe("ELEGIVEL");
+  });
+
+  it("rascunho recente sem e-mail confirmado continua em andamento", async () => {
+    findUniqueMock.mockResolvedValue({ id: "ong-1", cnpj: CNPJ, status: "RASCUNHO", userId: "u1" } as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ emailVerified: false, createdAt: new Date(Date.now() - 5 * 60_000) } as never);
+    lookupMock.mockResolvedValue(cnpjDataMock());
+
+    expect((await (await get(CNPJ)).json()).status).toBe("EM_ANDAMENTO");
   });
 
   it("devolve NAO_ELEGIVEL quando a situação não é ATIVA", async () => {
