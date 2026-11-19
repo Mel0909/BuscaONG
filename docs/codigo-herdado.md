@@ -48,7 +48,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [x] `proxy.ts`: reescrito com a checagem otimista do cookie (`getSessionCookie`), sem `ROUTE_CONFIG` nem `matchesAnyPattern`; o redirecionamento de quem já está logado foi para as páginas `/login` e `/admin`
 - [x] `auth.ts`: a configuração segue a documentação do better-auth. O plugin `customSession` do template deu lugar ao `user.additionalFields.role`, e o bloco comentado do Google saiu (o Google para ONGs será feito do zero)
-- [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend
+- [x] `lib/email/*`: o wrapper do Resend foi reescrito a partir da documentação dele; o template `ResetPasswordEmail` foi removido (os templates atuais são do BuscaONG e escapam o HTML)
 
 ### Estilos
 

@@ -52,6 +52,16 @@ describe("sendEmail", () => {
     );
   });
 
+  it("EMAIL_FROM vazio cai no remetente de teste do Resend", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_teste");
+    vi.stubEnv("EMAIL_FROM", "");
+    sendMock.mockResolvedValue({ data: { id: "1" }, error: null });
+
+    await sendEmail(email);
+
+    expect(sendMock).toHaveBeenCalledWith(expect.objectContaining({ from: "BuscaONG <onboarding@resend.dev>" }));
+  });
+
   it("lança erro quando o Resend recusa o envio", async () => {
     vi.stubEnv("RESEND_API_KEY", "re_teste");
     sendMock.mockResolvedValue({ data: null, error: { message: "domínio não verificado" } });
