@@ -194,11 +194,11 @@ src/
 │   ├── geocodificacao/           endereço → coordenadas pelo Nominatim (fila de 1/s e cache)
 │   └── utils.ts                  cn() para combinar classes Tailwind
 ├── utils/                        funções auxiliares do projeto
-│   ├── api/server/               helpers das rotas: blockForbiddenRequests, exigirSessaoOng, exigirSessaoAdmin, getUserFromRequest, validBody, errorHandlers, rateLimit
+│   ├── api/server/               helpers das rotas: exigirSessaoOng, exigirSessaoAdmin, validBody, errorHandlers, rateLimit
 │   ├── api/toErrorMessage.ts     erro → texto legível
 │   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
 │   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
-├── types/                        tipos compartilhados (AllowedRoutes)
+├── types/                        declarações de tipos de bibliotecas (GeoJSON)
 ├── generated/                    cliente Prisma gerado (não editar, não versionado)
 ├── auth.ts                       configuração central do better-auth
 └── proxy.ts                      "porteiro": roda antes de cada página e protege rotas
@@ -237,7 +237,7 @@ navegador → proxy.ts (sessão? perfil?) → app/(frontend)/.../page.tsx → co
 
 ```
 cliente → app/(backend)/api/.../route.ts
-            1. blockForbiddenRequests(request, roles)   → 401/403 se não autorizado
+            1. exigirSessaoOng/exigirSessaoAdmin       → 401/403 se não autorizado
             2. validBody + schema Zod (schemas/)        → 400 se o corpo for inválido
             3. service (services/)                      → Prisma → MongoDB
             4. NextResponse.json(objeto)                → sucesso: só o objeto

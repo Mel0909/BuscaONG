@@ -24,7 +24,7 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 | Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) e, nas páginas da ONG, `carregarPainel`/`carregarPasso` |
 | Telas de acesso | `/login` (ONG), `/login/recuperar` (esqueci a senha), `/admin` (equipe) |
 | Criação de admin | `web/prisma/criar-admin.mts` (`pnpm admin:criar`) |
-| Proteção de rotas da API | `exigirSessaoOng`, `exigirSessaoAdmin` e `blockForbiddenRequests` ([padroes-api.md §5](padroes-api.md)) |
+| Proteção de rotas da API | `exigirSessaoOng` e `exigirSessaoAdmin` ([padroes-api.md §5](padroes-api.md)) |
 | Tabelas | modelos `User`, `Session`, `Account`, `Verification` no `schema.prisma` |
 
 Configuração atual do `auth.ts`:

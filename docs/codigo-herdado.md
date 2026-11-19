@@ -43,9 +43,9 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Utilitários e núcleo (~315 linhas)
 
-- [ ] `utils/api/server/*` (`blockForbiddenRequests`, `getUserFromRequest`, `validBody`, `errorHandlers`)
+- [ ] `utils/api/server/*` (`validBody`, `errorHandlers`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos)
 - [ ] `utils/api/toErrorMessage.ts`, `utils/validations/*`
-- [ ] `types/index.ts` (`AllowedRoutes`)
+- [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
 - [ ] `auth.ts`: a configuração em si segue a documentação do better-auth. O plugin `customSession` com role é do template.
 - [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend

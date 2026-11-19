@@ -24,10 +24,10 @@ Regra principal: **a rota nunca importa o Prisma.** Se precisa de dado, pede ao 
 
 ## 3. Ordem dentro de uma rota
 
-1. **Autorização:** `blockForbiddenRequests(request, perfisPermitidos)`. Se retornar algo, devolva esse retorno (401 ou 403).
+1. **Autorização:** `exigirSessaoOng(request)` ou `exigirSessaoAdmin(request)`. Se devolver um `NextResponse` (401 ou 403), devolva esse retorno. Rota pública não chama nenhuma das duas, mas ganha limite por IP (`rateLimit`).
 2. **Parâmetros da URL:** em Next 16, `params` é uma `Promise`. Sempre `const { id } = await params`.
 3. **Validação da entrada:** corpo e parâmetros passam pelo schema com `safeParse`. Se falhar, `returnInvalidDataErrors(resultado.error)` (400).
-4. **Regra de dono**, quando aplicável: um perfil comum só mexe nos próprios dados (`getUserFromRequest` para saber quem é).
+4. **Regra de dono**, quando aplicável: a ONG só mexe nos próprios dados. O alvo sai da sessão (`userId`), nunca de um ID vindo da requisição.
 5. **Service.**
 6. **Resposta.**
 
@@ -36,7 +36,7 @@ Envolva tudo em `try/catch` e, no `catch`, use `zodErrorHandler(error)` (400 par
 Exemplo de validação:
 
 ```ts
-const resultado = idSchema.safeParse(id);
+const resultado = objectIdSchema.safeParse(id);
 if (!resultado.success) {
   return returnInvalidDataErrors(resultado.error);
 }
@@ -67,7 +67,7 @@ if (!resultado.success) {
 | 409 | conflito (ex.: CNPJ já cadastrado) |
 | 500 | erro inesperado |
 
-> ⚠️ **O código herdado não segue esse formato à risca.** `blockForbiddenRequests`, `getUserFromRequest` e alguns retornos 403/409 usam `{ "error": "texto" }`. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
+> ⚠️ **O código herdado não segue esse formato à risca.** O `validBody` responde `{ "error": "texto" }` para JSON malformado. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
 
 ## 5. Utilitários disponíveis
 
@@ -75,11 +75,9 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 
 | Função | Uso |
 |---|---|
-| `blockForbiddenRequests(request, roles)` | exige sessão e, se `roles` for passado, um dos perfis |
 | `exigirSessaoOng(request)` | exige a sessão de uma conta `ONG` e devolve `{ userId, email }` (ou a resposta 401/403, no formato novo) |
 | `exigirSessaoAdmin(request)` | o mesmo para o perfil `ADMIN`; devolve `{ id, email }` |
 | `rateLimit(chave, { limit, windowMs })` + `tooManyRequests(s)` | limite simples em memória por chave (IP ou usuário) |
-| `getUserFromRequest(request)` | usuário da sessão com `role` (ou resposta 401) |
 | `validBody(request)` | lê o JSON do corpo ⚠️ ver bug #10 em [erros-a-consertar.md](erros-a-consertar.md) |
 | `returnInvalidDataErrors(zodError)` | resposta 400 padronizada a partir de um erro do Zod |
 | `zodErrorHandler(error)` | para o `catch`: 400 se for Zod, 500 caso contrário |
@@ -90,21 +88,12 @@ E `toErrorMessage(message, details?)` em `@/utils/api/toErrorMessage`.
 
 **Rotas do admin** (`api/admin/*`): montadas por `rotaAdmin(schema, acao)` em `api/admin/_utils/rotaAdmin.ts` (sessão de admin → ID da URL, se houver, validado como ObjectId → corpo validado → service), que também traduz os erros dos services do admin. Toda ação que muda algo exige motivo e é registrada (`registrarAcao`).
 
-**IDs do MongoDB:** documentos criados pelo Prisma (ONG, denúncia, opção de lista) têm ID ObjectId (24 caracteres hexadecimais) e são validados com `objectIdSchema`. O `idSchema` (UUID) não serve para eles (erro #5).
+**IDs do MongoDB:** documentos criados pelo Prisma (ONG, denúncia, opção de lista) têm ID ObjectId (24 caracteres hexadecimais) e são validados com `objectIdSchema`.
 
 ## 6. Autenticação nas rotas
 
 - Operações de conta (login, cadastro, troca de senha e e-mail) passam pelo better-auth; ver [autenticacao.md](autenticacao.md).
-- Os perfis permitidos por método ficam numa constante no topo da rota, tipada com `AllowedRoutes` (`@/types`):
-
-```ts
-const allowedRoles: AllowedRoutes = {
-  GET: ["ADMIN"],
-  PATCH: ["ADMIN", "ONG"],
-};
-```
-
-Use sempre a chave do **mesmo método** da função (`allowedRoles.GET` dentro de `GET`). Errar isso já causou uma falha de segurança no código herdado (bug #2).
+- Cada rota exige o perfil de forma explícita, com `exigirSessaoOng` ou `exigirSessaoAdmin` (ou pelos montadores `rotaDoCadastro` e `rotaAdmin`, que já fazem isso). O template usava uma tabela de perfis por método (`allowedRoles` + `blockForbiddenRequests`), e passar a chave do método errado já abriu uma falha de segurança (bug #2); por isso ela foi removida.
 
 ### Sem rotas de usuários
 
