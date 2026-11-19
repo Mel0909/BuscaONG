@@ -37,7 +37,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [x] `components/base/input/*` (`ValidatedInput`, `BaseCheckbox`, `RequiredTag`) (removidos)
 - [x] `components/base/nav/InitialNav` (removido)
 - [x] `components/auth/*` (`CredentialsLoginForm`, `CredentialsButton`, `GoogleLoginButton`, `LoginOptionals`) (removidos)
-- [ ] `components/common/ToastProvider.tsx`
+- [x] `components/common/ToastProvider.tsx`: reescrito como `Avisos.tsx`, com as cores dos tokens (o ícone de erro padrão era vermelho, fora da paleta)
 
 `components/base/brand/BuscaOngLogo.tsx` é **novo**, feito a partir do design do projeto.
 

@@ -36,7 +36,7 @@ O `_` no nome da pasta (`_components`, `_utils`, `_actions`) a torna **privada**
 - **Ícones:** `lucide-react`.
 - **Fontes:** só via `next/font` (já configuradas no `layout.tsx`); use as classes `font-sans`, `font-display` e `font-mono`.
 - **Cores:** só os tokens do projeto (`bg-musgo`, `text-tinta`, `border-borda`...). **Terracota é exclusiva de urgência.**
-- **Feedback ao usuário:** `toast.success(...)` e `toast.error(...)` do `react-hot-toast` (o `ToastProvider` já está no layout).
+- **Feedback ao usuário:** `toast.success(...)` e `toast.error(...)` do `react-hot-toast`. O componente `Avisos` (`components/common/Avisos.tsx`), já no layout, mostra os toasts com as cores do projeto: musgo no sucesso e tinta no erro, nunca terracota.
 - **Classes condicionais:** `cn()` de `@/lib/utils`.
 
 ## 5. Ordem dos imports

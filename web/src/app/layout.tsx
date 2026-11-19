@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { ToastProvider } from "@/components/common/ToastProvider";
+import { Avisos } from "@/components/common/Avisos";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
 
-        <ToastProvider />
+        <Avisos />
       </body>
     </html>
   );
