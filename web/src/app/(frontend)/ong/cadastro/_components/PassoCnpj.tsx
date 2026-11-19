@@ -169,7 +169,7 @@ export function PassoCnpj() {
       {estado.tipo === "em-andamento" && (
         <div className="flex flex-col gap-4">
           <Aviso>
-            Este CNPJ tem um cadastro em andamento, ainda não publicado. Entre na conta para continuar ou recomeçar após confirmar seu e-mail.
+            Este CNPJ tem um cadastro em andamento, ainda não publicado. Entre na conta para continuar ou recomeçar após confirmar seu e-mail. Se o e-mail desse cadastro nunca foi confirmado, o CNPJ fica livre de novo 1 hora depois de criado.
           </Aviso>
           <div className="flex flex-wrap gap-3">
             <Link
