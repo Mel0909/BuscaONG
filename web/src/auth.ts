@@ -58,15 +58,10 @@ export const auth = betterAuth({
         deleteUser: {
             enabled: false
         },
+        // nenhuma tela troca o e-mail; ligado, uma ONG logada mandaria códigos para qualquer
+        // endereço (gastando o limite diário de e-mails de todo o site)
         changeEmail: {
-            enabled: true,
-            // sendChangeEmailVerification: async ({ user, newEmail, url, token }, request) => {
-            //     await sendEmail({
-            //         to: user.email, // verification email must be sent to the current user email to approve the change
-            //         subject: 'Approve email change',
-            //         text: `Click the link to approve the change: ${url}`
-            //     })
-            // }
+            enabled: false,
         }
     },
     // Descomente abaixo para ativar o provedor social google e login com google funcionar

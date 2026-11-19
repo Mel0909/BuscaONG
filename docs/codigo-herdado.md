@@ -17,11 +17,10 @@ Caminhos de código relativos a `web/src/`. Ao reescrever, **não copiar o códi
 
 ### Back-end (~500 linhas)
 
-- [x] `app/(backend)/api/users/route.ts` e `api/users/[id]/route.ts`: reescritas com sessão, perfil e regra de dono explícitos; testes de acesso adicionados
-- [ ] `app/(backend)/api/users/[id]/email` e `password` (troca de e-mail e senha)
+- [x] `app/(backend)/api/users/**` (listagem, conta por ID, troca de e-mail e senha): removidas, sem uso nas telas
 - [x] `app/(backend)/api/password/forgot`, `reset`: reescritas para recuperação por código via better-auth, com validação, limites e testes
-- [ ] `app/(backend)/schemas/*` (`auth.schema.ts`, `base.schema.ts`)
-- [ ] `app/(backend)/services/auth/*`, `services/users/*`
+- [ ] `app/(backend)/schemas/base.schema.ts` (`auth.schema.ts` foi removido)
+- [ ] `app/(backend)/services/auth/*` (`services/users/*` foi removido)
 - [ ] `app/(backend)/README.md`
 
 Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-consertar.md).
@@ -44,9 +43,9 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Utilitários e núcleo (~315 linhas)
 
-- [ ] `utils/api/server/*` (`blockForbiddenRequests`, `getUserFromRequest`, `validBody`, `errorHandlers`)
+- [ ] `utils/api/server/*` (`validBody`, `errorHandlers`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos)
 - [ ] `utils/api/toErrorMessage.ts`, `utils/validations/*`
-- [ ] `types/index.ts` (`AllowedRoutes`)
+- [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
 - [ ] `auth.ts`: a configuração em si segue a documentação do better-auth. O plugin `customSession` com role é do template.
 - [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend
@@ -57,7 +56,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Testes (~135 linhas)
 
-- [ ] `web/tests/integration/**` (teste de `POST /api/users`, mocks de auth, request e user)
+- [ ] `web/tests/integration/**` (mocks de auth e request; os testes de `/api/users` saíram com as rotas)
 - [ ] `web/tests/e2e/example.spec.ts` (reescrito na Etapa 2, mas segue a estrutura do original)
 
 ### Fora do código-fonte

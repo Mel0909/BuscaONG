@@ -24,7 +24,7 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 | Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) e, nas páginas da ONG, `carregarPainel`/`carregarPasso` |
 | Telas de acesso | `/login` (ONG), `/login/recuperar` (esqueci a senha), `/admin` (equipe) |
 | Criação de admin | `web/prisma/criar-admin.mts` (`pnpm admin:criar`) |
-| Proteção de rotas da API | `exigirSessaoOng`, `exigirSessaoAdmin` e `blockForbiddenRequests` ([padroes-api.md §5](padroes-api.md)) |
+| Proteção de rotas da API | `exigirSessaoOng` e `exigirSessaoAdmin` ([padroes-api.md §5](padroes-api.md)) |
 | Tabelas | modelos `User`, `Session`, `Account`, `Verification` no `schema.prisma` |
 
 Configuração atual do `auth.ts`:
@@ -37,17 +37,17 @@ Configuração atual do `auth.ts`:
 - `emailOTP.disableSignUp: true`: códigos nunca criam usuários sem ONG.
 - Códigos limitados a três tentativas e dez minutos, com hash. O hook compartilha limites por e-mail entre as rotas próprias e os aliases do better-auth (3 envios ou 10 confirmações por minuto); APIs próprias também limitam IP/conta. São limites em memória, por instância, não um limite global distribuído.
 - Redefinir a senha revoga as sessões anteriores (`revokeSessionsOnPasswordReset`).
-- Exclusão e troca de e-mail habilitadas.
+- **Exclusão de conta e troca de e-mail desligadas** (`deleteUser.enabled` e `changeEmail.enabled` falsos). Nenhuma tela usa, e a troca de e-mail deixaria uma ONG logada mandar códigos para qualquer endereço, gastando o limite diário de e-mails do site.
 - O plugin `customSession` acrescenta o `role` do usuário à sessão.
 - O plugin `nextCookies` cuida dos cookies em Server Actions.
 
 ## 3. Regras
 
 1. **Operações de conta passam pelo better-auth**, nunca pelo Prisma direto: cadastro, login, logout, troca de senha, troca de e-mail, reset de senha. Ele cuida de hash, verificação de e-mail e invalidação de sessão.
-2. **Nunca alterar senha ou e-mail via `update` comum.** O schema de atualização de usuário (`patchSchema`) bloqueia esses campos de propósito; use as funções dedicadas (`auth.api.changePassword`, `auth.api.changeEmail`).
+2. **Nunca alterar senha ou e-mail via `update` comum do Prisma**; use as funções dedicadas do better-auth (`auth.api.changePassword`, `auth.api.changeEmail`). Hoje nenhuma tela troca senha logada ou e-mail.
 3. **Ninguém troca a senha ou o e-mail de outra pessoa**, nem admin. Se o admin precisar agir sobre contas (bloquear, remover), avaliar o [plugin admin do better-auth](https://www.better-auth.com/docs/plugins/admin) em vez de escrever no banco.
-4. **Exceção conhecida:** a exclusão de conta hoje apaga `User` (e, em cascata, sessões, contas, ONG e denúncias) direto via Prisma: no `DELETE /api/users/[id]` (`services/users`) e no "Excluir" da ficha da ONG (`services/admin/ongs.ts`, A1). Não pede senha nem sessão recente, e as imagens da ONG ficam no R2. Ao reescrever, preferir o fluxo do better-auth ou do plugin admin. A rota `/delete-user` do better-auth fica fechada (ver §5).
-5. **Funções de servidor precisam da sessão:** chamadas como `auth.api.getSession`, `changePassword` e `changeEmail` exigem `headers: await headers()`. Sem isso, falham (bug #6 em [erros-a-consertar.md](erros-a-consertar.md)).
+4. **Exceção conhecida:** a exclusão de conta hoje apaga `User` (e, em cascata, sessões, contas, ONG e denúncias) direto via Prisma, no "Excluir" da ficha da ONG (`services/admin/ongs.ts`, A1), que fica no registro de ações. A ONG não apaga a própria conta: não há rota para isso. Não pede senha nem sessão recente, e as imagens da ONG ficam no R2. Ao reescrever, preferir o fluxo do better-auth ou do plugin admin. A rota `/delete-user` do better-auth fica fechada (ver §5).
+5. **Funções de servidor precisam da sessão:** chamadas como `auth.api.getSession`, `changePassword` e `changeEmail` exigem `headers: await headers()`. Sem isso, falham (foi o bug #6 em [erros-a-consertar.md](erros-a-consertar.md)).
 6. **Não editar os modelos do better-auth no `schema.prisma`** sem conferir a documentação; campos novos de usuário entram como `additionalFields` na configuração.
 7. **Contas só nascem pelo `POST /api/ongs`.** Não reabra o cadastro direto do better-auth: uma conta de perfil ONG sem `Ong` ligada fica num estado inválido.
 8. **E-mail repetido não dá erro no `signUpEmail`:** com a verificação obrigatória, o better-auth devolve um usuário falso para não revelar quais e-mails existem. Quem cria conta precisa checar o e-mail antes, como `criarContaOng` faz.
