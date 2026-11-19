@@ -81,4 +81,17 @@ describe("POST /api/denuncias", () => {
     expect((await denunciar({ ongId: "6ae67eea8cf900bcea8cfe25", motivo: "FECHOU" })).status).toBe(201);
     expect((await denunciar({ ongId: ONG_ID, motivo: "FECHOU" }, "2.2.2.2")).status).toBe(201);
   });
+
+  it("400 no formato da API para JSON malformado", async () => {
+    const response = await POST(
+      new NextRequest("http://localhost:3000/api/denuncias", {
+        method: "POST",
+        body: "{ não é json",
+        headers: { "Content-Type": "application/json", "x-forwarded-for": "3.3.3.3" },
+      })
+    );
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: { message: "JSON malformado" } });
+    expect(db.denuncia.create).not.toHaveBeenCalled();
+  });
 });

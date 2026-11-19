@@ -195,7 +195,7 @@ src/
 │   ├── geocodificacao/           endereço → coordenadas pelo Nominatim (fila de 1/s e cache)
 │   └── utils.ts                  cn() para combinar classes Tailwind
 ├── utils/                        funções auxiliares do projeto
-│   ├── api/server/               helpers das rotas: exigirSessaoOng, exigirSessaoAdmin, validBody, respostas de erro, rateLimit
+│   ├── api/server/               helpers das rotas: exigirSessaoOng, exigirSessaoAdmin, lerJson, respostas de erro, rateLimit
 │   ├── formatters/               formatação para a tela (dados da Receita, chave normalizada, iniciais)
 │   └── validations/              senha e e-mail; CNPJ; contatos (WhatsApp, Instagram, site); CEP e UF
 ├── types/                        declarações de tipos de bibliotecas (GeoJSON)

@@ -112,7 +112,10 @@ describe("POST /api/ongs", () => {
       headers: { "Content-Type": "application/json" },
     });
 
-    expect((await POST(request)).status).toBe(400);
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: { message: "JSON malformado" } });
+    expect(signUpEmail).not.toHaveBeenCalled();
   });
 
   it("devolve 409 quando o CNPJ já tem conta, sem consultar a Receita", async () => {

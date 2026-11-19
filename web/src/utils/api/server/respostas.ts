@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+import { JsonInvalidoError } from "./lerJson";
+
 // Respostas de erro da API, no formato de docs/padroes-api.md §4:
 // { "error": { "message": "...", "details": ... } }, com "details" só quando houver.
 
@@ -23,10 +25,11 @@ export function erroDeValidacao(error: ZodError) {
 }
 
 /**
- * Para o `catch` das rotas, depois dos erros que a rota conhece: validação do Zod vira 400;
- * qualquer outro erro, 500 com mensagem genérica (o detalhe fica só no log do servidor).
+ * Para o `catch` das rotas, depois dos erros que a rota conhece: JSON malformado e validação do
+ * Zod viram 400; qualquer outro erro, 500 com mensagem genérica (o detalhe fica só no log do servidor).
  */
 export function erroNaRota(error: unknown) {
+  if (error instanceof JsonInvalidoError) return erroJson(400, error.message);
   if (error instanceof ZodError) return erroDeValidacao(error);
   console.error("Erro inesperado na API:", error instanceof Error ? `${error.name}: ${error.message}` : error);
   return erroJson(500, "Erro interno do servidor");

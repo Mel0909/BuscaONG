@@ -67,7 +67,7 @@ if (!resultado.success) {
 | 409 | conflito (ex.: CNPJ já cadastrado) |
 | 500 | erro inesperado |
 
-> ⚠️ **O código herdado não segue esse formato à risca.** O `validBody` responde `{ "error": "texto" }` para JSON malformado. Rotas novas seguem o formato acima; o código antigo será reescrito (ver [codigo-herdado.md](codigo-herdado.md)).
+JSON malformado no corpo também é 400, no mesmo formato: `{ "error": { "message": "JSON malformado" } }`.
 
 ## 5. Utilitários disponíveis
 
@@ -78,7 +78,7 @@ Em `web/src/utils/api/server/` (importar de `@/utils/api/server`):
 | `exigirSessaoOng(request)` | exige a sessão de uma conta `ONG` e devolve `{ userId, email }` (ou a resposta 401/403, no formato novo) |
 | `exigirSessaoAdmin(request)` | o mesmo para o perfil `ADMIN`; devolve `{ id, email }` |
 | `rateLimit(chave, { limit, windowMs })` + `tooManyRequests(s)` | limite simples em memória por chave (IP ou usuário) |
-| `validBody(request)` | lê o JSON do corpo ⚠️ ver bug #10 em [erros-a-consertar.md](erros-a-consertar.md) |
+| `lerJson(request, { vazio? })` | lê o JSON do corpo; malformado lança `JsonInvalidoError`, que o `erroNaRota` responde com 400. `vazio` diz quanto vale um corpo vazio (ex.: `{}`); sem ele, corpo vazio também é erro |
 | `erroJson(status, message, { details?, headers? })` | resposta de erro no formato da seção 4 |
 | `erroDeValidacao(zodError)` | resposta 400 a partir de um erro do Zod (a primeira mensagem e, em `details`, todas por campo) |
 | `erroNaRota(error)` | fim do `catch`: 400 se for Zod, 500 genérico caso contrário (com log) |

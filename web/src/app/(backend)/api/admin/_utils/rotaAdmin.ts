@@ -4,7 +4,7 @@ import type { ZodType } from "zod";
 import { objectIdSchema } from "@/backend/schemas";
 import { AcaoInvalidaError, NaoEncontradoError, OpcaoDuplicadaError, OpcaoEmUsoError } from "@/backend/services/admin";
 import { CnpjLookupUnavailableError, CnpjNotFoundError } from "@/lib/cnpj";
-import { erroDeValidacao, erroJson, erroNaRota, exigirSessaoAdmin, type SessaoAdmin } from "@/utils/api/server";
+import { erroDeValidacao, erroJson, erroNaRota, exigirSessaoAdmin, lerJson, type SessaoAdmin } from "@/utils/api/server";
 
 const erro = (message: string, status: number) => erroJson(status, message);
 
@@ -41,15 +41,7 @@ export function rotaAdmin<T>(
         if (!id.success) return erroDeValidacao(id.error);
       }
 
-      const texto = await request.text();
-      let body: unknown = {};
-      try {
-        if (texto) body = JSON.parse(texto);
-      } catch {
-        return erro("Formato de dados inválido - JSON malformado", 400);
-      }
-
-      const resultado = schema.safeParse(body);
+      const resultado = schema.safeParse(await lerJson(request, { vazio: {} }));
       if (!resultado.success) return erroDeValidacao(resultado.error);
 
       return NextResponse.json(await acao(admin, resultado.data, segmentos), { status });

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAPIError } from "better-auth/api";
 import type { ZodType } from "zod";
 import { CadastroAlteradoError } from "@/backend/services/ongs/erros";
-import { exigirSessaoOng, rateLimit, erroDeValidacao, tooManyRequests, erroJson } from "@/utils/api/server";
+import { exigirSessaoOng, rateLimit, erroDeValidacao, tooManyRequests, erroJson, lerJson } from "@/utils/api/server";
 import { respostaDeErro } from "../../_utils/rotaDoCadastro";
 
 export function rotaReinicio<T>(schema: ZodType<T>, acao: (userId: string, email: string, dados: T, headers: Headers) => Promise<Headers | void>, envio = false) {
@@ -16,11 +16,7 @@ export function rotaReinicio<T>(schema: ZodType<T>, acao: (userId: string, email
       }
       const limite = rateLimit(`reinicio:${envio ? "envio" : "confirmacao"}:${sessao.userId}`, { limit: envio ? 3 : 5, windowMs: 60_000 });
       if (!limite.ok) return tooManyRequests(limite.retryAfterSeconds);
-      let corpo: unknown;
-      try { corpo = await request.json(); } catch {
-        return erroJson(400, "JSON malformado");
-      }
-      const resultado = schema.safeParse(corpo);
+      const resultado = schema.safeParse(await lerJson(request));
       if (!resultado.success) return erroDeValidacao(resultado.error);
       const headers = await acao(sessao.userId, sessao.email, resultado.data, request.headers);
       const response = NextResponse.json({ ok: true, passoAtual: envio ? undefined : 3 });

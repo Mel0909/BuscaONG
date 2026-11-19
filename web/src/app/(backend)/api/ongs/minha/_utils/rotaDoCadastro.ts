@@ -17,9 +17,9 @@ import {
   rateLimit,
   erroDeValidacao,
   tooManyRequests,
-  validBody,
   erroJson,
   erroNaRota,
+  lerJson,
 } from "@/utils/api/server";
 
 const erro = (message: string, status: number, details?: unknown) => erroJson(status, message, { details });
@@ -61,8 +61,7 @@ export function rotaDoCadastro<T>(
         if (!resultado.ok) return tooManyRequests(resultado.retryAfterSeconds);
       }
 
-      const body = await validBody(request);
-      if (body instanceof NextResponse) return body;
+      const body = await lerJson(request);
 
       const resultado = schema.safeParse(body);
       if (!resultado.success) return erroDeValidacao(resultado.error);

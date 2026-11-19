@@ -109,6 +109,19 @@ describe("rotas /api/ongs/minha/*", () => {
       await putLocalizacao(requisicao("PUT", "localizacao", corpo));
       expect(db.ong.findUnique).toHaveBeenCalledWith({ where: { userId: "test-user-id" } });
     });
+
+    it("400 no formato da API para JSON malformado, sem gravar", async () => {
+      const response = await putLocalizacao(
+        new NextRequest("http://localhost:3000/api/x", {
+        method: "PUT",
+        body: "{ não é json",
+        headers: { "Content-Type": "application/json" },
+      })
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: { message: "JSON malformado" } });
+      expect(db.ong.update).not.toHaveBeenCalled();
+    });
   });
 
   it("passo 3 grava o ponto GeoJSON [lng, lat] e libera o passo 4", async () => {

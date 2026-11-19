@@ -43,7 +43,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Utilitários e núcleo (~315 linhas)
 
-- [ ] `utils/api/server/validBody.ts` (`errorHandlers` e `toErrorMessage` foram reescritos em `respostas.ts`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos)
+- [x] `utils/api/server/*`: `validBody`, `errorHandlers` e `toErrorMessage` foram reescritos em `lerJson.ts` e `respostas.ts`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos
 - [ ] `utils/validations/index.ts` (`hasUppercase` e afins; `zod.ts` e `isSafeRedirect` foram removidos)
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
 - [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.

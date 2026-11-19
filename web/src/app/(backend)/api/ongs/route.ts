@@ -17,9 +17,9 @@ import {
   rateLimit,
   erroDeValidacao,
   tooManyRequests,
-  validBody,
   erroJson,
   erroNaRota,
+  lerJson,
 } from "@/utils/api/server";
 
 // pública: cria a conta, consulta a Receita e envia e-mail, então o limite é mais baixo
@@ -56,10 +56,7 @@ export async function POST(request: NextRequest) {
       return tooManyRequests(limite.retryAfterSeconds);
     }
 
-    const body = await validBody(request);
-    if (body instanceof NextResponse) {
-      return body;
-    }
+    const body = await lerJson(request);
 
     const validationResult = novaContaOngSchema.safeParse(body);
     if (!validationResult.success) {

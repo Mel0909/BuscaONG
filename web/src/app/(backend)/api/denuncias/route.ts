@@ -8,9 +8,9 @@ import {
   rateLimit,
   erroDeValidacao,
   tooManyRequests,
-  validBody,
   erroJson,
   erroNaRota,
+  lerJson,
 } from "@/utils/api/server";
 
 // pública: além do limite geral, uma denúncia por perfil a cada 24 h por IP
@@ -25,8 +25,7 @@ export async function POST(request: NextRequest) {
     const geral = rateLimit(`denuncias:${ip}`, LIMITE);
     if (!geral.ok) return tooManyRequests(geral.retryAfterSeconds);
 
-    const body = await validBody(request);
-    if (body instanceof NextResponse) return body;
+    const body = await lerJson(request);
 
     const resultado = novaDenunciaSchema.safeParse(body);
     if (!resultado.success) return erroDeValidacao(resultado.error);
