@@ -71,7 +71,7 @@ describe("GET /api/itens-livres", () => {
     expect(await response.json()).toEqual([{ nome: "Ventilador", chave: "ventilador", ongs: 4 }]);
     const { pipeline } = db.ong.aggregateRaw.mock.calls[0][0] as { pipeline: Record<string, unknown>[] };
     expect(pipeline[0]).toEqual({
-      $match: { userId: { $ne: "test-user-id" }, "itensLivres.chave": { $regex: "^ventil" } },
+      $match: { userId: { $ne: "test-user-id" }, status: "PUBLICADA", "itensLivres.chave": { $regex: "^ventil" } },
     });
   });
 
@@ -80,6 +80,13 @@ describe("GET /api/itens-livres", () => {
     await getItensLivres(get("itens-livres?q=a.b*"));
     const { pipeline } = db.ong.aggregateRaw.mock.calls[0][0] as { pipeline: { $match: Record<string, unknown> }[] };
     expect(pipeline[0].$match["itensLivres.chave"]).toEqual({ $regex: "^a\\.b\\*" });
+  });
+
+  it("não sugere texto de rascunhos nem de ONGs suspensas (só de perfis publicados)", async () => {
+    db.ong.aggregateRaw.mockResolvedValue([] as never);
+    await getItensLivres(get("itens-livres?q=ventil"));
+    const { pipeline } = db.ong.aggregateRaw.mock.calls[0][0] as { pipeline: { $match: Record<string, unknown> }[] };
+    expect(pipeline[0].$match.status).toBe("PUBLICADA");
   });
 
   it("400 com menos de 3 letras", async () => {
