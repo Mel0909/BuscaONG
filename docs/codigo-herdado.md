@@ -46,7 +46,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 - [x] `utils/api/server/*`: `validBody`, `errorHandlers` e `toErrorMessage` foram reescritos em `lerJson.ts` e `respostas.ts`; `blockForbiddenRequests` e `getUserFromRequest` foram removidos
 - [ ] `utils/validations/index.ts` (`hasUppercase` e afins; `zod.ts` e `isSafeRedirect` foram removidos)
 - [x] `types/index.ts` (`AllowedRoutes`): removido, sem uso
-- [ ] `proxy.ts`: a lógica de `ROUTE_CONFIG` e `matchesAnyPattern` é do template. O nome e a função do arquivo são convenção do Next.
+- [x] `proxy.ts`: reescrito com a checagem otimista do cookie (`getSessionCookie`), sem `ROUTE_CONFIG` nem `matchesAnyPattern`; o redirecionamento de quem já está logado foi para as páginas `/login` e `/admin`
 - [x] `auth.ts`: a configuração segue a documentação do better-auth. O plugin `customSession` do template deu lugar ao `user.additionalFields.role`, e o bloco comentado do Google saiu (o Google para ONGs será feito do zero)
 - [ ] `lib/email/*`: o template `ResetPasswordEmail` foi removido; falta revisar o wrapper do Resend
 

@@ -201,17 +201,15 @@ src/
 ├── types/                        declarações de tipos de bibliotecas (GeoJSON)
 ├── generated/                    cliente Prisma gerado (não editar, não versionado)
 ├── auth.ts                       configuração central do better-auth
-└── proxy.ts                      "porteiro": roda antes de cada página e protege rotas
+└── proxy.ts                      "porteiro": sem cookie de sessão, manda da área do admin e do painel para o login
 ```
 
 ### 4.3 Arquivos centrais
 
-- **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha e o perfil (`role`) como campo extra do usuário, que chega com a sessão em `session.user.role`. É importado por páginas, rotas da API e pelo proxy.
-- **`proxy.ts`:** executa antes de cada página (exceto `/api` e arquivos estáticos) e redireciona conforme a sessão:
-  - **Precisa de login:** `/dashboard`, `/perfil`, `/settings`.
-  - **Precisa de `ADMIN`:** `/admin/**` (sem login, vai para `/admin`; admin logado em `/admin` vai para `/admin/ongs`).
-  - **Quem já está logado sai do `/login`:** admin para `/admin/ongs`, ONG para `/ong/painel` (que leva o cadastro não terminado ao passo em que parou).
-  - O painel da ONG (`/ong/painel`) e os passos do cadastro conferem a sessão na própria página (`carregarPainel`, `carregarPasso`).
+- **`auth.ts`:** configuração do better-auth. Adapter Prisma/MongoDB, login por e-mail e senha e o perfil (`role`) como campo extra do usuário, que chega com a sessão em `session.user.role`. É importado por páginas e rotas da API (o proxy não o importa).
+- **`proxy.ts`:** roda antes das páginas de `/admin/*` (não do login `/admin`) e de `/ong/painel/*`. Faz só a checagem otimista que as documentações do Next e do better-auth recomendam: sem o cookie de sessão (`getSessionCookie`), manda para `/admin` ou `/login` antes de renderizar. Não consulta o banco nem importa o `auth.ts`.
+  - **A checagem de verdade fica nas páginas**, porque um cookie presente pode estar vencido ou ser de outro perfil: `carregarAdmin` (área do admin), `carregarPainel` (painel), `carregarPasso` (passos do cadastro). Nas rotas da API, `exigirSessaoAdmin` e `exigirSessaoOng`.
+  - **Quem já está logado sai das telas de login** pela própria página: em `/login`, o admin vai para `/admin/ongs` e a ONG para `/ong/painel` (que leva o cadastro não terminado ao passo em que parou); em `/admin`, o admin vai para `/admin/ongs` e outra conta para `/`.
   - O Next exige esse nome e esse local (no Next 16, `proxy.ts` substituiu o `middleware.ts`).
 
 ### 4.4 Aliases de import (`tsconfig.json`)
@@ -229,8 +227,8 @@ O `vitest.config.mts` repete esses aliases para os testes.
 ### 5.1 Requisição de página
 
 ```
-navegador → proxy.ts (sessão? perfil?) → app/(frontend)/.../page.tsx → componentes de components/
-                 └─ redireciona se não puder acessar
+navegador → proxy.ts (tem cookie de sessão?) → app/(frontend)/.../page.tsx (sessão válida? perfil?) → componentes
+                 └─ sem cookie, vai ao login              └─ carregarAdmin / carregarPainel redirecionam
 ```
 
 ### 5.2 Requisição à API
@@ -273,7 +271,7 @@ Regras (detalhes em [padroes-api.md](padroes-api.md)):
 | Integração com serviço externo (Mapbox, R2, BrasilAPI...) | `lib/<servico>/` |
 | Função auxiliar genérica | `utils/` |
 | Tipo compartilhado | `types/` |
-| Rota que exige login ou perfil | adicionar em `ROUTE_CONFIG` no `proxy.ts` |
+| Página que exige login ou perfil | chamar `carregarAdmin`/`carregarPainel` (ou conferir a sessão) na página; se ficar fora de `/admin/*` e `/ong/painel/*`, incluir no `matcher` do `proxy.ts` para o redirecionamento rápido |
 | Teste de função isolada (validação, formatação, regra) | `tests/unit/` |
 | Teste de API | `tests/integration/api/<recurso>/` |
 | Teste no navegador | `tests/e2e/` |
