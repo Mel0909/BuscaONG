@@ -17,7 +17,7 @@ import {
   normalizarWhatsapp,
   UFS,
 } from "@/utils/validations";
-import type { DiaVoluntariado } from "@/generated/prisma";
+import type { DiaVoluntariado } from "@prisma/client";
 import { emailSchema, slugSchema } from "./base.schema";
 
 // Passos 3 a 8 do cadastro da ONG: corpo de PUT /api/ongs/minha/<seção> e afins.

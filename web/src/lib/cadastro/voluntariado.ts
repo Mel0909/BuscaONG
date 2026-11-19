@@ -1,4 +1,4 @@
-import type { DiaVoluntariado, Turno } from "@/generated/prisma";
+import type { DiaVoluntariado, Turno } from "@prisma/client";
 
 // opções do passo 6; os valores são os do enum DiaVoluntariado do Prisma
 export const DIAS_VOLUNTARIADO: { valor: DiaVoluntariado; nome: string }[] = [

@@ -1,106 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "./auth";
-import type { Role } from "./generated/prisma";
+import { getSessionCookie } from "better-auth/cookies";
 
-// Configuration for different page types
-const ROUTE_CONFIG = {
-  authRequired: [
-    "/dashboard",
-    "/perfil",
-    "/settings",
-  ],
-  
-  // Pages that require the ADMIN role
-  adminRequired: [
-    "/admin/**",
-  ],
-  
-  redirectIfAuth: [
-    "/login",
-  ],
-  
-  // Special routes with custom logic
-  specialRoutes: [
-    "/admin", // Special handling for /admin route
-  ]
-};
+// Proxy do Next: roda antes das páginas da área do admin e do painel da ONG.
+// Só faz a checagem otimista, como recomendam as documentações do Next e do better-auth: sem o
+// cookie de sessão, manda para o login certo antes de renderizar. Não consulta o banco nem
+// importa o better-auth inteiro. A checagem de verdade (sessão válida e perfil) fica nas páginas
+// (carregarAdmin, carregarPainel) e nas rotas da API (exigirSessaoAdmin, exigirSessaoOng), porque
+// um cookie presente pode estar vencido ou ser de outro perfil.
 
-// Helper function to check if path matches any pattern
-function matchesAnyPattern(pathname: string, patterns: string[]): boolean {
-  return patterns.some(pattern => {
-    if (pattern.endsWith('**')) {
-      const basePattern = pattern.slice(0, -2);
-      return pathname.startsWith(basePattern);
-    }
-    return pathname === pattern || pathname.startsWith(pattern + '/');
-  });
-}
+export function proxy(request: NextRequest) {
+  if (getSessionCookie(request)) return NextResponse.next();
 
-function hasRequiredRole(userRole: Role | undefined, requiredRoles: Role[]): boolean {
-  if (!userRole) return false;
-  return requiredRoles.includes(userRole);
-}
-
-export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
-  
-  const userRole = session?.user.role as Role | undefined;
-  const isAuthenticated = !!session?.user;
-
-  // Handle /admin special route
-  if (pathname === "/admin") {
-    if (!isAuthenticated) {
-      return NextResponse.next();
-    }
-    
-    if (hasRequiredRole(userRole, ["ADMIN"])) {
-      // admin logado vai direto para a gestão de ONGs (A1)
-      return NextResponse.redirect(new URL("/admin/ongs", request.url));
-    } else {
-      // Redirect non-admin authenticated users to home
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
-  
-  if (matchesAnyPattern(pathname, ROUTE_CONFIG.redirectIfAuth)) {
-    if (isAuthenticated) {
-      // quem já entrou vai para a própria área (o painel leva o cadastro não terminado ao passo em que parou)
-      const destino = hasRequiredRole(userRole, ["ADMIN"]) ? "/admin/ongs" : "/ong/painel";
-      return NextResponse.redirect(new URL(destino, request.url));
-    }
-    return NextResponse.next();
-  }
-
-  if (matchesAnyPattern(pathname, ROUTE_CONFIG.adminRequired)) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-    
-    if (!hasRequiredRole(userRole, ["ADMIN"])) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    
-    return NextResponse.next();
-  }
-
-  if (matchesAnyPattern(pathname, ROUTE_CONFIG.authRequired)) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
+  const login = pathname.startsWith("/admin/") ? "/admin" : "/login";
+  return NextResponse.redirect(new URL(login, request.url));
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-  ]
+  matcher: ["/admin/:path+", "/ong/painel/:path*"],
 };

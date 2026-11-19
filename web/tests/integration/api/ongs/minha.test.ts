@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { distanciaKm } from "@/lib/mapa/geo";
 import { entrarComo } from "../../mocks/auth";
 import { resetRateLimit } from "@/utils/api/server/rateLimit";

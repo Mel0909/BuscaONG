@@ -1,5 +1,5 @@
 import prisma from "@/backend/services/db";
-import type { TipoLista } from "@/generated/prisma";
+import type { TipoLista } from "@prisma/client";
 
 export type Opcao = { slug: string; nome: string };
 

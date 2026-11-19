@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import prisma from "@/backend/services/db";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { limparCacheNomes } from "@/backend/services/ongs";
 import { entrarComo } from "../../mocks/auth";
 

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { Role } from "@/generated/prisma";
+import type { Role } from "@prisma/client";
 
 // Sessão falsa para os testes de rota (o setup.ts troca o @/auth por este mock).
 // entrarComo("ONG" | "ADMIN") simula uma conta logada com esse perfil; entrarComo(null), ninguém.

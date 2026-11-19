@@ -1,6 +1,6 @@
 import prisma from "@/backend/services/db";
 import type { RevisaoImagemData } from "@/backend/schemas";
-import type { Prisma } from "@/generated/prisma";
+import type { Prisma } from "@prisma/client";
 import { apagarArquivo, urlPublica } from "@/lib/armazenamento";
 import { sendEmail } from "@/lib/email";
 import { imagemRemovidaEmail } from "@/lib/email/templates/admin";

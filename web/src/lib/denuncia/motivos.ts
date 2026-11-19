@@ -1,4 +1,4 @@
-import type { MotivoDenuncia } from "@/generated/prisma";
+import type { MotivoDenuncia } from "@prisma/client";
 
 // Denúncia de perfil (P5.1) e fila do admin (A2). Os valores são os do enum MotivoDenuncia.
 

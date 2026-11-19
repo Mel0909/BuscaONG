@@ -21,7 +21,7 @@ Só **ONG** (`/ong`) e **Admin** (`/admin`). Visitantes e doadores usam o site s
 | Criação de conta (ONG) | `POST /api/ongs` → `services/ongs` (`criarContaOng`) |
 | Endpoints do better-auth (`/api/auth/*`) | `web/src/app/(backend)/api/auth/[...all]/route.ts` |
 | Cliente para o navegador | `web/src/lib/auth-client.ts` |
-| Proteção de páginas | `web/src/proxy.ts` (`ROUTE_CONFIG`) e, nas páginas da ONG, `carregarPainel`/`carregarPasso` |
+| Proteção de páginas | nas páginas: `carregarAdmin`, `carregarPainel`, `carregarPasso`; o `web/src/proxy.ts` só manda para o login quem não tem cookie de sessão |
 | Telas de acesso | `/login` (ONG), `/login/recuperar` (esqueci a senha), `/admin` (equipe) |
 | Criação de admin | `web/prisma/criar-admin.mts` (`pnpm admin:criar`) |
 | Proteção de rotas da API | `exigirSessaoOng` e `exigirSessaoAdmin` ([padroes-api.md §5](padroes-api.md)) |
@@ -54,7 +54,7 @@ Configuração atual do `auth.ts`:
 
 ## 4. Como usar
 
-**No servidor** (Server Component, rota, proxy):
+**No servidor** (Server Component, rota da API):
 
 ```ts
 import { auth } from "@/auth";

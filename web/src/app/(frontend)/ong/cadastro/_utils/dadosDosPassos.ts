@@ -1,4 +1,4 @@
-import type { Ong } from "@/generated/prisma";
+import type { Ong } from "@prisma/client";
 import { urlPublica } from "@/lib/armazenamento";
 import { capitalizarNome } from "@/utils/formatters/receita";
 import { formatarWhatsapp } from "@/utils/validations/contatos";

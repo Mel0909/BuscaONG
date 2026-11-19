@@ -1,7 +1,7 @@
 // Prepara o banco: preenche as listas fixas e cria o índice geográfico das ONGs.
 // Rodar depois do `prisma db push`, pela raiz: pnpm db:seed
 // Pode rodar de novo sem duplicar nada (upsert pelo slug).
-import { PrismaClient, TipoLista } from "../src/generated/prisma/index.js";
+import { PrismaClient, TipoLista } from "@prisma/client";
 
 type Opcao = { slug: string; nome: string };
 

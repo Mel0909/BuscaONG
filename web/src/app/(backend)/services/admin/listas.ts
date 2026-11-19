@@ -1,7 +1,7 @@
 import prisma from "@/backend/services/db";
 import { limparCacheNomes } from "@/backend/services/ongs";
 import type { DecisaoItemLivreData, EdicaoOpcaoData, NovaOpcaoData } from "@/backend/schemas";
-import type { Ong, Prisma, TipoLista } from "@/generated/prisma";
+import type { Ong, Prisma, TipoLista } from "@prisma/client";
 import { slugDoNome } from "@/lib/ong/slug";
 import { itemLivre } from "@/lib/ong/urgencia";
 import { normalizarChave } from "@/utils/formatters/texto";

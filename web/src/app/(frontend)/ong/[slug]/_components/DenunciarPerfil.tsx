@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { INTERVALO_DENUNCIA_MS, MAX_RELATO, MOTIVOS_DENUNCIA } from "@/lib/denuncia/motivos";
-import type { MotivoDenuncia } from "@/generated/prisma";
+import type { MotivoDenuncia } from "@prisma/client";
 import { Flag } from "lucide-react";
 import { Dialogo } from "@/components/base/Dialogo";
 

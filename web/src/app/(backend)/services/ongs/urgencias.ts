@@ -1,5 +1,5 @@
 import prisma from "@/backend/services/db";
-import { Prisma, type Ong, type Urgencia } from "@/generated/prisma";
+import { Prisma, type Ong, type Urgencia } from "@prisma/client";
 import type { UrgenciaData } from "@/backend/schemas";
 import { MAX_URGENCIAS, urgenciaAtiva } from "@/lib/ong/urgencia";
 import {

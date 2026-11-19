@@ -1,5 +1,5 @@
 import prisma from "@/backend/services/db";
-import type { Ong } from "@/generated/prisma";
+import type { Ong } from "@prisma/client";
 import { urlPublica } from "@/lib/armazenamento";
 import { ATIVIDADE_OUTRA, DIAS_VOLUNTARIADO, formatarHorario } from "@/lib/cadastro/voluntariado";
 import type { ContatosVisiveis } from "@/lib/ong/contatos";
