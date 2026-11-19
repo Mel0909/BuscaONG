@@ -153,7 +153,7 @@ export async function salvarCausasItens(userId: string, dados: CausasItensData) 
 export type SugestaoItem = { nome: string; chave: string; ongs: number };
 
 /**
- * Itens livres já usados por outras ONGs que começam com o texto digitado
+ * Itens livres já usados por outras ONGs publicadas que começam com o texto digitado
  * ("Ventil" → "Ventilador", usado por 4 ONGs). Usar o mesmo nome ajuda quem filtra.
  */
 export async function sugerirItensLivres(userId: string, texto: string): Promise<SugestaoItem[]> {
@@ -162,7 +162,8 @@ export async function sugerirItensLivres(userId: string, texto: string): Promise
 
   const resultado = await prisma.ong.aggregateRaw({
     pipeline: [
-      { $match: { userId: { $ne: userId }, "itensLivres.chave": { $regex: `^${prefixo}` } } },
+      // só perfis publicados: texto de rascunho ou de ONG suspensa não aparece para as outras ONGs
+      { $match: { userId: { $ne: userId }, status: "PUBLICADA", "itensLivres.chave": { $regex: `^${prefixo}` } } },
       { $unwind: "$itensLivres" },
       { $match: { "itensLivres.chave": { $regex: `^${prefixo}` } } },
       { $group: { _id: "$itensLivres.chave", nome: { $first: "$itensLivres.nome" }, ongs: { $sum: 1 } } },
