@@ -2,7 +2,9 @@
 
 Inventário do que ainda veio do template "monorepo base" (de onde saiu o projeto noctiluz), levantado em 2026-10-02.
 
-**Decisão:** o código abaixo é **mantido por enquanto e reescrito aos poucos**, conforme as features de ONG e Admin forem implementadas. A meta é não sobrar nada da seção 2 até o lançamento do BuscaONG.
+**Decisão:** o código abaixo foi mantido no começo e reescrito aos poucos, com a meta de não sobrar nada da seção 2 até o lançamento do BuscaONG.
+
+**Situação em 2026-11-19:** todos os itens da seção 2 foram reescritos ou removidos (PRs #19 a #28). O arquivo fica como registro do que veio do template e do que entrou no lugar.
 
 > Isto é um inventário técnico, não um parecer jurídico. O template não tinha arquivo LICENSE, o que por padrão significa "todos os direitos reservados" aos autores. A propriedade de software feito por membros de empresa júnior depende do estatuto e dos termos de voluntariado da organização.
 
@@ -63,7 +65,7 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 - [x] `web/docs/API.md`, `FRONTEND.md`, `BETTER-AUTH.md`: removidos e reescritos como [padroes-api.md](padroes-api.md), [padroes-frontend.md](padroes-frontend.md) e [autenticacao.md](autenticacao.md)
 - [x] `.husky/pre-commit`, `.husky/pre-push`: reescritos. O pre-push agora compara com a `main` (antes comparava com a própria branch remota, ou só o que não estava no stage) e roda `lint:check` em vez do `lint` com `--fix`; saiu o trecho de e2e e build na `main`, que não era alcançável
-- [ ] `bruno/**` (requisições de auth e session, `collection.bru`; as de users foram removidas)
+- [x] `bruno/**`: `collection.bru`, ambientes e `auth/` reescritos. O login usa o e-mail e a senha do ambiente (antes tinha um e-mail fixo) e guarda o cookie assinado (o token cru não abria sessão). `session/` virou `auth/sessao.bru` (a rota antiga não existia), e há `auth/sair.bru`. As requisições de users foram removidas
 - [x] `README.md`: a seção "Padrões de projeto", adaptada do template, foi trocada por um índice da documentação
 - [x] Modificação no `components/ui/sidebar.tsx` (prop `iconClassName`): o arquivo foi removido junto com o dashboard
 

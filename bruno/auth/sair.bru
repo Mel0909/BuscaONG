@@ -1,0 +1,23 @@
+meta {
+  name: sair
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/sign-out
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {}
+}
+
+script:post-response {
+  bru.setVar("cookieSessao", "");
+}
+
+docs {
+  Encerra a sessão no servidor e esquece o cookie guardado pelo login.
+}
