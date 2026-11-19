@@ -12,7 +12,14 @@ import {
   OpcaoInvalidaError,
 } from "@/backend/services/ongs";
 import { ArmazenamentoIndisponivelError } from "@/lib/armazenamento";
-import { exigirSessaoOng, returnInvalidDataErrors, validBody, zodErrorHandler } from "@/utils/api/server";
+import {
+  exigirSessaoOng,
+  rateLimit,
+  returnInvalidDataErrors,
+  tooManyRequests,
+  validBody,
+  zodErrorHandler,
+} from "@/utils/api/server";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
 
 const erro = (message: string, status: number, details?: unknown) =>
@@ -32,19 +39,28 @@ export function respostaDeErro(error: unknown) {
   return zodErrorHandler(error);
 }
 
+/** Limite por conta: `nome` separa a contagem de cada rota. */
+type LimitePorConta = { nome: string; limit: number; windowMs: number };
+
 /**
  * Rota de um passo do cadastro sobre a ONG do usuário logado:
- * sessão de ONG → corpo validado pelo schema → service.
+ * sessão de ONG → limite por conta (se houver) → corpo validado pelo schema → service.
  */
 export function rotaDoCadastro<T>(
   schema: ZodType<T>,
   service: (userId: string, dados: T) => Promise<unknown>,
-  status = 200
+  status = 200,
+  limite?: LimitePorConta
 ) {
   return async function (request: NextRequest) {
     try {
       const sessao = await exigirSessaoOng(request);
       if (sessao instanceof NextResponse) return sessao;
+
+      if (limite) {
+        const resultado = rateLimit(`${limite.nome}:${sessao.userId}`, limite);
+        if (!resultado.ok) return tooManyRequests(resultado.retryAfterSeconds);
+      }
 
       const body = await validBody(request);
       if (body instanceof NextResponse) return body;

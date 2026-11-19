@@ -4,6 +4,7 @@ import prisma from "@/backend/services/db";
 import { Prisma } from "@/generated/prisma";
 import { distanciaKm } from "@/lib/mapa/geo";
 import { setCurrentRole } from "../../mocks/auth";
+import { resetRateLimit } from "@/utils/api/server/rateLimit";
 
 vi.mock("@/backend/services/db", () => ({
   default: {
@@ -68,6 +69,7 @@ const opcoes = (...slugs: string[]) => slugs.map((slug) => ({ slug, nome: slug }
 describe("rotas /api/ongs/minha/*", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetRateLimit();
     setCurrentRole("ONG");
     db.ong.findUnique.mockResolvedValue(ongRascunho() as never);
     db.ong.update.mockImplementation((async (args: { data: Record<string, unknown> }) => ({
@@ -330,6 +332,21 @@ describe("rotas /api/ongs/minha/*", () => {
       db.ong.findUnique.mockResolvedValue(ongRascunho({ capa: "ongs/antiga/capa.png" }) as never);
       const response = await putApresentacao(requisicao("PUT", "apresentacao", { ...corpo, capa: "ongs/antiga/capa.png" }));
       expect(response.status).toBe(200);
+    });
+
+    it("limita os pedidos de URL de envio por conta (20 por hora)", async () => {
+      for (const nome of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"]) {
+        vi.stubEnv(nome, "");
+      }
+      try {
+        const pedir = () => postImagens(requisicao("POST", "imagens", { tipo: "capa", contentType: "image/png", tamanho: 1000 }));
+        for (let i = 0; i < 20; i++) expect((await pedir()).status).toBe(503);
+        const bloqueado = await pedir();
+        expect(bloqueado.status).toBe(429);
+        expect(Number(bloqueado.headers.get("Retry-After"))).toBeGreaterThan(0);
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
 
     it("pedir URL de envio sem o R2 configurado responde 503", async () => {
