@@ -5,7 +5,6 @@ import prisma from "@/backend/services/db";
 import { Prisma } from "@prisma/client";
 import { CnpjLookupUnavailableError, CnpjNotFoundError, lookupCnpj } from "@/lib/cnpj";
 import { resetRateLimit } from "@/utils/api/server";
-import { createRequest } from "../../mocks/requests";
 import { cnpjDataMock } from "../../mocks/cnpj";
 
 vi.mock("@/lib/cnpj", async (importOriginal) => ({
@@ -36,7 +35,14 @@ const corpo = {
   usarEnderecoReceita: true,
 };
 
-const post = (body: unknown = corpo) => POST(createRequest(body, "ongs"));
+const post = (body: unknown = corpo) =>
+  POST(
+    new NextRequest("http://localhost:3000/api/ongs", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    })
+  );
 
 describe("POST /api/ongs", () => {
   beforeEach(() => {

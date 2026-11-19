@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 import { CnpjLookupUnavailableError, CnpjNotFoundError, lookupCnpj } from "@/lib/cnpj";
 import prisma from "@/backend/services/db";
 import { resetRateLimit } from "@/utils/api/server";
-import { returnParams } from "../../mocks/requests";
 import { cnpjDataMock } from "../../mocks/cnpj";
 
 vi.mock("@/lib/cnpj", async (importOriginal) => ({
@@ -26,7 +25,7 @@ function get(cnpj: string, ip = "1.1.1.1") {
   const request = new NextRequest(`http://localhost:3000/api/cnpj/${encodeURIComponent(cnpj)}`, {
     headers: { "x-forwarded-for": ip },
   });
-  return GET(request, returnParams({ cnpj }) as { params: Promise<{ cnpj: string }> });
+  return GET(request, { params: Promise.resolve({ cnpj }) });
 }
 
 describe("GET /api/cnpj/[cnpj]", () => {

@@ -56,8 +56,8 @@ Vários desses têm bugs conhecidos; ver [erros-a-consertar.md](erros-a-conserta
 
 ### Testes (~135 linhas)
 
-- [ ] `web/tests/integration/**` (mocks de auth e request; os testes de `/api/users` saíram com as rotas)
-- [ ] `web/tests/e2e/example.spec.ts` (reescrito na Etapa 2, mas segue a estrutura do original)
+- [x] `web/tests/integration/**`: o mock de sessão (`mocks/auth.ts`) e o `setup.ts` foram reescritos; o `mocks/requests.ts` saiu (cada teste monta a própria requisição); os testes de `/api/users` saíram com as rotas
+- [x] `web/tests/e2e/example.spec.ts`: removido; o caso dele (a engrenagem leva ao passo 1 do cadastro) entrou no teste da engrenagem em `mapa.spec.ts`
 
 ### Fora do código-fonte
 

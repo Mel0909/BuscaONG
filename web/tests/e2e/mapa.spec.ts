@@ -114,5 +114,9 @@ test.describe('tela principal', () => {
     await page.getByRole('button', { name: 'Para ONGs' }).first().click()
     await expect(page.getByRole('dialog', { name: 'Para ONGs' }).getByRole('link', { name: /Entrar no painel/ })).toHaveAttribute('href', '/login')
     await expect(page.getByRole('dialog', { name: 'Para ONGs' }).getByRole('link', { name: /Cadastrar minha ONG/ })).toHaveAttribute('href', '/ong/cadastro')
+
+    await page.getByRole('dialog', { name: 'Para ONGs' }).getByRole('link', { name: /Cadastrar minha ONG/ }).click()
+    await expect(page).toHaveURL(`${BASE}/ong/cadastro`)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Comece pelo CNPJ da sua ONG')
   })
 })
