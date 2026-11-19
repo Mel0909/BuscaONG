@@ -15,25 +15,6 @@ export const emailSchema = z
     .email("Email inválido")
     .transform(str => str.toLowerCase().trim());
 
-export const nameSchema = z
-    .string({
-      error: (issue) => issue.input === undefined 
-    ? "Nome é obrigatório" 
-    : "Nome deve ser um texto" 
-    })
-    .min(1, "Nome não pode estar vazio")
-    .max(100, "Nome não pode ter mais de 100 caracteres")
-    .trim()
-    
-export const corSchema = z
-    .string({
-      error: (issue) => issue.input === undefined 
-      ? "Cor é obrigatória" 
-      : "Cor deve ser um texto" 
-    })
-    .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Cor deve estar no formato hexadecimal válido (ex: #FF0000)")
-    .trim()
-
 export const slugSchema = z
     .string({
       error: (issue) => issue.input === undefined 
